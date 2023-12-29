@@ -1,5 +1,9 @@
 ﻿Public Structure Vi2d
 
+  ' See comments below re: Option Strict; probably fine, but wanted to note that
+  ' before doing so code was "working" due to automatic type conversion; but now
+  ' it is strict... so there could be differences?
+
   Public x As Integer
   Public y As Integer
 
@@ -30,27 +34,27 @@
     Return New Vi2d(-y, x)
   End Function
 
-  Public Function Floor() As Vi2d
+  Public Function Floor() As Vi2d ' Turned on project-wide Option Strict; had to add CInt()?
     Return New Vi2d(CInt(MathF.Floor(x)), CInt(MathF.Floor(y)))
   End Function
 
-  Public Function Ceil() As Vi2d
+  Public Function Ceil() As Vi2d ' Turned on project-wide Option Strict; had to add CInt()?
     Return New Vi2d(CInt(MathF.Ceiling(x)), CInt(MathF.Ceiling(y)))
   End Function
 
-  Public Function [Max](v As Vi2d) As Vi2d
+  Public Function [Max](v As Vi2d) As Vi2d ' Turned on project-wide Option Strict; had to add CInt()?
     Return New Vi2d(CInt(MathF.Max(x, v.x)), CInt(MathF.Max(y, v.y)))
   End Function
 
-  Public Function [Min](v As Vi2d) As Vi2d
+  Public Function [Min](v As Vi2d) As Vi2d ' Turned on project-wide Option Strict; had to add CInt()?
     Return New Vi2d(CInt(MathF.Min(x, v.x)), CInt(MathF.Min(y, v.y)))
   End Function
 
-  Public Function Cart() As Vi2d
+  Public Function Cart() As Vi2d ' Turned on project-wide Option Strict; had to add CInt()?
     Return New Vi2d(CInt(MathF.Cos(y) * x), CInt(MathF.Sin(y) * x))
   End Function
 
-  Public Function Polar() As Vi2d
+  Public Function Polar() As Vi2d ' Turned on project-wide Option Strict; had to add CInt()?
     Return New Vi2d(Mag(), CInt(MathF.Atan2(y, x)))
   End Function
 
@@ -58,7 +62,7 @@
     Return [Max](v1).min(v2)
   End Function
 
-  Public Function Lerp(v1 As Vi2d, t As Double) As Vi2d
+  Public Function Lerp(v1 As Vi2d, t As Double) As Vi2d ' Turned on project-wide Option Strict; had to add CInt()?
     Return Me * CInt(Fix(1.0F - t)) + (v1 * CInt(Fix(t)))
   End Function
 
@@ -90,11 +94,11 @@
     Return New Vi2d(left.x * right.x, left.y * right.y)
   End Operator
 
-  Public Shared Operator /(left As Vi2d, right As Integer) As Vi2d
+  Public Shared Operator /(left As Vi2d, right As Integer) As Vi2d ' Turned on project-wide Option Strict; had to add CInt()?
     Return New Vi2d(CInt(Fix(left.x / right)), CInt(Fix(left.y / right)))
   End Operator
 
-  Public Shared Operator /(left As Vi2d, right As Vi2d) As Vi2d
+  Public Shared Operator /(left As Vi2d, right As Vi2d) As Vi2d ' Turned on project-wide Option Strict; had to add CInt()?
     Return New Vi2d(CInt(Fix(left.x / right.x)), CInt(Fix(left.y / right.y)))
   End Operator
 
