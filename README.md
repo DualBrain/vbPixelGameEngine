@@ -12,6 +12,7 @@ Provides a fast, richly featured, ~~cross platform~~ pixel drawing and user inte
 
 *vbPixelGameEngine* road map:
 
+- Continue adding / implementing (to reach parity with v1.24).
 - Add documentation.
 - Add / improve samples.
 - Improve performance.
@@ -20,7 +21,7 @@ Provides a fast, richly featured, ~~cross platform~~ pixel drawing and user inte
 
 *vbPixelGameEngine* is heavily inspired by [olcPixelGameEngine](https://github.com/OneLoneCoder/olcPixelGameEngine); specifically the v1.24 version. Even more specifically, I've developed this project while following along with [javidx9](https://www.youtube.com/@javidx9) videos; so very likely that not all features in v1.24 have been implemented at parity. Once parity has been reached with the v1.24 version, will evaluate if making the jump to v2.x (or greater) makes sense.
 
-*vbPixelGameEngine* is used by 1s of programmers at all levels of ability! ;-)
+*vbPixelGameEngine* is used by 1s of programmers at *some* level of ability! ;-)
 
 ## History
 
@@ -32,4 +33,4 @@ Right now the main focus is on the [olcPixelGameEngine](https://github.com/OneLo
 
 ## Documentation
 
-Please see https://github.com/DualBrain/vbPixelGameEngine/wiki
+Please see [wiki](https://github.com/DualBrain/vbPixelGameEngine/wiki).
