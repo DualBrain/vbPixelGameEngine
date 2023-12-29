@@ -10,11 +10,12 @@ Provides a fast, richly featured, ~~cross platform~~ pixel drawing and user inte
 - Education.
 - Following along with [javidx9](https://www.youtube.com/@javidx9)'s videos, using VB!
 
-*vbPixelGameEngine* road map:
+*vbPixelGameEngine* road map (in no particular order):
 
 - Continue adding / implementing (to reach parity with v1.24).
+- Publish as a nuget package?
 - Add documentation.
-- Add / improve samples.
+- Continue adding samples.
 - Improve performance.
 - Port to Debian (Linux).
 - Port to Raspberry Pi OS.
