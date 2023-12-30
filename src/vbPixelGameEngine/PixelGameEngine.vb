@@ -456,7 +456,7 @@ Public MustInherit Class PixelGameEngine
   <StructLayout(LayoutKind.Sequential)>
   Public Structure VisualInfo
     Public visual As IntPtr
-    Public visualid As Integer
+    Public visualid As ULong 'Integer
     Public screen As Integer
     Public depth As Integer
     Public klass As Integer
@@ -561,26 +561,51 @@ Public MustInherit Class PixelGameEngine
     Public ptr As IntPtr
   End Structure
 
-  Private Declare Function XInitThreads Lib "libX11.so" () As Integer
-  Private Declare Function XOpenDisplay Lib "libX11.so" (display_name As String) As IntPtr
-  Private Declare Function DefaultRootWindow Lib "libX11.so" (display As IntPtr) As IntPtr
-  Private Declare Function glXChooseVisual Lib "libGL.so" (display As IntPtr, screen As Integer, attribList As Integer()) As VisualInfo
-  Private Declare Sub glXSwapBuffers Lib "libGL.so" (display As IntPtr, drawable As IntPtr)
-  Private Declare Function XCreateColormap Lib "libX11.so" (display As IntPtr, w As IntPtr, visual As IntPtr, alloc As Integer) As IntPtr
-  Private Declare Function XCreateWindow Lib "libX11.so" (display As IntPtr, parent As IntPtr, x As Integer, y As Integer, width As Integer, height As Integer, border_width As Integer, depth As Integer, [class] As Integer, visual As IntPtr, valuemask As UInteger, ByRef attributes As XSetWindowAttributesStruct) As IntPtr
-  Private Declare Function XSetWMProtocols Lib "libX11.so" (display As IntPtr, window As IntPtr, protocols() As IntPtr, count As Integer) As Integer
-  Private Declare Function XStoreName Lib "libX11.so" (display As IntPtr, w As IntPtr, title As String) As Integer
-  Private Declare Function XSendEvent Lib "libX11.so" (display As IntPtr, w As IntPtr, propagate As Boolean, event_mask As UInteger, ByRef event_send As XEvent) As Integer
-  Private Declare Function SubstructureRedirectMask Lib "libX11.so" Alias "SubstructureRedirectMask" () As UInteger
-  Private Declare Function SubstructureNotifyMask Lib "libX11.so" Alias "SubstructureNotifyMask" () As UInteger
-  Private Declare Function XFlush Lib "libX11.so" (display As IntPtr) As Integer
-  Private Declare Function XGetWindowAttributes Lib "libX11.so" (display As IntPtr, window As IntPtr, ByRef window_attributes As XWindowAttributes) As Integer
-  Private Declare Function XSetWindowAttributes Lib "libX11.so" (display As IntPtr, w As IntPtr, ByRef attributes As XSetWindowAttributesStruct) As Integer
-  Private Declare Function XInternalAtom1 Lib "libX11" (display As IntPtr, name As String, onlyIfExists As Boolean) As ULong
-  Private Declare Function XMapWindow1 Lib "libX11" (display As IntPtr, w As IntPtr) As Integer
-  Private Declare Function XSendEvent Lib "libX11" (display As IntPtr, w As IntPtr, propagate As Boolean, event_mask As Long, ByRef event_send As XClientMessageEvent) As Integer
-  Private Declare Function XInternAtom Lib "libX11" (display As IntPtr, atom_name As String, only_if_exists As Boolean) As IntPtr
-  Private Declare Auto Function XMapWindow Lib "libX11" (display As IntPtr, w As IntPtr) As Integer
+  'Public Class X11
+  <DllImport("libX11.so.6", CharSet:=CharSet.Unicode)>
+  Private Shared Function XOpenDisplay(display As String) As IntPtr
+  End Function
+  <DllImport("libX11.so.6")>
+  Private Shared Function XDefaultRootWindow(display As IntPtr) As IntPtr
+  End Function
+
+  <DllImport("libX11.so.6",
+             CallingConvention:=CallingConvention.Cdecl,
+             SetLastError:=True)>
+  Private Shared Function XCreateColormap(display As IntPtr,
+                                          w As IntPtr,
+                                          visual As IntPtr,
+                                          alloc As Integer) As IntPtr
+  End Function
+
+  <DllImport("libX11.so.6",
+             CallingConvention:=CallingConvention.Cdecl,
+             SetLastError:=True)>
+  Private Shared Function XInternAtom(display As IntPtr, atom_name As String, only_if_exists As Boolean) As IntPtr
+  End Function
+
+  'End Class
+
+  Private Declare Function XInitThreads Lib "libX11.so.6" () As Integer
+  'Private Declare Function XOpenDisplay Lib "libX11.so.6" (display_name As String) As IntPtr
+  'Private Declare Function DefaultRootWindow Lib "libX11.so.6" (display As IntPtr) As IntPtr
+  Private Declare Function glXChooseVisual Lib "libGL.so.1" (display As IntPtr, screen As Integer, attribList As Integer()) As VisualInfo
+  Private Declare Sub glXSwapBuffers Lib "libGL.so.1" (display As IntPtr, drawable As IntPtr)
+  'Private Declare Function XCreateColormap Lib "libX11.so.6" (display As IntPtr, w As IntPtr, visual As IntPtr, alloc As Integer) As IntPtr
+  Private Declare Function XCreateWindow Lib "libX11.so.6" (display As IntPtr, parent As IntPtr, x As Integer, y As Integer, width As Integer, height As Integer, border_width As Integer, depth As Integer, [class] As Integer, visual As IntPtr, valuemask As UInteger, ByRef attributes As XSetWindowAttributesStruct) As IntPtr
+  Private Declare Function XSetWMProtocols Lib "libX11.so.6" (display As IntPtr, window As IntPtr, protocols() As IntPtr, count As Integer) As Integer
+  Private Declare Function XStoreName Lib "libX11.so.6" (display As IntPtr, w As IntPtr, title As String) As Integer
+  Private Declare Function XSendEvent Lib "libX11.so.6" (display As IntPtr, w As IntPtr, propagate As Boolean, event_mask As UInteger, ByRef event_send As XEvent) As Integer
+  Private Declare Function SubstructureRedirectMask Lib "libX11.so.6" Alias "SubstructureRedirectMask" () As UInteger
+  Private Declare Function SubstructureNotifyMask Lib "libX11.so.6" Alias "SubstructureNotifyMask" () As UInteger
+  Private Declare Function XFlush Lib "libX11.so.6" (display As IntPtr) As Integer
+  Private Declare Function XGetWindowAttributes Lib "libX11.so.6" (display As IntPtr, window As IntPtr, ByRef window_attributes As XWindowAttributes) As Integer
+  Private Declare Function XSetWindowAttributes Lib "libX11.so.6" (display As IntPtr, w As IntPtr, ByRef attributes As XSetWindowAttributesStruct) As Integer
+  Private Declare Function XInternalAtom1 Lib "libX11.so.6" (display As IntPtr, name As String, onlyIfExists As Boolean) As ULong
+  Private Declare Function XMapWindow1 Lib "libX11.so.6" (display As IntPtr, w As IntPtr) As Integer
+  Private Declare Function XSendEvent Lib "libX11.so.6" (display As IntPtr, w As IntPtr, propagate As Boolean, event_mask As Long, ByRef event_send As XClientMessageEvent) As Integer
+  'Private Declare Function XInternAtom Lib "libX11.so.6" (display As IntPtr, atom_name As String, only_if_exists As Boolean) As IntPtr
+  Private Declare Auto Function XMapWindow Lib "libX11.so.6" (display As IntPtr, w As IntPtr) As Integer
   Private Declare Function glXCreateContext Lib "libGL.so.1" (display As IntPtr, visual As VisualInfo, share_context As IntPtr, direct As Boolean) As GLXContext
   Private Declare Function glXMakeCurrent Lib "libGL.so.1" (display As IntPtr, drawable As IntPtr, context As GLXContext) As Boolean
   Private Declare Function glXGetProcAddress Lib "libGL.so.1" (procname As String) As IntPtr
@@ -2166,34 +2191,62 @@ next4:
   ' Do the Linux stuff!
   Private Function Pge_WindowCreate_Linux() As IntPtr
 
+    Console.WriteLine("XInitThreads")
     Dim hrslt = XInitThreads()
+    Console.WriteLine($"    hresult = {hrslt}")
 
     ' Grab the deafult display and window
+    Console.WriteLine("XOpenDisplay")
     pge_Display = XOpenDisplay(Nothing)
-    pge_WindowRoot = DefaultRootWindow(pge_Display)
+    Console.WriteLine($"    pge_Display = {pge_Display}")
+    Console.WriteLine("XDefaultRootWindow")
+    pge_WindowRoot = XDefaultRootWindow(pge_Display)
+    Console.WriteLine($"    pge_WindowRoot = {pge_WindowRoot}")
 
     ' Based on the display capabilities, configure the appearance of the window
     Dim pge_GLAttribs() As Integer = {GLX_RGBA, GLX_DEPTH_SIZE, 24, GLX_DOUBLEBUFFER, None}
+    Console.WriteLine("glXChooseVisual")
     pge_VisualInfo = glXChooseVisual(pge_Display, 0, pge_GLAttribs)
+    Console.WriteLine($"    pge_VisualInfo...
+      visual = {pge_VisualInfo.visual}
+      visualid = {pge_VisualInfo.visualid}
+      screen = {pge_VisualInfo.screen}
+      depth = {pge_VisualInfo.depth}
+      klass = {pge_VisualInfo.klass}
+      red_mask = {pge_VisualInfo.red_mask}
+      green_mask = {pge_VisualInfo.green_mask}
+      blue_mask = {pge_VisualInfo.blue_mask}
+      colormap_size = {pge_VisualInfo.colormap_size}
+      bits_per_rgb = {pge_VisualInfo.bits_per_rgb}")
+    Console.WriteLine("XCreateColormap")
     pge_ColourMap = XCreateColormap(pge_Display, pge_WindowRoot, pge_VisualInfo.visual, AllocNone)
+    Console.WriteLine($"    pge_ColourMap = {pge_ColourMap}")
     pge_SetWindowAttribs.colormap = pge_ColourMap
 
     ' Register which events we are interested in receiving
     pge_SetWindowAttribs.event_mask = ExposureMask Or KeyPressMask Or KeyReleaseMask Or ButtonPressMask Or ButtonReleaseMask Or PointerMotionMask Or FocusChangeMask Or StructureNotifyMask
 
     ' Create the window
+    Console.WriteLine("XCreateWindow")
     pge_Window = XCreateWindow(pge_Display, pge_WindowRoot, 30, 30, nScreenWidth * nPixelWidth, nScreenHeight * nPixelHeight, 0, pge_VisualInfo.depth, InputOutput, pge_VisualInfo.visual, CWColormap Or CWEventMask, pge_SetWindowAttribs)
+    Console.WriteLine($"    pge_Window = {pge_Window}")
 
+    Console.WriteLine("XInternAtom")
     Dim wmDelete = XInternAtom(pge_Display, "WM_DELETE_WINDOW", True)
+    Console.WriteLine("XSetWMProtocols")
     hrslt = XSetWMProtocols(pge_Display, pge_Window, {wmDelete}, 1)
 
+    Console.WriteLine("XMapWindow")
     hrslt = XMapWindow(pge_Display, pge_Window)
-    hrslt = XStoreName(pge_Display, pge_Window, "OneLoneCoder.com - Pixel Game Engine")
+    Console.WriteLine("XStoreName")
+    hrslt = XStoreName(pge_Display, pge_Window, "vbPixelGameEngine")
 
     If bFullScreen Then ' Thanks DragonEye, again :D
       Dim wm_state As IntPtr
       Dim fullscreen As Byte
+      Console.WriteLine("XInternAtom")
       wm_state = XInternAtom(pge_Display, "_NET_WM_STATE", False)
+      Console.WriteLine("XInternAtom")
       fullscreen = CByte(XInternAtom(pge_Display, "_NET_WM_STATE_FULLSCREEN", False))
       Dim xev As XEvent = Nothing
       xev.type = ClientMessage
@@ -2204,10 +2257,14 @@ next4:
       xev.xclient.data.l(1) = fullscreen ' first property to alter
       xev.xclient.data.l(2) = 0 ' second property to alter
       xev.xclient.data.l(3) = 0 ' source indication
+      Console.WriteLine("XMapWindow")
       hrslt = XMapWindow(pge_Display, pge_Window)
-      hrslt = XSendEvent(pge_Display, DefaultRootWindow(pge_Display), False, SubstructureRedirectMask Or SubstructureNotifyMask, xev)
+      Console.WriteLine("XSendEvent/XDefaultRootWindow")
+      hrslt = XSendEvent(pge_Display, XDefaultRootWindow(pge_Display), False, SubstructureRedirectMask Or SubstructureNotifyMask, xev)
+      Console.WriteLine("XFlush")
       hrslt = XFlush(pge_Display)
       Dim gwa As XWindowAttributes
+      Console.WriteLine("XGetWindowAttributes")
       hrslt = XGetWindowAttributes(pge_Display, pge_Window, gwa)
       nWindowWidth = gwa.width
       nWindowHeight = gwa.height
@@ -2249,14 +2306,19 @@ next4:
 
   Function Pge_OpenGLCreate_Linux() As Boolean
 
+    Debug.WriteLine("glXCreateContext")
     Dim glDeviceContext As GLXContext = glXCreateContext(pge_Display, pge_VisualInfo, IntPtr.Zero, GL_TRUE = 1)
+    Debug.WriteLine("glXMakeCurrent")
     glXMakeCurrent(pge_Display, pge_Window, glDeviceContext)
 
     Dim gwa As XWindowAttributes
+    Debug.WriteLine("XGetWindowAttributes")
     Dim hrslt = XGetWindowAttributes(pge_Display, pge_Window, gwa)
+    Debug.WriteLine("glViewPort")
     glViewport(0, 0, gwa.width, gwa.height)
 
     Dim glSwapIntervalEXT As glSwapInterval_t = Nothing
+    Debug.WriteLine("glXGetProcAddress")
     glSwapIntervalEXT = CType(Marshal.GetDelegateForFunctionPointer(glXGetProcAddress("glXSwapIntervalEXT"), GetType(glSwapInterval_t)), glSwapInterval_t)
 
     If glSwapIntervalEXT Is Nothing AndAlso Not bEnableVSYNC Then
