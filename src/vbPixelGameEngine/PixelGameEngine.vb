@@ -1,16 +1,7 @@
-﻿Option Explicit On
-Option Strict On
-Option Infer On
-
-Imports System.Data.Common
-Imports System.Formats.Tar
-Imports System.Runtime.InteropServices
+﻿Imports System.Runtime.InteropServices
 Imports System.Runtime.InteropServices.OSPlatform
 Imports System.Runtime.InteropServices.RuntimeInformation
 Imports System.Threading
-Imports System.Xml
-
-Delegate Function WndProc(hWnd As IntPtr, msg As UInteger, wParam As IntPtr, lParam As IntPtr) As IntPtr
 
 Public Module Singleton
 
@@ -23,6 +14,8 @@ End Module
 Public MustInherit Class PixelGameEngine
 
 #Region "Win32"
+
+#Region "Win32 - Const"
 
   Private Const VK_F1 As Integer = &H70
   Private Const VK_F2 As Integer = &H71
@@ -121,180 +114,7 @@ Public MustInherit Class PixelGameEngine
 
   Private Const MONITOR_DEFAULTTONEAREST As Integer = &H2
 
-  <StructLayout(LayoutKind.Sequential)>
-  Public Class CREATESTRUCT
-    Public lpCreateParams As IntPtr
-    Public hInstance As IntPtr
-    Public hMenu As IntPtr
-    Public hwndParent As IntPtr
-    Public cy As Integer
-    Public cx As Integer
-    Public y As Integer
-    Public x As Integer
-    Public style As Integer
-    Public lpszName As String
-    Public lpszClass As String
-    Public dwExStyle As UInteger
-  End Class
-
-  <StructLayout(LayoutKind.Sequential)>
-  Private Structure Point
-    Public X As Integer
-    Public Y As Integer
-    Public Sub New(x As Integer, y As Integer)
-      Me.X = x
-      Me.Y = y
-    End Sub
-  End Structure
-
-  <StructLayout(LayoutKind.Sequential)>
-  Private Structure RECT
-    Public Left As Integer
-    Public Top As Integer
-    Public Right As Integer
-    Public Bottom As Integer
-  End Structure
-
-  <StructLayout(LayoutKind.Sequential)>
-  Private Structure MONITORINFO
-    Public cbSize As Integer
-    Public rcMonitor As RECT
-    Public rcWork As RECT
-    Public dwFlags As UInt32
-  End Structure
-
-  <StructLayout(LayoutKind.Sequential)>
-  Private Structure MSG
-    Public hWnd As IntPtr
-    Public message As UInteger
-    Public wParam As IntPtr
-    Public lParam As IntPtr
-    Public time As Integer
-    Public pt As Point
-  End Structure
-
-  '<StructLayout(LayoutKind.Sequential, CharSet:=CharSet.Auto)>
-  'Private Structure WNDCLASSEX
-  '  <MarshalAs(UnmanagedType.U4)> Public Size As Integer
-  '  <MarshalAs(UnmanagedType.U4)> Public Style As Integer
-  '  Public WndProc As IntPtr
-  '  Public ClsExtra As Integer
-  '  Public WndExtra As Integer
-  '  Public hInstance As IntPtr
-  '  Public hIcon As IntPtr
-  '  Public hCursor As IntPtr
-  '  Public hBackground As IntPtr
-  '  Public MenuName As String
-  '  Public ClassName As String
-  '  Public hIconSm As IntPtr
-  'End Structure
-
-  <StructLayout(LayoutKind.Sequential, CharSet:=CharSet.Auto)>
-  Public Structure WNDCLASS
-    <MarshalAs(UnmanagedType.U4)> Public Style As Integer
-    Public WndProc As IntPtr
-    Public ClsExtra As Integer
-    Public WndExtra As Integer
-    Public hInstance As IntPtr
-    Public hIcon As IntPtr
-    Public hCursor As IntPtr
-    Public hBackground As IntPtr
-    Public MenuName As String
-    Public ClassName As String
-  End Structure
-
-  <StructLayout(LayoutKind.Sequential)>
-  Private Structure TRACKMOUSEEVENTSTRUCT
-    <MarshalAs(UnmanagedType.U4)> Public cbSize As Integer
-    <MarshalAs(UnmanagedType.U4)> Public dwFlags As Integer
-    Public hWnd As IntPtr
-    <MarshalAs(UnmanagedType.U4)> Public dwHoverTime As Integer
-  End Structure
-
-  Private ReadOnly m_delegWndProc As WndProc = AddressOf Pge_WindowEvent
-
-  Private Declare Function UpdateWindow Lib "user32.dll" (hWnd As IntPtr) As Boolean
-  Private Declare Function ShowWindow Lib "user32.dll" (hWnd As IntPtr, cmdShow As Integer) As <MarshalAs(UnmanagedType.Bool)> Boolean
-  Private Declare Function DestroyWindow Lib "user32.dll" (hWnd As IntPtr) As Boolean
-  Private Declare Function GetConsoleWindow Lib "kernel32.dll" () As IntPtr
-  'Private Declare Function RegisterClassEx Lib "user32.dll" Alias "RegisterClassExA" (<[In]> ByRef wndClass As WNDCLASSEX) As UShort
-  'Private Declare Function CreateWindowEx Lib "user32.dll" Alias "CreateWindowExA" (exStyle As Integer,
-  '                                                                                  atom As UShort, 'string lpClassName,
-  '                                                                                  windowName As String,
-  '                                                                                  style As UInteger,
-  '                                                                                  x As Integer,
-  '                                                                                  y As Integer,
-  '                                                                                  width As Integer,
-  '                                                                                  height As Integer,
-  '                                                                                  hWndParent As IntPtr,
-  '                                                                                  hMenu As IntPtr,
-  '                                                                                  hInstance As IntPtr,
-  '                                                                                  lpParam As IntPtr) As IntPtr
-  Private Declare Function CreateWindowEx Lib "user32.dll" Alias "CreateWindowExW" (exStyle As UInteger,
-                                                                                    atom As UShort, 'className As String,
-                                                                                    windowName As String,
-                                                                                    style As UInteger,
-                                                                                    x As Integer,
-                                                                                    y As Integer,
-                                                                                    width As Integer,
-                                                                                    height As Integer,
-                                                                                    wndParent As IntPtr,
-                                                                                    menu As IntPtr,
-                                                                                    hInstance As IntPtr,
-                                                                                    lpParam As IntPtr) As IntPtr
-  Private Declare Function GetLastError Lib "kernel32.dll" () As UInteger
-  Private Declare Function DefWindowProc Lib "user32.dll" Alias "DefWindowProcA" (hWnd As IntPtr, msg As UInteger, wParam As IntPtr, lParam As IntPtr) As IntPtr
-  Private Declare Sub PostQuitMessage Lib "user32.dll" (exitCode As Integer)
-  Private Declare Function LoadCursor Lib "user32.dll" Alias "LoadCursorA" (hInstance As IntPtr, cursorName As Integer) As IntPtr
-  Private Declare Function GetMessage Lib "user32.dll" Alias "GetMessageA" (ByRef lpMsg As MSG, hWnd As IntPtr, wMsgFilterMin As UInteger, wMsgFilterMax As UInteger) As Integer
-  Private Declare Function TranslateMessage Lib "user32.dll" (ByRef lpMsg As MSG) As Boolean
-  Private Declare Function DispatchMessage Lib "user32.dll" Alias "DispatchMessageA" (ByRef lpMsg As MSG) As Integer
-
-  Private Declare Function LoadIcon Lib "user32.dll" Alias "LoadIconA" (hInstance As IntPtr, lpIconName As Integer) As IntPtr
-  Private Declare Function RegisterClass Lib "user32.dll" Alias "RegisterClassA" (ByRef lpWndClass As WNDCLASS) As UShort
-  Private Declare Function GetModuleHandle Lib "kernel32.dll" Alias "GetModuleHandleA" (lpModuleName As IntPtr) As IntPtr
-  Private Declare Function MonitorFromWindow Lib "user32.dll" (hwnd As IntPtr, dwFlags As UInteger) As IntPtr
-  Private Declare Function GetMonitorInfo Lib "user32.dll" Alias "GetMonitorInfoA" (hMonitor As IntPtr, ByRef lpmi As MONITORINFO) As Boolean
-  Private Declare Function AdjustWindowRectEx Lib "user32.dll" (ByRef lpRect As RECT, dwStyle As UInteger, bMenu As Boolean, dwExStyle As UInteger) As Boolean
-  Private Declare Function CreateWindow Lib "user32.dll" Alias "CreateWindowA" (lpClassName As String, lpWindowName As String, dwStyle As Integer, x As Integer, y As Integer, nWidth As Integer, nHeight As Integer, hWndParent As IntPtr, hMenu As IntPtr, hInstance As IntPtr, lpParam As IntPtr) As IntPtr
-  Private Declare Function TrackMouseEvent Lib "user32.dll" (ByRef tme As TRACKMOUSEEVENTSTRUCT) As Boolean
-
-  Private Declare Function FreeConsole Lib "kernel32.dll" () As Boolean
-  Private Declare Function FindWindow Lib "user32.dll" (lpClassName As String, lpWindowName As String) As IntPtr
-
-  'Private Declare Function FindWindow Lib "user32.dll" Alias "FindWindowA" (lpClassName As String, lpWindowName As String) As IntPtr
-  'Private Declare Function ShowWindow Lib "user32.dll" (hWnd As IntPtr, nCmdShow As Integer) As Boolean
   'Private Const SW_HIDE As Integer = 0
-
-  <StructLayout(LayoutKind.Sequential)>
-  Private Structure PIXELFORMATDESCRIPTOR
-    Public nSize As UShort
-    Public nVersion As UShort
-    Public dwFlags As UInteger
-    Public iPixelType As Byte
-    Public cColorBits As Byte
-    Public cRedBits As Byte
-    Public cRedShift As Byte
-    Public cGreenBits As Byte
-    Public cGreenShift As Byte
-    Public cBlueBits As Byte
-    Public cBlueShift As Byte
-    Public cAlphaBits As Byte
-    Public cAlphaShift As Byte
-    Public cAccumBits As Byte
-    Public cAccumRedBits As Byte
-    Public cAccumGreenBits As Byte
-    Public cAccumBlueBits As Byte
-    Public cAccumAlphaBits As Byte
-    Public cDepthBits As Byte
-    Public cStencilBits As Byte
-    Public cAuxBuffers As Byte
-    Public iLayerType As Byte
-    Public bReserved As Byte
-    Public dwLayerMask As UInteger
-    Public dwVisibleMask As UInteger
-    Public dwDamageMask As UInteger
-  End Structure
 
   Private Const PFD_DRAW_TO_WINDOW As Integer = &H4
   Private Const PFD_SUPPORT_OPENGL As Integer = &H20
@@ -315,32 +135,205 @@ Public MustInherit Class PixelGameEngine
   Private Const GL_QUADS As UInteger = &H7
   Private Const GL_COLOR_BUFFER_BIT As UInteger = &H4000
 
-  Private Declare Function GetDC Lib "user32" (hWnd As IntPtr) As IntPtr
-  Private Declare Function ChoosePixelFormat Lib "gdi32" (hdc As IntPtr, ByRef pfd As PIXELFORMATDESCRIPTOR) As Integer
-  Private Declare Function SetPixelFormat Lib "gdi32" (hdc As IntPtr, iPixelFormat As Integer, ByRef pfd As PIXELFORMATDESCRIPTOR) As Integer
-  Private Declare Function wglCreateContext Lib "opengl32" (hdc As IntPtr) As IntPtr
-  Private Declare Function wglMakeCurrent Lib "opengl32" (hdc As IntPtr, hglrc As IntPtr) As Integer
-  Private Declare Sub glViewport Lib "opengl32" (x As Integer, y As Integer, width As Integer, height As Integer)
-  Private Declare Function wglGetProcAddress Lib "opengl32" (lpProcName As String) As IntPtr
-  Private Declare Sub glEnable Lib "opengl32.dll" (cap As UInteger)
-  Private Declare Sub glGenTextures Lib "opengl32.dll" (n As Integer, ByRef textures As UInteger)
-  Private Declare Sub glBindTexture Lib "opengl32.dll" (target As UInteger, texture As UInteger)
-  Private Declare Sub glTexParameteri Lib "opengl32.dll" (target As UInteger, pname As UInteger, param As Integer)
-  Private Declare Sub glTexEnvf Lib "opengl32.dll" (target As UInteger, pname As UInteger, param As Single)
-  Private Declare Sub glTexImage2D Lib "opengl32.dll" (target As UInteger, level As Integer, internalformat As Integer, width As Integer, height As Integer, border As Integer, format As UInteger, type As UInteger, data As IntPtr)
-  Private Declare Sub glTexSubImage2D Lib "opengl32.dll" (target As UInteger, level As Integer, xoffset As Integer, yoffset As Integer, width As Integer, height As Integer, format As UInteger, type As UInteger, pixels As IntPtr)
-  Private Declare Sub glBegin Lib "opengl32.dll" (mode As UInteger)
-  Private Declare Sub glTexCoord2f Lib "opengl32.dll" (s As Single, t As Single)
-  Private Declare Sub glEnd Lib "opengl32.dll" ()
-  'Private Declare Function SwapBuffers Lib "user32.dll" (hdc As IntPtr) As Boolean
-  'Declare Function SwapBuffers Lib "opengl32.dll" (hdc As IntPtr) As Boolean
-  Private Declare Function SwapBuffers Lib "gdi32.dll" (hdc As IntPtr) As Boolean
-  Private Declare Sub glVertex3f Lib "opengl32.dll" (x As Single, y As Single, z As Single)
-  Private Declare Function SetWindowText Lib "user32.dll" Alias "SetWindowTextA" (hwnd As IntPtr, lpString As String) As Boolean
-  Private Declare Function wglDeleteContext Lib "opengl32.dll" (hglrc As IntPtr) As Boolean
-  Private Declare Function PostMessage Lib "user32.dll" Alias "PostMessageA" (hwnd As IntPtr, wMsg As UInteger, wParam As IntPtr, lParam As IntPtr) As Boolean
-  Private Declare Sub glClear Lib "opengl32.dll" (mask As UInteger)
+#End Region
 
+  Private Class Win32
+
+    Delegate Function WndProc(hWnd As IntPtr, msg As UInteger, wParam As IntPtr, lParam As IntPtr) As IntPtr
+
+#Region "Win32 - Structure"
+
+    <StructLayout(LayoutKind.Sequential)>
+    Friend Class CREATESTRUCT
+      Public lpCreateParams As IntPtr
+      Public hInstance As IntPtr
+      Public hMenu As IntPtr
+      Public hwndParent As IntPtr
+      Public cy As Integer
+      Public cx As Integer
+      Public y As Integer
+      Public x As Integer
+      Public style As Integer
+      Public lpszName As String
+      Public lpszClass As String
+      Public dwExStyle As UInteger
+    End Class
+
+    <StructLayout(LayoutKind.Sequential)>
+    Friend Structure Point
+      Public X As Integer
+      Public Y As Integer
+      Public Sub New(x As Integer, y As Integer)
+        Me.X = x
+        Me.Y = y
+      End Sub
+    End Structure
+
+    <StructLayout(LayoutKind.Sequential)>
+    Friend Structure RECT
+      Public Left As Integer
+      Public Top As Integer
+      Public Right As Integer
+      Public Bottom As Integer
+    End Structure
+
+    <StructLayout(LayoutKind.Sequential)>
+    Friend Structure MONITORINFO
+      Public cbSize As Integer
+      Public rcMonitor As RECT
+      Public rcWork As RECT
+      Public dwFlags As UInt32
+    End Structure
+
+    <StructLayout(LayoutKind.Sequential)>
+    Friend Structure MSG
+      Public hWnd As IntPtr
+      Public message As UInteger
+      Public wParam As IntPtr
+      Public lParam As IntPtr
+      Public time As Integer
+      Public pt As Point
+    End Structure
+
+    <StructLayout(LayoutKind.Sequential, CharSet:=CharSet.Auto)>
+    Friend Structure WNDCLASS
+      <MarshalAs(UnmanagedType.U4)> Public Style As Integer
+      Public WndProc As IntPtr
+      Public ClsExtra As Integer
+      Public WndExtra As Integer
+      Public hInstance As IntPtr
+      Public hIcon As IntPtr
+      Public hCursor As IntPtr
+      Public hBackground As IntPtr
+      Public MenuName As String
+      Public ClassName As String
+    End Structure
+
+    <StructLayout(LayoutKind.Sequential)>
+    Friend Structure TRACKMOUSEEVENTSTRUCT
+      <MarshalAs(UnmanagedType.U4)> Public cbSize As Integer
+      <MarshalAs(UnmanagedType.U4)> Public dwFlags As Integer
+      Public hWnd As IntPtr
+      <MarshalAs(UnmanagedType.U4)> Public dwHoverTime As Integer
+    End Structure
+
+    <StructLayout(LayoutKind.Sequential)>
+    Friend Structure PIXELFORMATDESCRIPTOR
+      Public nSize As UShort
+      Public nVersion As UShort
+      Public dwFlags As UInteger
+      Public iPixelType As Byte
+      Public cColorBits As Byte
+      Public cRedBits As Byte
+      Public cRedShift As Byte
+      Public cGreenBits As Byte
+      Public cGreenShift As Byte
+      Public cBlueBits As Byte
+      Public cBlueShift As Byte
+      Public cAlphaBits As Byte
+      Public cAlphaShift As Byte
+      Public cAccumBits As Byte
+      Public cAccumRedBits As Byte
+      Public cAccumGreenBits As Byte
+      Public cAccumBlueBits As Byte
+      Public cAccumAlphaBits As Byte
+      Public cDepthBits As Byte
+      Public cStencilBits As Byte
+      Public cAuxBuffers As Byte
+      Public iLayerType As Byte
+      Public bReserved As Byte
+      Public dwLayerMask As UInteger
+      Public dwVisibleMask As UInteger
+      Public dwDamageMask As UInteger
+    End Structure
+
+#End Region
+
+#Region "Win32 - P/Invoke"
+
+    Friend Declare Function wglCreateContext Lib "opengl32" (hdc As IntPtr) As IntPtr
+    Friend Declare Function wglMakeCurrent Lib "opengl32" (hdc As IntPtr, hglrc As IntPtr) As Integer
+    Friend Declare Sub glViewport Lib "opengl32" (x As Integer, y As Integer, width As Integer, height As Integer)
+    Friend Declare Function wglGetProcAddress Lib "opengl32" (lpProcName As String) As IntPtr
+    Friend Declare Sub glEnable Lib "opengl32.dll" (cap As UInteger)
+    Friend Declare Sub glGenTextures Lib "opengl32.dll" (n As Integer, ByRef textures As UInteger)
+    Friend Declare Sub glBindTexture Lib "opengl32.dll" (target As UInteger, texture As UInteger)
+    Friend Declare Sub glTexParameteri Lib "opengl32.dll" (target As UInteger, pname As UInteger, param As Integer)
+    Friend Declare Sub glTexEnvf Lib "opengl32.dll" (target As UInteger, pname As UInteger, param As Single)
+    Friend Declare Sub glTexImage2D Lib "opengl32.dll" (target As UInteger, level As Integer, internalformat As Integer, width As Integer, height As Integer, border As Integer, format As UInteger, type As UInteger, data As IntPtr)
+    Friend Declare Sub glTexSubImage2D Lib "opengl32.dll" (target As UInteger, level As Integer, xoffset As Integer, yoffset As Integer, width As Integer, height As Integer, format As UInteger, type As UInteger, pixels As IntPtr)
+    Friend Declare Sub glBegin Lib "opengl32.dll" (mode As UInteger)
+    Friend Declare Sub glTexCoord2f Lib "opengl32.dll" (s As Single, t As Single)
+    Friend Declare Sub glEnd Lib "opengl32.dll" ()
+    Friend Declare Sub glVertex3f Lib "opengl32.dll" (x As Single, y As Single, z As Single)
+    Friend Declare Function wglDeleteContext Lib "opengl32.dll" (hglrc As IntPtr) As Boolean
+    Friend Declare Sub glClear Lib "opengl32.dll" (mask As UInteger)
+    'Declare Function SwapBuffers Lib "opengl32.dll" (hdc As IntPtr) As Boolean
+
+    Friend Declare Function UpdateWindow Lib "user32.dll" (hWnd As IntPtr) As Boolean
+    Friend Declare Function ShowWindow Lib "user32.dll" (hWnd As IntPtr, cmdShow As Integer) As <MarshalAs(UnmanagedType.Bool)> Boolean
+    Friend Declare Function DestroyWindow Lib "user32.dll" (hWnd As IntPtr) As Boolean
+    'Private Declare Function RegisterClassEx Lib "user32.dll" Alias "RegisterClassExA" (<[In]> ByRef wndClass As WNDCLASSEX) As UShort
+    'Private Declare Function CreateWindowEx Lib "user32.dll" Alias "CreateWindowExA" (exStyle As Integer,
+    '                                                                                  atom As UShort, 'string lpClassName,
+    '                                                                                  windowName As String,
+    '                                                                                  style As UInteger,
+    '                                                                                  x As Integer,
+    '                                                                                  y As Integer,
+    '                                                                                  width As Integer,
+    '                                                                                  height As Integer,
+    '                                                                                  hWndParent As IntPtr,
+    '                                                                                  hMenu As IntPtr,
+    '                                                                                  hInstance As IntPtr,
+    '                                                                                  lpParam As IntPtr) As IntPtr
+    Friend Declare Function CreateWindowEx Lib "user32.dll" Alias "CreateWindowExW" (exStyle As UInteger,
+                                                                                    atom As UShort, 'className As String,
+                                                                                    windowName As String,
+                                                                                    style As UInteger,
+                                                                                    x As Integer,
+                                                                                    y As Integer,
+                                                                                    width As Integer,
+                                                                                    height As Integer,
+                                                                                    wndParent As IntPtr,
+                                                                                    menu As IntPtr,
+                                                                                    hInstance As IntPtr,
+                                                                                    lpParam As IntPtr) As IntPtr
+    Friend Declare Function DefWindowProc Lib "user32.dll" Alias "DefWindowProcA" (hWnd As IntPtr, msg As UInteger, wParam As IntPtr, lParam As IntPtr) As IntPtr
+    Friend Declare Sub PostQuitMessage Lib "user32.dll" (exitCode As Integer)
+    Friend Declare Function LoadCursor Lib "user32.dll" Alias "LoadCursorA" (hInstance As IntPtr, cursorName As Integer) As IntPtr
+    Friend Declare Function GetMessage Lib "user32.dll" Alias "GetMessageA" (ByRef lpMsg As MSG, hWnd As IntPtr, wMsgFilterMin As UInteger, wMsgFilterMax As UInteger) As Integer
+    Friend Declare Function TranslateMessage Lib "user32.dll" (ByRef lpMsg As MSG) As Boolean
+    Friend Declare Function DispatchMessage Lib "user32.dll" Alias "DispatchMessageA" (ByRef lpMsg As MSG) As Integer
+    Friend Declare Function LoadIcon Lib "user32.dll" Alias "LoadIconA" (hInstance As IntPtr, lpIconName As Integer) As IntPtr
+    Friend Declare Function RegisterClass Lib "user32.dll" Alias "RegisterClassA" (ByRef lpWndClass As WNDCLASS) As UShort
+    Friend Declare Function MonitorFromWindow Lib "user32.dll" (hwnd As IntPtr, dwFlags As UInteger) As IntPtr
+    Friend Declare Function GetMonitorInfo Lib "user32.dll" Alias "GetMonitorInfoA" (hMonitor As IntPtr, ByRef lpmi As MONITORINFO) As Boolean
+    Friend Declare Function AdjustWindowRectEx Lib "user32.dll" (ByRef lpRect As RECT, dwStyle As UInteger, bMenu As Boolean, dwExStyle As UInteger) As Boolean
+    Friend Declare Function CreateWindow Lib "user32.dll" Alias "CreateWindowA" (lpClassName As String, lpWindowName As String, dwStyle As Integer, x As Integer, y As Integer, nWidth As Integer, nHeight As Integer, hWndParent As IntPtr, hMenu As IntPtr, hInstance As IntPtr, lpParam As IntPtr) As IntPtr
+    Friend Declare Function TrackMouseEvent Lib "user32.dll" (ByRef tme As TRACKMOUSEEVENTSTRUCT) As Boolean
+    Friend Declare Function FindWindow Lib "user32.dll" (lpClassName As String, lpWindowName As String) As IntPtr
+    Friend Declare Function GetDC Lib "user32" (hWnd As IntPtr) As IntPtr
+    Friend Declare Function SetWindowText Lib "user32.dll" Alias "SetWindowTextA" (hwnd As IntPtr, lpString As String) As Boolean
+    Friend Declare Function PostMessage Lib "user32.dll" Alias "PostMessageA" (hwnd As IntPtr, wMsg As UInteger, wParam As IntPtr, lParam As IntPtr) As Boolean
+    'Private Declare Function FindWindow Lib "user32.dll" Alias "FindWindowA" (lpClassName As String, lpWindowName As String) As IntPtr
+    'Private Declare Function ShowWindow Lib "user32.dll" (hWnd As IntPtr, nCmdShow As Integer) As Boolean
+    'Private Declare Function SwapBuffers Lib "user32.dll" (hdc As IntPtr) As Boolean
+
+    Friend Declare Function GetLastError Lib "kernel32.dll" () As UInteger
+    Friend Declare Function GetModuleHandle Lib "kernel32.dll" Alias "GetModuleHandleA" (lpModuleName As IntPtr) As IntPtr
+    Friend Declare Function FreeConsole Lib "kernel32.dll" () As Boolean
+    Friend Declare Function GetConsoleWindow Lib "kernel32.dll" () As IntPtr
+
+    Friend Declare Function ChoosePixelFormat Lib "gdi32" (hdc As IntPtr, ByRef pfd As PIXELFORMATDESCRIPTOR) As Integer
+    Friend Declare Function SetPixelFormat Lib "gdi32" (hdc As IntPtr, iPixelFormat As Integer, ByRef pfd As PIXELFORMATDESCRIPTOR) As Integer
+    Friend Declare Function SwapBuffers Lib "gdi32.dll" (hdc As IntPtr) As Boolean
+
+#End Region
+
+  End Class
+
+  ' Windows
+  Private ReadOnly m_delegWndProc As Win32.WndProc = AddressOf Pge_WindowEvent
   Private Delegate Function wglSwapInterval_t(interval As Integer) As Integer
   Private wglSwapInterval As wglSwapInterval_t
 
@@ -348,9 +341,7 @@ Public MustInherit Class PixelGameEngine
 
 #Region "Linux"
 
-
-  Private Delegate Function glSwapInterval_t(display As IntPtr, drawable As IntPtr, interval As Integer) As Integer
-  Private glSwapIntervalEXT As glSwapInterval_t
+#Region "Linux - Const"
 
   Private Const XK_F1 As Integer = &HFFBE
   Private Const XK_F2 As Integer = &HFFBF
@@ -424,196 +415,1140 @@ Public MustInherit Class PixelGameEngine
 
   Private Const AllocNone As Integer = 0
   Private Const None As Integer = 0
-  Private Const ExposureMask As Integer = &H8000
-  Private Const KeyPressMask As Integer = &H1
-  Private Const KeyReleaseMask As Integer = &H2
-  Private Const ButtonPressMask As Integer = &H4
-  Private Const ButtonReleaseMask As Integer = &H8
-  Private Const PointerMotionMask As Integer = &H200
-  Private Const FocusChangeMask As Integer = &H20000
-  Private Const StructureNotifyMask As Integer = &H20000
+  'Private Const ExposureMask As Integer = &H8000
+  'Private Const KeyPressMask As Integer = &H1
+  'Private Const KeyReleaseMask As Integer = &H2
+  'Private Const ButtonPressMask As Integer = &H4
+  'Private Const ButtonReleaseMask As Integer = &H8
+  'Private Const PointerMotionMask As Integer = &H200
+  'Private Const FocusChangeMask As Integer = &H20000
+  'Private Const StructureNotifyMask As Integer = &H20000
   Private Const InputOutput As Integer = 1
 
-  Private Const WEColormap As UInteger = &H2
+  'Private Const WEColormap As UInteger = &H2
 
-  Private Const CWEventMask As UInteger = &H80
-  Private Const CWColormap As UInteger = &H4
+  'Private Const CWEventMask As UInteger = &H80
+  'Private Const CWColormap As UInteger = &H4
 
-  Private Const XInternalAtom As UInteger = &H400000
-  Private Const XMapWindowConst As Integer = 18
+  'Private Const XInternalAtom As UInteger = &H400000
+  'Private Const XMapWindowConst As Integer = 18
 
-  Private Const ClientMessage As Integer = 3
+  'Private Const ClientMessage As Integer = 3
 
   Private Const GL_TRUE As Integer = 1
 
+#End Region
+
+  Private Class X11
+
+    Private Sub New()
+    End Sub
+
+#Region "Structure"
+
+    Public Enum XKeySym
+
+      NoSymbol = 0
+
+      ' * TTY function keys, cleverly chosen to map to ASCII, for convenience of
+      ' * programming, but could have been arbitrary (at the cost of lookup
+      ' * tables in client code).
+
+      ''' <summary>
+      ''' Back space, back char 
+      ''' </summary>
+      XK_BackSpace = &HFF08
+      XK_Tab = &HFF09
+      ''' <summary>
+      ''' Linefeed, LF
+      ''' </summary>
+      XK_Linefeed = &HFF0A
+      XK_Clear = &HFF0B
+      ''' <summary>
+      ''' Return, enter
+      ''' </summary>
+      XK_Return = &HFF0D
+      ''' <summary>
+      ''' Pause, hold 
+      ''' </summary>
+      XK_Pause = &HFF13
+      XK_Scroll_Lock = &HFF14
+      XK_Sys_Req = &HFF15
+      XK_Escape = &HFF1B
+      ''' <summary>
+      ''' Delete, rubout
+      ''' </summary>
+      XK_Delete = &HFFFF
+
+      ' * International & multi-key character composition
+
+      ' * Japanese keyboard support
+
+      ' * 0xff31 thru 0xff3f are under XK_KOREAN
+
+      ' * Cursor control & motion
+
+      XK_Home = &HFF50
+      ''' <summary>
+      ''' Move left, left arrow
+      ''' </summary>
+      XK_Left = &HFF51
+      ''' <summary>
+      ''' Move up, up arrow
+      ''' </summary>
+      XK_Up = &HFF52
+      ''' <summary>
+      ''' Move right, right arrow
+      ''' </summary>
+      XK_Right = &HFF53
+      ''' <summary>
+      ''' Move down, down arrow
+      ''' </summary>
+      XK_Down = &HFF54
+      ''' <summary>
+      ''' Prior, previous
+      ''' </summary>
+      XK_Page_Up = &HFF55
+      'XK_Prior = &HFF55
+      ''' <summary>
+      ''' Next
+      ''' </summary>
+      XK_Page_Down = &HFF56
+      'XK_Next = &HFF56
+      ''' <summary>
+      ''' EOL
+      ''' </summary>
+      XK_End = &HFF57
+      ''' <summary>
+      ''' BOL
+      ''' </summary>
+      XK_Begin = &HFF58
+
+      ' * Misc functions
+
+      ' * Keypad functions, keypad numbers cleverly chosen to map to ASCII
+
+      ''' <summary>
+      ''' Space
+      ''' </summary>
+      XK_KP_Space = &HFF80
+      XK_KP_Tab = &HFF89
+      ''' <summary>
+      ''' Enter
+      ''' </summary>
+      XK_KP_Enter = &HFF8D
+      ''' <summary>
+      ''' PF1, KP_A, ...
+      ''' </summary>
+      XK_KP_F1 = &HFF91
+      XK_KP_F2 = &HFF92
+      XK_KP_F3 = &HFF93
+      XK_KP_F4 = &HFF94
+      XK_KP_Home = &HFF95
+      XK_KP_Left = &HFF96
+      XK_KP_Up = &HFF97
+      XK_KP_Right = &HFF98
+      XK_KP_Down = &HFF99
+      'XK_KP_Prior = &HFF9A
+      XK_KP_Page_Up = &HFF9A
+      'XK_KP_Next = &HFF9B
+      XK_KP_Page_Down = &HFF9B
+      XK_KP_End = &HFF9C
+      XK_KP_Begin = &HFF9D
+      XK_KP_Insert = &HFF9E
+      XK_KP_Delete = &HFF9F
+      ''' <summary>
+      ''' Equals
+      ''' </summary>
+      XK_KP_Equal = &HFFBD
+      XK_KP_Multiply = &HFFAA
+      XK_KP_Add = &HFFAB
+      ''' <summary>
+      ''' Separator, often comma
+      ''' </summary>
+      XK_KP_Separator = &HFFAC
+      XK_KP_Subtract = &HFFAD
+      XK_KP_Decimal = &HFFAE
+      XK_KP_Divide = &HFFAF
+
+      XK_KP_0 = &HFFB0
+      XK_KP_1 = &HFFB1
+      XK_KP_2 = &HFFB2
+      XK_KP_3 = &HFFB3
+      XK_KP_4 = &HFFB4
+      XK_KP_5 = &HFFB5
+      XK_KP_6 = &HFFB6
+      XK_KP_7 = &HFFB7
+      XK_KP_8 = &HFFB8
+      XK_KP_9 = &HFFB9
+
+      ' * Auxiliary functions; note the duplicate definitions for left and right
+      ' * function keys;  Sun keyboards And a few other manufacturers have such
+      ' * function key groups on the left And/Or right sides of the keyboard.
+      ' * We've not found a keyboard with more than 35 function keys total.
+
+      XK_F1 = &HFFBE
+      XK_F2 = &HFFBF
+      XK_F3 = &HFFC0
+      XK_F4 = &HFFC1
+      XK_F5 = &HFFC2
+      XK_F6 = &HFFC3
+      XK_F7 = &HFFC4
+      XK_F8 = &HFFC5
+      XK_F9 = &HFFC6
+      XK_F10 = &HFFC7
+      XK_F11 = &HFFC8
+      'XK_L1 = &HFFC8
+      XK_F12 = &HFFC9
+      'XK_L2 = &HFFC9
+      XK_F13 = &HFFCA
+      'XK_L3 = &HFFCA
+      XK_F14 = &HFFCB
+      'XK_L4 = &HFFCB
+      XK_F15 = &HFFCC
+      'XK_L5 = &HFFCC
+      XK_F16 = &HFFCD
+      'XK_L6 = &HFFCD
+      XK_F17 = &HFFCE
+      'XK_L7 = &HFFCE
+      XK_F18 = &HFFCF
+      'XK_L8 = &HFFCF
+      XK_F19 = &HFFD0
+      'XK_L9 = &HFFD0
+      XK_F20 = &HFFD1
+      'XK_L10 = &HFFD1
+      XK_F21 = &HFFD2
+      'XK_R1 = &HFFD2
+      XK_F22 = &HFFD3
+      'XK_R2 = &HFFD3
+      XK_F23 = &HFFD4
+      'XK_R3 = &HFFD4
+      XK_F24 = &HFFD5
+      'XK_R4 = &HFFD5
+      XK_F25 = &HFFD6
+      'XK_R5 = &HFFD6
+      XK_F26 = &HFFD7
+      'XK_R6 = &HFFD7
+      XK_F27 = &HFFD8
+      'XK_R7 = &HFFD8
+      XK_F28 = &HFFD9
+      'XK_R8 = &HFFD9
+      XK_F29 = &HFFDA
+      'XK_R9 = &HFFDA
+      XK_F30 = &HFFDB
+      'XK_R10 = &HFFDB
+      XK_F31 = &HFFDC
+      'XK_R11 = &HFFDC
+      XK_F32 = &HFFDD
+      'XK_R12 = &HFFDD
+      XK_F33 = &HFFDE
+      'XK_R13 = &HFFDE
+      XK_F34 = &HFFDF
+      'XK_R14 = &HFFDF
+      XK_F35 = &HFFE0
+      'XK_R15 = &HFFE0
+
+      ' * Modifiers
+
+      ''' <summary>
+      ''' Left shift
+      ''' </summary>
+      XK_Shift_L = &HFFE1
+      ''' <summary>
+      ''' Right shift
+      ''' </summary>
+      XK_Shift_R = &HFFE2
+      ''' <summary>
+      ''' Left control
+      ''' </summary>
+      XK_Control_L = &HFFE3
+      ''' <summary>
+      ''' Right control
+      ''' </summary>
+      XK_Control_R = &HFFE4
+      ''' <summary>
+      ''' Caps lock
+      ''' </summary>
+      XK_Caps_Lock = &HFFE5
+      ''' <summary>
+      ''' Shift lock
+      ''' </summary>
+      XK_Shift_Lock = &HFFE6
+      ''' <summary>
+      ''' Left meta
+      ''' </summary>
+      XK_Meta_L = &HFFE7
+      ''' <summary>
+      ''' Right meta
+      ''' </summary>
+      XK_Meta_R = &HFFE8
+      ''' <summary>
+      ''' Left alt
+      ''' </summary>
+      XK_Alt_L = &HFFE9
+      ''' <summary>
+      ''' Right alt
+      ''' </summary>
+      XK_Alt_R = &HFFEA
+      ''' <summary>
+      ''' Left super
+      ''' </summary>
+      XK_Super_L = &HFFEB
+      ''' <summary>
+      ''' Right super
+      ''' </summary>
+      XK_Super_R = &HFFEC
+      ''' <summary>
+      ''' Left hyper
+      ''' </summary>
+      XK_Hyper_L = &HFFED
+      ''' <summary>
+      ''' Right hyper
+      ''' </summary>
+      XK_Hyper_R = &HFFEE
+
+      ' * Latin 1
+      ' * (ISO/IEC 8859-1 = Unicode U+0020..U+00FF)
+      ' * Byte 3 = 0
+
+      ''' <summary>
+      ''' U+0020 SPACE
+      ''' </summary>
+      XK_space = &H20
+      ''' <summary>
+      ''' U+0021 EXCLAMATION MARK 
+      ''' </summary>
+      XK_exclam = &H21
+      ''' <summary>
+      ''' U+0022 QUOTATION MARK
+      ''' </summary>
+      XK_quotedbl = &H22
+      ''' <summary>
+      ''' U+0023 NUMBER SIGN
+      ''' </summary>
+      XK_numbersign = &H23
+      ''' <summary>
+      ''' U+0024 DOLLAR SIGN
+      ''' </summary>
+      XK_dollar = &H24
+      ''' <summary>
+      ''' U+0025 PERCENT SIGN
+      ''' </summary>
+      XK_percent = &H25
+      ''' <summary>
+      ''' U+0026 AMPERSAND
+      ''' </summary>
+      XK_ampersand = &H26
+      ''' <summary>
+      ''' U+0027 APOSTROPHE
+      ''' </summary>
+      XK_apostrophe = &H27
+      '''' <summary>
+      '''' deprecated
+      '''' </summary>
+      'XK_quoteright = &H27
+      ''' <summary>
+      ''' U+0028 LEFT PARENTHESIS
+      ''' </summary>
+      XK_parenleft = &H28
+      ''' <summary>
+      ''' U+0029 RIGHT PARENTHESIS
+      ''' </summary>
+      XK_parenright = &H29
+      ''' <summary>
+      ''' U+002A ASTERISK
+      ''' </summary>
+      XK_asterisk = &H2A
+      ''' <summary>
+      ''' U+002B PLUS SIGN
+      ''' </summary>
+      XK_plus = &H2B
+      ''' <summary>
+      ''' U+002C COMMA
+      ''' </summary>
+      XK_comma = &H2C
+      ''' <summary>
+      ''' U+002D HYPHEN-MINUS
+      ''' </summary>
+      XK_minus = &H2D
+      ''' <summary>
+      ''' U+002E FULL STOP
+      ''' </summary>
+      XK_period = &H2E
+      ''' <summary>
+      ''' U+002F SOLIDUS
+      ''' </summary>
+      XK_slash = &H2F
+      ''' <summary>
+      ''' U+0030 DIGIT ZERO
+      ''' </summary>
+      XK_0 = &H30
+      ''' <summary>
+      ''' U+0031 DIGIT ONE
+      ''' </summary>
+      XK_1 = &H31
+      ''' <summary>
+      ''' U+0032 DIGIT TWO
+      ''' </summary>
+      XK_2 = &H32
+      ''' <summary>
+      ''' U+0033 DIGIT THREE
+      ''' </summary>
+      XK_3 = &H33
+      ''' <summary>
+      ''' U+0034 DIGIT FOUR
+      ''' </summary>
+      XK_4 = &H34
+      ''' <summary>
+      ''' U+0035 DIGIT FIVE
+      ''' </summary>
+      XK_5 = &H35
+      ''' <summary>
+      ''' U+0036 DIGIT SIX
+      ''' </summary>
+      XK_6 = &H36
+      ''' <summary>
+      ''' U+0037 DIGIT SEVEN
+      ''' </summary>
+      XK_7 = &H37
+      ''' <summary>
+      ''' U+0038 DIGIT EIGHT
+      ''' </summary>
+      XK_8 = &H38
+      ''' <summary>
+      ''' U+0039 DIGIT NINE
+      ''' </summary>
+      XK_9 = &H39
+      ''' <summary>
+      ''' U+003A COLON
+      ''' </summary>
+      XK_colon = &H3A
+      ''' <summary>
+      ''' U+003B SEMICOLON
+      ''' </summary>
+      XK_semicolon = &H3B
+      ''' <summary>
+      ''' U+003C LESS-THAN SIGN
+      ''' </summary>
+      XK_less = &H3C
+      ''' <summary>
+      ''' U+003D EQUALS SIGN
+      ''' </summary>
+      XK_equal = &H3D
+      ''' <summary>
+      ''' U+003E GREATER-THAN SIGN
+      ''' </summary>
+      XK_greater = &H3E
+      ''' <summary>
+      ''' U+003F QUESTION MARK
+      ''' </summary>
+      XK_question = &H3F
+      ''' <summary>
+      ''' U+0040 COMMERCIAL AT
+      ''' </summary>
+      XK_at = &H40
+      ''' <summary>
+      ''' U+0041 LATIN CAPITAL LETTER A
+      ''' </summary>
+      XK_c_A = &H41
+      ''' <summary>
+      ''' U+0042 LATIN CAPITAL LETTER B
+      ''' </summary>
+      XK_c_B = &H42
+      ''' <summary>
+      ''' U+0043 LATIN CAPITAL LETTER C
+      ''' </summary>
+      XK_c_C = &H43
+      ''' <summary>
+      ''' U+0044 LATIN CAPITAL LETTER D
+      ''' </summary>
+      XK_c_D = &H44
+      ''' <summary>
+      ''' U+0045 LATIN CAPITAL LETTER E
+      ''' </summary>
+      XK_c_E = &H45
+      ''' <summary>
+      ''' U+0046 LATIN CAPITAL LETTER F
+      ''' </summary>
+      XK_c_F = &H46
+      ''' <summary>
+      ''' U+0047 LATIN CAPITAL LETTER G
+      ''' </summary>
+      XK_c_G = &H47
+      ''' <summary>
+      ''' U+0048 LATIN CAPITAL LETTER H
+      ''' </summary>
+      XK_c_H = &H48
+      ''' <summary>
+      ''' U+0049 LATIN CAPITAL LETTER I
+      ''' </summary>
+      XK_c_I = &H49
+      ''' <summary>
+      ''' U+004A LATIN CAPITAL LETTER J
+      ''' </summary>
+      XK_c_J = &H4A
+      ''' <summary>
+      ''' U+004B LATIN CAPITAL LETTER K
+      ''' </summary>
+      XK_c_K = &H4B
+      ''' <summary>
+      ''' U+004C LATIN CAPITAL LETTER L
+      ''' </summary>
+      XK_c_L = &H4C
+      ''' <summary>
+      ''' U+004D LATIN CAPITAL LETTER M
+      ''' </summary>
+      XK_c_M = &H4D
+      ''' <summary>
+      ''' U+004E LATIN CAPITAL LETTER N
+      ''' </summary>
+      XK_c_N = &H4E
+      ''' <summary>
+      ''' U+004F LATIN CAPITAL LETTER O
+      ''' </summary>
+      XK_c_O = &H4F
+      ''' <summary>
+      ''' U+0050 LATIN CAPITAL LETTER P
+      ''' </summary>
+      XK_c_P = &H50
+      ''' <summary>
+      ''' U+0051 LATIN CAPITAL LETTER Q
+      ''' </summary>
+      XK_c_Q = &H51
+      ''' <summary>
+      ''' U+0052 LATIN CAPITAL LETTER R
+      ''' </summary>
+      XK_c_R = &H52
+      ''' <summary>
+      ''' U+0053 LATIN CAPITAL LETTER S
+      ''' </summary>
+      XK_c_S = &H53
+      ''' <summary>
+      ''' U+0054 LATIN CAPITAL LETTER T
+      ''' </summary>
+      XK_c_T = &H54
+      ''' <summary>
+      ''' U+0055 LATIN CAPITAL LETTER U
+      ''' </summary>
+      XK_c_U = &H55
+      ''' <summary>
+      ''' U+0056 LATIN CAPITAL LETTER V
+      ''' </summary>
+      XK_c_V = &H56
+      ''' <summary>
+      ''' U+0057 LATIN CAPITAL LETTER W
+      ''' </summary>
+      XK_c_W = &H57
+      ''' <summary>
+      ''' U+0058 LATIN CAPITAL LETTER X
+      ''' </summary>
+      XK_c_X = &H58
+      ''' <summary>
+      ''' U+0059 LATIN CAPITAL LETTER Y
+      ''' </summary>
+      XK_c_Y = &H59
+      ''' <summary>
+      ''' U+005A LATIN CAPITAL LETTER Z
+      ''' </summary>
+      XK_c_Z = &H5A
+      ''' <summary>
+      ''' U+005B LEFT SQUARE BRACKET
+      ''' </summary>
+      XK_bracketleft = &H5B
+      ''' <summary>
+      ''' U+005C REVERSE SOLIDUS
+      ''' </summary>
+      XK_backslash = &H5C
+      ''' <summary>
+      ''' U+005D RIGHT SQUARE BRACKET
+      ''' </summary>
+      XK_bracketright = &H5D
+      ''' <summary>
+      ''' U+005E CIRCUMFLEX ACCENT
+      ''' </summary>
+      XK_asciicircum = &H5E
+      ''' <summary>
+      ''' U+005F LOW LINE
+      ''' </summary>
+      XK_underscore = &H5F
+      ''' <summary>
+      ''' U+0060 GRAVE ACCENT
+      ''' </summary>
+      XK_grave = &H60
+      '''' <summary>
+      '''' deprecated
+      '''' </summary>
+      'XK_quoteleft = &H60
+      ''' <summary>
+      ''' U+0061 LATIN SMALL LETTER A
+      ''' </summary>
+      XK_a = &H61
+      ''' <summary>
+      ''' U+0062 LATIN SMALL LETTER B
+      ''' </summary>
+      XK_b = &H62
+      ''' <summary>
+      ''' U+0063 LATIN SMALL LETTER C
+      ''' </summary>
+      XK_c = &H63
+      ''' <summary>
+      ''' U+0064 LATIN SMALL LETTER D
+      ''' </summary>
+      XK_d = &H64
+      ''' <summary>
+      ''' U+0065 LATIN SMALL LETTER E
+      ''' </summary>
+      XK_e = &H65
+      ''' <summary>
+      ''' U+0066 LATIN SMALL LETTER F
+      ''' </summary>
+      XK_f = &H66
+      ''' <summary>
+      ''' U+0067 LATIN SMALL LETTER G
+      ''' </summary>
+      XK_g = &H67
+      ''' <summary>
+      ''' U+0068 LATIN SMALL LETTER H
+      ''' </summary>
+      XK_h = &H68
+      ''' <summary>
+      ''' U+0069 LATIN SMALL LETTER I
+      ''' </summary>
+      XK_i = &H69
+      ''' <summary>
+      ''' U+006A LATIN SMALL LETTER J
+      ''' </summary>
+      XK_j = &H6A
+      ''' <summary>
+      ''' U+006B LATIN SMALL LETTER K
+      ''' </summary>
+      XK_k = &H6B
+      ''' <summary>
+      ''' U+006C LATIN SMALL LETTER L
+      ''' </summary>
+      XK_l = &H6C
+      ''' <summary>
+      ''' U+006D LATIN SMALL LETTER M
+      ''' </summary>
+      XK_m = &H6D
+      ''' <summary>
+      ''' U+006E LATIN SMALL LETTER N
+      ''' </summary>
+      XK_n = &H6E
+      ''' <summary>
+      ''' U+006F LATIN SMALL LETTER O
+      ''' </summary>
+      XK_o = &H6F
+      ''' <summary>
+      ''' U+0070 LATIN SMALL LETTER P
+      ''' </summary>
+      XK_p = &H70
+      ''' <summary>
+      ''' U+0071 LATIN SMALL LETTER Q
+      ''' </summary>
+      XK_q = &H71
+      ''' <summary>
+      ''' U+0072 LATIN SMALL LETTER R
+      ''' </summary>
+      XK_r = &H72
+      ''' <summary>
+      ''' U+0073 LATIN SMALL LETTER S
+      ''' </summary>
+      XK_s = &H73
+      ''' <summary>
+      ''' U+0074 LATIN SMALL LETTER T
+      ''' </summary>
+      XK_t = &H74
+      ''' <summary>
+      ''' U+0075 LATIN SMALL LETTER U
+      ''' </summary>
+      XK_u = &H75
+      ''' <summary>
+      ''' U+0076 LATIN SMALL LETTER V
+      ''' </summary>
+      XK_v = &H76
+      ''' <summary>
+      ''' U+0077 LATIN SMALL LETTER W
+      ''' </summary>
+      XK_w = &H77
+      ''' <summary>
+      ''' U+0078 LATIN SMALL LETTER X
+      ''' </summary>
+      XK_x = &H78
+      ''' <summary>
+      ''' U+0079 LATIN SMALL LETTER Y
+      ''' </summary>
+      XK_y = &H79
+      ''' <summary>
+      ''' U+007A LATIN SMALL LETTER Z
+      ''' </summary>
+      XK_z = &H7A
+      ''' <summary>
+      ''' U+007B LEFT CURLY BRACKET
+      ''' </summary>
+      XK_braceleft = &H7B
+      ''' <summary>
+      ''' U+007C VERTICAL LINE
+      ''' </summary>
+      XK_bar = &H7C
+      ''' <summary>
+      ''' U+007D RIGHT CURLY BRACKET
+      ''' </summary>
+      XK_braceright = &H7D
+      ''' <summary>
+      ''' U+007E TILDE
+      ''' </summary>
+      XK_asciitilde = &H7E
+    End Enum
+
+    <StructLayout(LayoutKind.Sequential)>
+    Public Structure XMotionEvent
+      Public Type As XEventType
+      Public Serial As Long
+      Public Send_Event As Boolean
+      Public Display As IntPtr
+      Public Window As IntPtr
+      Public Root As IntPtr
+      Public Subwindow As IntPtr
+      Public Time As Long
+      Public X, Y As Integer
+      Public X_Root, Y_Root As Integer
+      Public State As Integer
+      Public Is_Hint As Char
+      Public Same_Screen As Boolean
+    End Structure
+
+    <StructLayout(LayoutKind.Sequential)>
+    Public Structure XButtonEvent
+      Public Type As XEventType
+      Public Serial As Long
+      Public Send_Event As Boolean
+      Public Display As IntPtr
+      Public Window As IntPtr
+      Public Root As IntPtr
+      Public Subwindow As IntPtr
+      Public Time As Long
+      Public X, Y As Integer
+      Public X_Root, Y_Root As Integer
+      Public State As Integer
+      Public Button As Integer
+      Public Same_Screen As Boolean
+    End Structure
+
+    <StructLayout(LayoutKind.Sequential)>
+    Public Structure XClientMessageEvent
+      Public Type As XEventType
+      Public Serial As Long
+      Public Send_Event As Boolean
+      Public Display As IntPtr
+      Public Window As IntPtr
+      Public Message_Type As ULong 'XAtom
+      Public Format As Integer
+      'Public Data As XClientMessageEventData
+      Public L0 As Long
+      Public L1 As Long
+      Public L2 As Long
+      Public L3 As Long
+      Public L4 As Long
+    End Structure
+
+    <StructLayout(LayoutKind.Sequential)>
+    Public Structure XConfigureEvent
+      Public Type As XEventType
+      Public Serial As Long
+      Public Send_Event As Boolean
+      Public Display As IntPtr
+      Public _Event As Integer
+      Public Window As IntPtr
+      Public X, Y As Integer
+      Public Width, Height As Integer
+      Public Border_Width As Integer
+      Public Above As Integer
+      Public Override_Redirect As Integer
+    End Structure
+
+    ''' <summary>
+    ''' Information used by the visual utility routines to find desired visual
+    ''' type from the many visuals a display may support.
+    ''' </summary>
+    <StructLayout(LayoutKind.Sequential)>
+    Public Structure XVisualInfo
+      Public Visual As IntPtr ' Visual*
+      Public VisualId As ULong ' VisualID: unsigned long OR CARD32, BITS32 
+      Public Screen As Integer ' int
+      Public Depth As Integer ' int
+      Public [Class] As Integer ' int
+      Public RedMask As ULong ' unsigned long
+      Public GreenMask As ULong ' unsigned long
+      Public BlueMask As ULong ' unsigned long
+      Public ColormapSize As Integer ' int
+      Public BitsPerRgb As Integer ' int
+    End Structure
+
+    <StructLayout(LayoutKind.Sequential)>
+    Public Structure XKeyEvent
+      Public Type As XEventType
+      Public Serial As Long
+      Public Send_Event As Boolean
+      Public Display As IntPtr
+      Public Window As IntPtr
+      Public Root As IntPtr
+      Public Subwindow As IntPtr
+      Public Time As Long
+      Public X, Y As Integer
+      Public X_Root, Y_Root As Integer
+      Public State As Integer
+      Public Keycode As Integer
+      Public Same_Screen As Boolean
+    End Structure
+
+    ''' <summary>
+    ''' Data structure for setting window attributes.
+    ''' </summary>
+    <StructLayout(LayoutKind.Sequential)>
+    Public Structure XSetWindowAttributes
+      ''' <summary>
+      ''' background or None or ParentRelative
+      ''' </summary>
+      Public Background_Pixmap As IntPtr ' Pixmap
+      ''' <summary>
+      ''' background pixel
+      ''' </summary>
+      Public Background_Pixel As Long ' unsigned long
+      ''' <summary>
+      ''' order of the window
+      ''' </summary>
+      Public Border_Pixmap As IntPtr ' Pixmap
+      ''' <summary>
+      ''' border pixel value
+      ''' </summary>
+      Public BorderPixel As Long ' unsigned long
+      ''' <summary>
+      ''' one of bit gravity values
+      ''' </summary>
+      Public Bit_Gravity As Integer ' int
+      ''' <summary>
+      ''' one of the window gravity values
+      ''' </summary>
+      Public Win_Gravity As Integer ' int
+      ''' <summary>
+      ''' NotUseful, WhenMapped, Always
+      ''' </summary>
+      Public Backing_Store As Integer ' int
+      ''' <summary>
+      ''' planes to be preserved if possible
+      ''' </summary>
+      Public Backing_Planes As Long ' unsigned long
+      ''' <summary>
+      ''' value to use in restoring planes
+      ''' </summary>
+      Public Backing_Pixel As Long ' unsigned long
+      ''' <summary>
+      ''' should bits under be saved? (popups)
+      ''' </summary>
+      Public Save_Under As Boolean ' Bool
+      ''' <summary>
+      ''' set of events that should be saved
+      ''' </summary>
+      Public EventMask As Long 'XEventMask ' long
+      ''' <summary>
+      ''' set of events that should not propagate
+      ''' </summary>
+      Public Do_Not_Propogate_Mask As Long 'XEventMask ' long
+      ''' <summary>
+      ''' boolean value for override-redirect
+      ''' </summary>
+      Public Override_Redirect As Boolean ' Bool
+      ''' <summary>
+      ''' color map to be associated with window
+      ''' </summary>
+      Public Colormap As IntPtr ' Colormap
+      ''' <summary>
+      ''' cursor to be displayed (or None)
+      ''' </summary>
+      Public Cursor As IntPtr ' Cursor
+    End Structure
+
+    <StructLayout(LayoutKind.Sequential)>
+    Public Structure XWindowAttributes
+      ''' <summary>
+      ''' location of window
+      ''' </summary>
+      Public X, Y As Integer ' int
+      ''' <summary>
+      ''' width and height of window
+      ''' </summary>
+      Public Width, Height As Integer ' int
+      ''' <summary>
+      ''' border width of window
+      ''' </summary>
+      Public Border_Width As Integer ' int
+      ''' <summary>
+      ''' depth of window
+      ''' </summary>
+      Public Depth As Integer ' int
+      ''' <summary>
+      ''' the associated visual structure
+      ''' </summary>
+      Public Visual As IntPtr ' Visual *
+      ''' <summary>
+      ''' root of screen containing window
+      ''' </summary>
+      Public Root As IntPtr ' Window
+      ''' <summary>
+      ''' InputOutput, InputOnly
+      ''' </summary>
+      Public [Class] As Integer ' int
+      ''' <summary>
+      ''' one of bit gravity values
+      ''' </summary>
+      Public Bit_Gravity As Integer ' int
+      ''' <summary>
+      ''' one of the window gravity values
+      ''' </summary>
+      Public Win_Gravity As Integer ' int
+      ''' <summary>
+      ''' NotUseful, WhenMapped, Always
+      ''' </summary>
+      Public Backing_Store As Integer ' int
+      ''' <summary>
+      ''' planes to be preserved if possible
+      ''' </summary>
+      Public Backing_Planes As Long ' unsigned long
+      ''' <summary>
+      ''' value to be used when restoring planes
+      ''' </summary>
+      Public Backing_Pixel As Long ' unsigned long
+      ''' <summary>
+      ''' boolean, should bits under be saved?
+      ''' </summary>
+      Public Save_Under As Boolean ' Bool
+      ''' <summary>
+      ''' color map to be associated with window
+      ''' </summary>
+      Public Colormap As IntPtr ' Colormap
+      ''' <summary>
+      ''' boolean, is color map currently installed
+      ''' </summary>
+      Public Map_Installed As Boolean ' Bool
+      ''' <summary>
+      ''' IsUnmapped, IsUnviewable, IsViewable
+      ''' </summary>
+      Public Map_State As XMapState ' int
+      ''' <summary>
+      ''' set of events all people have interest in
+      ''' </summary>
+      Public All_Event_Masks As Long ' long
+      ''' <summary>
+      ''' my event mask
+      ''' </summary>
+      Public Your_Event_Mask As Long ' long
+      ''' <summary>
+      ''' set of events that should not propagate
+      ''' </summary>
+      Public Do_Not_Propagate_Mask As Long ' long
+      ''' <summary>
+      ''' boolean value for override-redirect
+      ''' </summary>
+      Public Override_Redirect As Boolean ' Bool
+      ''' <summary>
+      ''' back pointer to correct screen
+      ''' </summary>
+      Public Screen As IntPtr ' Screen *
+    End Structure
+
+    <StructLayout(LayoutKind.Sequential, Size:=192)>
+    Public Structure _XEvent
+      Public Type As XEventType
+    End Structure
+
+#End Region
+
+#Region "Enum"
+
+    Public Enum XMapState
+      IsUnmapped = 0
+      IsUnviewable = 1
+      IsViewable = 2
+    End Enum
+
+    <Flags()>
+    Public Enum XEventType
+      KeyPress = 2
+      KeyRelease = 3
+      ButtonPress = 4
+      ButtonRelease = 5
+      MotionNotify = 6
+      EnterNotify = 7
+      LeaveNotify = 8
+      FocusIn = 9
+      FocusOut = 10
+      KeymapNotify = 11
+      Expose = 12
+      GraphicsExpose = 13
+      NoExpose = 14
+      VisibilityNotify = 15
+      CreateNotify = 16
+      DestroyNotify = 17
+      UnmapNotify = 18
+      MapNotify = 19
+      MapRequest = 20
+      ReparentNotify = 21
+      ConfigureNotify = 22
+      ConfigureRequest = 23
+      GravityNotify = 24
+      ResizeRequest = 25
+      CirculateNotify = 26
+      CirculateRequest = 27
+      PropertyNotify = 28
+      SelectionClear = 29
+      SelectionRequest = 30
+      SelectionNotify = 31
+      ColormapNotify = 32
+      ClientMessage = 33
+      MappingNotify = 34
+    End Enum
+
+    <Flags()>
+    Public Enum XWindowAttributeFlags
+      CWBackPixel = (1 << 1)
+      CWBorderPixmap = (1 << 2)
+      CWBorderPixel = (1 << 3)
+      CWBitGravity = (1 << 4)
+      CWWinGravity = (1 << 5)
+      CWBackingStore = (1 << 6)
+      CWBackingPlanes = (1 << 7)
+      CWBackingPixel = (1 << 8)
+      CWOverrideRedirect = (1 << 9)
+      CWSaveUnder = (1 << 10)
+      CWEventMask = (1 << 11)
+      CWDontPropagate = (1 << 12)
+      CWColormap = (1 << 13)
+      CWCursor = (1 << 14)
+    End Enum
+
+    <Flags()>
+    Public Enum XEventMask
+      KeyPressMask = (1 << 0)
+      KeyReleaseMask = (1 << 1)
+      ButtonPressMask = (1 << 2)
+      ButtonReleaseMask = (1 << 3)
+      EnterWindowMask = (1 << 4)
+      LeaveWindowMask = (1 << 5)
+      PointerMotionMask = (1 << 6)
+      PointerMotionHintMask = (1 << 7)
+      Button1MotionMask = (1 << 8)
+      Button2MotionMask = (1 << 9)
+      Button3MotionMask = (1 << 10)
+      Button4MotionMask = (1 << 11)
+      Button5MotionMask = (1 << 12)
+      ButtonMotionMask = (1 << 13)
+      KeymapStateMask = (1 << 14)
+      ExposureMask = (1 << 15)
+      VisibilityChangeMask = (1 << 16)
+      StructureNotifyMask = (1 << 17)
+      ResizeRedirectMask = (1 << 18)
+      SubstructureNotifyMask = (1 << 19)
+      SubstructureRedirectMask = (1 << 20)
+      FocusChangeMask = (1 << 21)
+      PropertyChangeMask = (1 << 22)
+      ColormapChangeMask = (1 << 23)
+    End Enum
+
+#End Region
+
+#Region "OpenGL"
+
+    <DllImport("libGL.so.1", CharSet:=CharSet.Ansi)>
+    Friend Shared Function glXGetProcAddress(procname As String) As IntPtr
+    End Function
+
+    Friend Declare Function glXChooseVisual Lib "libGL.so.1" (display As IntPtr,
+                                                             screen As Integer,
+                                                             ByRef attribList() As Integer) As IntPtr
+    Friend Declare Function glXCreateContext Lib "libGL.so.1" (display As IntPtr, vi As IntPtr, shareList As IntPtr, direct As Boolean) As IntPtr
+    Friend Declare Function glXMakeCurrent Lib "libGL.so.1" (display As IntPtr, draw As IntPtr, context As IntPtr) As Integer
+    Friend Declare Sub glViewport Lib "libGL.so.1" (x As Integer, y As Integer, width As Integer, height As Integer)
+
+    Friend Declare Sub glEnable Lib "libGL.so.1" (cap As UInteger)
+    Friend Declare Sub glGenTextures Lib "libGL.so.1" (n As Integer, ByRef textures As UInteger)
+    Friend Declare Sub glBindTexture Lib "libGL.so.1" (target As UInteger, texture As UInteger)
+    Friend Declare Sub glTexParameteri Lib "libGL.so.1" (target As UInteger, pname As UInteger, param As Integer)
+    Friend Declare Sub glTexEnvf Lib "libGL.so.1" (target As UInteger, pname As UInteger, param As Single)
+    Friend Declare Sub glTexImage2D Lib "libGL.so.1" (target As UInteger, level As Integer, internalformat As Integer, width As Integer, height As Integer, border As Integer, format As UInteger, type As UInteger, data As IntPtr)
+    Friend Declare Sub glVertex3f Lib "libGL.so.1" (x As Single, y As Single, z As Single)
+    Friend Declare Sub glBegin Lib "libGL.so.1" (mode As UInteger)
+    Friend Declare Sub glTexCoord2f Lib "libGL.so.1" (s As Single, t As Single)
+    Friend Declare Sub glEnd Lib "libGL.so.1" ()
+    Friend Declare Sub glClear Lib "libGL.so.1" (mask As UInteger)
+    Friend Declare Sub glXSwapBuffers Lib "libGL.so.1" (display As IntPtr, drawable As IntPtr)
+    Friend Declare Sub glTexSubImage2D Lib "libGL.so.1" (target As UInteger, level As Integer, xoffset As Integer, yoffset As Integer, width As Integer, height As Integer, format As UInteger, type As UInteger, pixels As IntPtr)
+    Friend Declare Function glXDestroyContext Lib "libGL.so.1" (display As IntPtr, ctx As IntPtr) As Integer
+
+#End Region
+
+#Region "Linux P/Invoke - X11"
+
+    <DllImport("libX11.so.6", CharSet:=CharSet.Ansi)>
+    Friend Shared Function XInternAtom(display As IntPtr, atomName As String, onlyIfExists As Boolean) As Integer
+    End Function
+
+    <DllImport("libX11.so.6", CharSet:=CharSet.Ansi)>
+    Friend Shared Function XOpenDisplay(display As String) As IntPtr
+    End Function
+
+    <DllImport("libX11.so.6", CharSet:=CharSet.Ansi)>
+    Friend Shared Sub XStoreName(display As IntPtr, window As IntPtr, title As String)
+    End Sub
+
+    Friend Declare Sub XCloseDisplay Lib "libX11.so.6" (display As IntPtr)
+    Friend Declare Function XCreateColormap Lib "libX11.so.6" (display As IntPtr,
+                                                            window As IntPtr,
+                                                            visual As IntPtr,
+                                                            alloc As Integer) As IntPtr
+    Friend Declare Function XCreateWindow Lib "libX11.so.6" (display As IntPtr, ' Display*
+                                                          parent As IntPtr, ' Window
+                                                          x As Integer, ' int
+                                                          y As Integer, ' int
+                                                          width As Integer, ' unsigned int
+                                                          height As Integer, ' unsigned int
+                                                          borderWidth As Integer, ' unsigned int
+                                                          depth As Integer, ' int
+                                                          [class] As Integer, ' unsigned int
+                                                          visual As IntPtr, ' Visual*
+                                                          valueMask As XWindowAttributeFlags, ' unsigned long
+                                                          ByRef attributes As XSetWindowAttributes ' XSetWindowAttributes*
+                                                          ) As IntPtr ' Window
+    Friend Declare Function XDefaultRootWindow Lib "libX11.so.6" (display As IntPtr) As IntPtr
+    Friend Declare Function XDestroyWindow Lib "libX11.so.6" (display As IntPtr, window As IntPtr) As Integer
+    Friend Declare Function XFlush Lib "libX11.so.6" (display As IntPtr) As Integer
+    Friend Declare Function XGetWindowAttributes Lib "libX11.so.6" (display As IntPtr, w As IntPtr, <Out> ByRef windowAttributesReturn As XWindowAttributes) As Integer
+    Friend Declare Function XInitThreads Lib "libX11.so.6" () As Integer
+    Friend Declare Sub XMapWindow Lib "libX11.so.6" (display As IntPtr, window As IntPtr)
+    Friend Declare Function XLookupKeysym Lib "libX11.so.6" (ByRef keyEvent As XKeyEvent, index As Integer) As XKeySym
+    Friend Declare Function XNextEvent Lib "libX11.so.6" (display As IntPtr, handle As IntPtr) As Integer
+    Friend Declare Function XPending Lib "libX11.so.6" (display As IntPtr) As Integer
+    Friend Declare Function XSendEvent Lib "libX11.so.6" (display As IntPtr, ' Display *
+                                                       window As IntPtr, ' Window
+                                                       propagate As Boolean, ' Bool
+                                                       eventMask As Long, ' long
+                                                       eventSend As IntPtr ' XEvent *
+                                                       ) As Integer ' Status
+    Friend Declare Sub XSetWMProtocols Lib "libX11.so.6" (display As IntPtr, window As IntPtr,
+                                                       protocols As Integer(), count As Integer)
+
+#End Region
+
+  End Class
+
+  Private Delegate Function glSwapInterval_t(display As IntPtr, drawable As IntPtr, interval As Integer) As Integer
+  Private glSwapIntervalEXT As glSwapInterval_t
   Private pge_Display As IntPtr
   Private pge_WindowRoot As IntPtr
   Private pge_Window As IntPtr
-  Private pge_VisualInfo As VisualInfo
+  Private pge_VisualInfo As IntPtr
   Private pge_ColourMap As IntPtr
-  Private pge_SetWindowAttribs As XSetWindowAttributesStruct
-
-  <StructLayout(LayoutKind.Sequential)>
-  Public Structure VisualInfo
-    Public visual As IntPtr
-    Public visualid As ULong 'Integer
-    Public screen As Integer
-    Public depth As Integer
-    Public klass As Integer
-    Public red_mask As ULong
-    Public green_mask As ULong
-    Public blue_mask As ULong
-    Public colormap_size As Integer
-    Public bits_per_rgb As Integer
-  End Structure
-
-  <StructLayout(LayoutKind.Sequential)>
-  Private Structure XEvent
-    Public type As UInteger
-    Public xclient As XClientMessageEvent
-  End Structure
-
-  <StructLayout(LayoutKind.Sequential)>
-  Private Structure XClientMessageEvent
-    Public type As UInteger
-    Public serial As UInteger
-    Public send_event As Boolean
-    Public display As IntPtr
-    Public window As IntPtr
-    Public message_type As IntPtr
-    Public format As Integer
-    Public data As XClientMessageEventDataUnion
-  End Structure
-
-  <StructLayout(LayoutKind.Sequential)>
-  Private Structure XClientMessageEventDataUnion
-    <MarshalAs(UnmanagedType.ByValArray, SizeConst:=20)> Public l() As Byte
-  End Structure
-
-  <StructLayout(LayoutKind.Explicit)>
-  Public Structure ClientMessageDataUnion
-    <FieldOffset(0)>
-    Public b As Byte
-
-    <FieldOffset(0)>
-    Public s As Short
-
-    <FieldOffset(0)>
-    Public l As Integer
-
-    <FieldOffset(0)>
-    Public ll As Long
-  End Structure
-
-  <StructLayout(LayoutKind.Sequential)>
-  Private Structure XWindowAttributes
-    Dim x As Integer
-    Dim y As Integer
-    Dim width As Integer
-    Dim height As Integer
-    Dim border_width As Integer
-    Dim depth As Integer
-    Dim visual As IntPtr
-    Dim root As IntPtr
-    Dim [Class] As Integer
-    Dim bit_gravity As Integer
-    Dim win_gravity As Integer
-    Dim backing_store As Integer
-    Dim backing_planes As Long
-    Dim backing_pixel As Long
-    Dim save_under As Integer
-    Dim colormap As IntPtr
-    Dim map_installed As Integer
-    Dim map_state As Integer
-    Dim all_event_masks As Long
-    Dim your_event_mask As Long
-    Dim do_not_propagate_mask As Long
-    Dim override_redirect As Integer
-    Dim screen As IntPtr
-  End Structure
-
-  <StructLayout(LayoutKind.Sequential)>
-  Public Structure XSetWindowAttributesStruct
-    Public background_pixmap As IntPtr
-    Public background_pixel As ULong
-    Public border_pixmap As IntPtr
-    Public border_pixel As ULong
-    Public bit_gravity As Integer
-    Public win_gravity As Integer
-    Public backing_store As Integer
-    Public backing_planes As ULong
-    Public backing_pixel As ULong
-    Public save_under As Boolean
-    Public event_mask As ULong
-    Public do_not_propagate_mask As ULong
-    Public override_redirect As Boolean
-    Public colormap As IntPtr
-    Public cursor As IntPtr
-  End Structure
-
-  <StructLayout(LayoutKind.Sequential)>
-  Structure GLXContext
-    Public ptr As IntPtr
-  End Structure
-
-  <StructLayout(LayoutKind.Sequential)>
-  Structure GLXFBConfig
-    Public ptr As IntPtr
-  End Structure
-
-  'Public Class X11
-  <DllImport("libX11.so.6", CharSet:=CharSet.Unicode)>
-  Private Shared Function XOpenDisplay(display As String) As IntPtr
-  End Function
-  <DllImport("libX11.so.6")>
-  Private Shared Function XDefaultRootWindow(display As IntPtr) As IntPtr
-  End Function
-
-  <DllImport("libX11.so.6",
-             CallingConvention:=CallingConvention.Cdecl,
-             SetLastError:=True)>
-  Private Shared Function XCreateColormap(display As IntPtr,
-                                          w As IntPtr,
-                                          visual As IntPtr,
-                                          alloc As Integer) As IntPtr
-  End Function
-
-  <DllImport("libX11.so.6",
-             CallingConvention:=CallingConvention.Cdecl,
-             SetLastError:=True)>
-  Private Shared Function XInternAtom(display As IntPtr, atom_name As String, only_if_exists As Boolean) As IntPtr
-  End Function
-
-  'End Class
-
-  Private Declare Function XInitThreads Lib "libX11.so.6" () As Integer
-  'Private Declare Function XOpenDisplay Lib "libX11.so.6" (display_name As String) As IntPtr
-  'Private Declare Function DefaultRootWindow Lib "libX11.so.6" (display As IntPtr) As IntPtr
-  Private Declare Function glXChooseVisual Lib "libGL.so.1" (display As IntPtr, screen As Integer, attribList As Integer()) As VisualInfo
-  Private Declare Sub glXSwapBuffers Lib "libGL.so.1" (display As IntPtr, drawable As IntPtr)
-  'Private Declare Function XCreateColormap Lib "libX11.so.6" (display As IntPtr, w As IntPtr, visual As IntPtr, alloc As Integer) As IntPtr
-  Private Declare Function XCreateWindow Lib "libX11.so.6" (display As IntPtr, parent As IntPtr, x As Integer, y As Integer, width As Integer, height As Integer, border_width As Integer, depth As Integer, [class] As Integer, visual As IntPtr, valuemask As UInteger, ByRef attributes As XSetWindowAttributesStruct) As IntPtr
-  Private Declare Function XSetWMProtocols Lib "libX11.so.6" (display As IntPtr, window As IntPtr, protocols() As IntPtr, count As Integer) As Integer
-  Private Declare Function XStoreName Lib "libX11.so.6" (display As IntPtr, w As IntPtr, title As String) As Integer
-  Private Declare Function XSendEvent Lib "libX11.so.6" (display As IntPtr, w As IntPtr, propagate As Boolean, event_mask As UInteger, ByRef event_send As XEvent) As Integer
-  Private Declare Function SubstructureRedirectMask Lib "libX11.so.6" Alias "SubstructureRedirectMask" () As UInteger
-  Private Declare Function SubstructureNotifyMask Lib "libX11.so.6" Alias "SubstructureNotifyMask" () As UInteger
-  Private Declare Function XFlush Lib "libX11.so.6" (display As IntPtr) As Integer
-  Private Declare Function XGetWindowAttributes Lib "libX11.so.6" (display As IntPtr, window As IntPtr, ByRef window_attributes As XWindowAttributes) As Integer
-  Private Declare Function XSetWindowAttributes Lib "libX11.so.6" (display As IntPtr, w As IntPtr, ByRef attributes As XSetWindowAttributesStruct) As Integer
-  Private Declare Function XInternalAtom1 Lib "libX11.so.6" (display As IntPtr, name As String, onlyIfExists As Boolean) As ULong
-  Private Declare Function XMapWindow1 Lib "libX11.so.6" (display As IntPtr, w As IntPtr) As Integer
-  Private Declare Function XSendEvent Lib "libX11.so.6" (display As IntPtr, w As IntPtr, propagate As Boolean, event_mask As Long, ByRef event_send As XClientMessageEvent) As Integer
-  'Private Declare Function XInternAtom Lib "libX11.so.6" (display As IntPtr, atom_name As String, only_if_exists As Boolean) As IntPtr
-  Private Declare Auto Function XMapWindow Lib "libX11.so.6" (display As IntPtr, w As IntPtr) As Integer
-  Private Declare Function glXCreateContext Lib "libGL.so.1" (display As IntPtr, visual As VisualInfo, share_context As IntPtr, direct As Boolean) As GLXContext
-  Private Declare Function glXMakeCurrent Lib "libGL.so.1" (display As IntPtr, drawable As IntPtr, context As GLXContext) As Boolean
-  Private Declare Function glXGetProcAddress Lib "libGL.so.1" (procname As String) As IntPtr
-  Private Declare Function glXDestroyContext Lib "libGL.so.1" (display As IntPtr, ctx As IntPtr) As Integer
-  Private Declare Function XDestroyWindow Lib "libX11.so.6" (display As IntPtr, w As IntPtr) As Integer
-  Private Declare Function XCloseDisplay Lib "libX11.so.6" (display As IntPtr) As Integer
-  'Private Delegate Sub glSwapInterval_t(ByVal display As IntPtr, ByVal drawable As IntPtr, ByVal interval As Integer)
-  'Private Declare Sub glSwapIntervalEXT Lib "libGL.so.1" (ByVal display As IntPtr, ByVal drawable As IntPtr, ByVal interval As Integer)
+  Private pge_SetWindowAttribs As X11.XSetWindowAttributes
 
 #End Region
 
@@ -825,17 +1760,17 @@ Public MustInherit Class PixelGameEngine
     nScreenHeight = h
     pDefaultDrawTarget = New Sprite(nScreenWidth, nScreenHeight)
     SetDrawTarget(Nothing)
-    glClear(GL_COLOR_BUFFER_BIT)
 
     If IsOSPlatform(Windows) Then
-      SwapBuffers(glDeviceContext)
+      Win32.glClear(GL_COLOR_BUFFER_BIT)
+      Win32.SwapBuffers(glDeviceContext)
+      Win32.glClear(GL_COLOR_BUFFER_BIT)
+    Else
+      X11.glClear(GL_COLOR_BUFFER_BIT)
+      X11.glXSwapBuffers(pge_Display, pge_Window)
+      X11.glClear(GL_COLOR_BUFFER_BIT)
     End If
 
-    If IsOSPlatform(Linux) Then
-      glXSwapBuffers(pge_Display, pge_Window)
-    End If
-
-    glClear(GL_COLOR_BUFFER_BIT)
     Pge_UpdateViewport()
 
   End Sub
@@ -845,23 +1780,17 @@ Public MustInherit Class PixelGameEngine
 
     ' Construct the window
     If IsOSPlatform(Windows) Then
-      If Pge_WindowCreate_Windows() = IntPtr.Zero Then
-        Return RCode.FAIL
-      End If
+      If Pge_WindowCreate_Windows() = IntPtr.Zero Then Return RCode.FAIL
     ElseIf IsOSPlatform(Linux) Then
-      If Pge_WindowCreate_Linux() = IntPtr.Zero Then
-        Return RCode.FAIL
-      End If
+      If Pge_WindowCreate_Linux() = IntPtr.Zero Then Return RCode.FAIL
     Else
       Return RCode.FAIL
     End If
 
     If IsOSPlatform(Windows) Then
-
       'FreeConsole() ' doesn't always work??????
-      Dim ptr = GetConsoleWindow
-      ShowWindow(ptr, 0)
-
+      Dim ptr = Win32.GetConsoleWindow
+      Win32.ShowWindow(ptr, 0)
     End If
 
     ' Start the thread
@@ -871,16 +1800,16 @@ Public MustInherit Class PixelGameEngine
 
     If IsOSPlatform(Windows) Then
       ' Handle Windows Message Loop
-      Dim m = New MSG
+      Dim m = New Win32.MSG
       m.message = 0 ' Set the message parameter to zero to retrieve any message.
       m.hWnd = IntPtr.Zero ' Set the window handle parameter to zero to retrieve messages for any window.
       m.wParam = IntPtr.Zero ' Set the wParam parameter to zero.
       m.lParam = IntPtr.Zero ' Set the lParam parameter to zero.
       m.time = 0 ' Set the time parameter to zero.
-      m.pt = New Point(0, 0) ' Set the cursor position to (0,0).
-      While GetMessage(m, IntPtr.Zero, 0, 0) > 0
-        TranslateMessage(m)
-        Dim hrslt = DispatchMessage(m)
+      m.pt = New Win32.Point(0, 0) ' Set the cursor position to (0,0).
+      While Win32.GetMessage(m, IntPtr.Zero, 0, 0) > 0
+        Win32.TranslateMessage(m)
+        Dim hrslt = Win32.DispatchMessage(m)
       End While
     End If
 
@@ -1685,40 +2614,46 @@ next4:
 
   Private Sub EngineThread()
 
-    ' Start OpenGL, the context is owned by the game thread
     If IsOSPlatform(Windows) Then
+      ' Start OpenGL, the context is owned by the game thread
       Pge_OpenGLCreate_Windows()
+      ' Create Screen Texture - disable filtering
+      Win32.glEnable(GL_TEXTURE_2D)
+      Win32.glGenTextures(1, glBuffer)
+      Win32.glBindTexture(GL_TEXTURE_2D, glBuffer)
+      Win32.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
+      Win32.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
+      Win32.glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL)
     ElseIf IsOSPlatform(Linux) Then
+      ' Start OpenGL, the context is owned by the game thread
       Pge_OpenGLCreate_Linux()
+      ' Create Screen Texture - disable filtering
+      X11.glEnable(GL_TEXTURE_2D)
+      X11.glGenTextures(1, glBuffer)
+      X11.glBindTexture(GL_TEXTURE_2D, glBuffer)
+      X11.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
+      X11.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
+      X11.glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL)
     End If
 
-    ' Create Screen Texture - disable filtering
-    glEnable(GL_TEXTURE_2D)
-    glGenTextures(1, glBuffer)
-    glBindTexture(GL_TEXTURE_2D, glBuffer)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
-    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL)
-
     If True Then
-      ' NOTE: the below doesn't seem to be working as SizeOf is reporting 8 instead of 4 as I would expect given the FieldOffset overlap...
-      'Dim data = pDefaultDrawTarget.GetData
-      'Dim sz = Marshal.SizeOf(GetType(Pixel))
-      'Dim ptr = Marshal.AllocHGlobal(sz * data.Length)
-      'For i = 0 To data.Length - 1
-      '  Marshal.StructureToPtr(data(i), ptr + i * sz, False)
-      'Next
-      Dim data = pDefaultDrawTarget.GetData ' NOTE: DO NOT INLINE... perf hit big time!
-      Dim b((data.Length * 4) - 1) As Byte
-      For index = 0 To data.Length - 1
-        b(index * 4) = data(index).R
-        b((index * 4) + 1) = data(index).G
-        b((index * 4) + 2) = data(index).B
-        b((index * 4) + 3) = data(index).A
-      Next
+      Dim data = pDefaultDrawTarget.GetData
+      Dim sz = Marshal.SizeOf(GetType(Pixel))
+      Dim ts As Integer = sz * data.Length
+      Dim b(ts - 1) As Byte
+      Dim handle As GCHandle = GCHandle.Alloc(data, GCHandleType.Pinned)
+      Try
+        Marshal.Copy(handle.AddrOfPinnedObject(), b, 0, ts)
+      Finally
+        handle.Free()
+      End Try
       Dim ptr = Marshal.AllocHGlobal(b.Length)
       Marshal.Copy(b, 0, ptr, b.Length)
-      glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, nScreenWidth, nScreenHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, ptr)
+      If IsOSPlatform(Linux) Then
+        X11.glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, nScreenWidth, nScreenHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, ptr)
+      Else
+        Win32.glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, nScreenWidth, nScreenHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, ptr)
+      End If
       Marshal.FreeHGlobal(ptr)
     End If
 
@@ -1730,203 +2665,236 @@ next4:
     Dim tp1 = Now()
     'Dim tp2 = Now()
 
-    While Singleton.AtomActive
+    Dim xe = Marshal.AllocHGlobal(Marshal.SizeOf(GetType(X11._XEvent)))
 
-      ' Run as fast as possible
+    Try
+
       While Singleton.AtomActive
 
-        ' Handle Timing
-        Dim tp2 = Now
-        Dim difference = tp2 - tp1
-        tp1 = tp2
+        ' Run as fast as possible
+        While Singleton.AtomActive
 
-        Dim elapsedTime = CSng(difference.TotalSeconds)
+          ' Handle Timing
+          Dim tp2 = Now
+          Dim difference = tp2 - tp1
+          tp1 = tp2
 
-        If IsOSPlatform(Linux) Then
+          Dim elapsedTime = CSng(difference.TotalSeconds)
 
-          'TODO:
+          If IsOSPlatform(Linux) Then
 
-          '' Handle Xlib Message Loop - we do this in the
-          '' same thread that OpenGL was created so we don't
-          '' need to worry too much about multithreading with X11
-          'Dim xev As XEvent
-          'While XPending(pge_Display) > 0
-          '  XNextEvent(pge_Display, xev)
+            ' Handle Xlib Message Loop - we do this in the
+            ' same thread that OpenGL was created so we don't
+            ' need to worry too much about multithreading with X11
+            While X11.XPending(pge_Display) > 0
 
-          '  If xev.type = Expose Then
-          '    Dim gwa As XWindowAttributes
-          '    XGetWindowAttributes(pge_Display, pge_Window, gwa)
-          '    nWindowWidth = gwa.width
-          '    nWindowHeight = gwa.height
-          '    pge_UpdateViewport()
-          '    glClear(GL_COLOR_BUFFER_BIT) ' Thanks Benedani!
-          '  ElseIf xev.type = ConfigureNotify Then
-          '    Dim xce As XConfigureEvent = xev.xconfigure
-          '    nWindowWidth = xce.width
-          '    nWindowHeight = xce.height
-          '  ElseIf xev.type = KeyPress Then
-          '    Dim sym As KeySym = XLookupKeysym(xev.xkey, 0)
-          '    pKeyNewState(mapKeys(sym)) = True
-          '    Dim e As XKeyEvent = CType(xev, XKeyEvent) ' Because DragonEye loves numpads
-          '    XLookupString(e, Nothing, 0, sym, Nothing)
-          '    pKeyNewState(mapKeys(sym)) = True
-          '  ElseIf xev.type = KeyRelease Then
-          '    Dim sym As KeySym = XLookupKeysym(xev.xkey, 0)
-          '    pKeyNewState(mapKeys(sym)) = False
-          '    Dim e As XKeyEvent = CType(xev, XKeyEvent)
-          '    XLookupString(e, Nothing, 0, sym, Nothing)
-          '    pKeyNewState(mapKeys(sym)) = False
-          '  ElseIf xev.type = ButtonPress Then
-          '    Select Case xev.xbutton.button
-          '      Case 1 : pMouseNewState(0) = True
-          '      Case 2 : pMouseNewState(2) = True
-          '      Case 3 : pMouseNewState(1) = True
-          '      Case 4 : pge_UpdateMouseWheel(120)
-          '      Case 5 : pge_UpdateMouseWheel(-120)
-          '      Case Else
-          '    End Select
-          '  ElseIf xev.type = ButtonRelease Then
-          '    Select Case xev.xbutton.button
-          '      Case 1 : pMouseNewState(0) = False
-          '      Case 2 : pMouseNewState(2) = False
-          '      Case 3 : pMouseNewState(1) = False
-          '      Case Else
-          '    End Select
-          '  ElseIf xev.type = MotionNotify Then
-          '    pge_UpdateMouse(xev.xmotion.x, xev.xmotion.y)
-          '  ElseIf xev.type = FocusIn Then
-          '    bHasInputFocus = True
-          '  ElseIf xev.type = FocusOut Then
-          '    bHasInputFocus = False
-          '  ElseIf xev.type = ClientMessage Then
-          '    bAtomActive = False
-          '  End If
-          'End While
+              Dim status = X11.XNextEvent(pge_Display, xe)
+              Dim xevent = CType(Marshal.PtrToStructure(xe, GetType(X11._XEvent)), X11._XEvent)
 
-        End If
+              Select Case xevent.Type
+                Case X11.XEventType.Expose
+                  Dim gwa As X11.XWindowAttributes
+                  Dim rslt = X11.XGetWindowAttributes(pge_Display, pge_Window, gwa)
+                  nWindowWidth = gwa.Width
+                  nWindowHeight = gwa.Height
+                  Pge_UpdateViewport()
+                  X11.glClear(GL_COLOR_BUFFER_BIT) ' Thanks Benedani!
+                Case X11.XEventType.ConfigureNotify
+                  Dim xce = CType(Marshal.PtrToStructure(xe, GetType(X11.XConfigureEvent)), X11.XConfigureEvent)
+                  nWindowWidth = xce.Width
+                  nWindowHeight = xce.Height
+                Case X11.XEventType.KeyPress
+                  Dim key = CType(Marshal.PtrToStructure(xe, GetType(X11.XKeyEvent)), X11.XKeyEvent)
+                  Dim sym = X11.XLookupKeysym(key, 0)
+                  pKeyNewState(MapKeys(sym)) = True
+                'Dim sym As X11.XKeySym = X11.XLookupKeysym(xev.xkey, 0)
+                'pKeyNewState(MapKeys(sym)) = True
+                'Dim e As X11.XKeyEvent = CType(xev, X11.XKeyEvent) ' Because DragonEye loves numpads
+                'X11.XLookupString(e, Nothing, 0, sym, Nothing)
+                'pKeyNewState(MapKeys(sym)) = True
+                Case X11.XEventType.KeyRelease
+                  Dim key = CType(Marshal.PtrToStructure(xe, GetType(X11.XKeyEvent)), X11.XKeyEvent)
+                  Dim sym = X11.XLookupKeysym(key, 0)
+                  pKeyNewState(MapKeys(sym)) = False
+                'Dim sym As X11.XKeySym = X11.XLookupKeysym(xev.xkey, 0)
+                'pKeyNewState(MapKeys(sym)) = False
+                'Dim e As X11.XKeyEvent = CType(xev, X11.XKeyEvent)
+                'X11.XLookupString(e, Nothing, 0, sym, Nothing)
+                'pKeyNewState(MapKeys(sym)) = False
+                Case X11.XEventType.ButtonPress
+                  Dim btn = CType(Marshal.PtrToStructure(xe, GetType(X11.XButtonEvent)), X11.XButtonEvent)
+                  Select Case btn.Button
+                    Case 1 : pMouseNewState(0) = True
+                    Case 2 : pMouseNewState(2) = True
+                    Case 3 : pMouseNewState(1) = True
+                    Case 4 : Pge_UpdateMouseWheel(120)
+                    Case 5 : Pge_UpdateMouseWheel(-120)
+                    Case Else
+                  End Select
+                Case X11.XEventType.ButtonRelease
+                  Dim btn = CType(Marshal.PtrToStructure(xe, GetType(X11.XButtonEvent)), X11.XButtonEvent)
+                  Select Case btn.Button
+                    Case 1 : pMouseNewState(0) = False
+                    Case 2 : pMouseNewState(2) = False
+                    Case 3 : pMouseNewState(1) = False
+                    Case Else
+                  End Select
+                Case X11.XEventType.MotionNotify
+                  Dim motion = CType(Marshal.PtrToStructure(xe, GetType(X11.XMotionEvent)), X11.XMotionEvent)
+                  Pge_UpdateMouse(motion.X, motion.Y)
+                Case X11.XEventType.FocusIn
+                  bHasInputFocus = True
+                Case X11.XEventType.FocusOut
+                  bHasInputFocus = False
+                Case X11.XEventType.ClientMessage
+                  Singleton.AtomActive = False
+                Case Else
+              End Select
+            End While
 
-        ' Handle User Input - Keyboard
-        For i = 0 To 255
-          pKeyboardState(i).Pressed = False
-          pKeyboardState(i).Released = False
-          If pKeyNewState(i) <> pKeyOldState(i) Then
-            If pKeyNewState(i) Then
-              pKeyboardState(i).Pressed = Not pKeyboardState(i).Held
-              pKeyboardState(i).Held = True
-            Else
-              pKeyboardState(i).Released = True
-              pKeyboardState(i).Held = False
-            End If
           End If
-          pKeyOldState(i) = pKeyNewState(i)
-        Next
 
-        ' Handle User Input - Mouse
-        For i = 0 To 4
-          pMouseState(i).Pressed = False
-          pMouseState(i).Released = False
-          If pMouseNewState(i) <> pMouseOldState(i) Then
-            If pMouseNewState(i) Then
-              pMouseState(i).Pressed = Not pMouseState(i).Held
-              pMouseState(i).Held = True
-            Else
-              pMouseState(i).Released = True
-              pMouseState(i).Held = False
+          ' Handle User Input - Keyboard
+          For i = 0 To 255
+            pKeyboardState(i).Pressed = False
+            pKeyboardState(i).Released = False
+            If pKeyNewState(i) <> pKeyOldState(i) Then
+              If pKeyNewState(i) Then
+                pKeyboardState(i).Pressed = Not pKeyboardState(i).Held
+                pKeyboardState(i).Held = True
+              Else
+                pKeyboardState(i).Released = True
+                pKeyboardState(i).Held = False
+              End If
             End If
+            pKeyOldState(i) = pKeyNewState(i)
+          Next
+
+          ' Handle User Input - Mouse
+          For i = 0 To 4
+            pMouseState(i).Pressed = False
+            pMouseState(i).Released = False
+            If pMouseNewState(i) <> pMouseOldState(i) Then
+              If pMouseNewState(i) Then
+                pMouseState(i).Pressed = Not pMouseState(i).Held
+                pMouseState(i).Held = True
+              Else
+                pMouseState(i).Released = True
+                pMouseState(i).Held = False
+              End If
+            End If
+            pMouseOldState(i) = pMouseNewState(i)
+          Next
+
+          ' Cache mouse coordinates so they remain
+          ' consistent during frame
+          nMousePosX = nMousePosXcache
+          nMousePosY = nMousePosYcache
+
+          nMouseWheelDelta = nMouseWheelDeltaCache
+          nMouseWheelDeltaCache = 0
+
+          ' Handle Frame Update
+          If Not OnUserUpdate(elapsedTime) Then
+            Singleton.AtomActive = False
           End If
-          pMouseOldState(i) = pMouseNewState(i)
-        Next
 
-        ' Cache mouse coordinates so they remain
-        ' consistent during frame
-        nMousePosX = nMousePosXcache
-        nMousePosY = nMousePosYcache
+          ' Display Graphics
+          If IsOSPlatform(Windows) Then
+            Win32.glViewport(nViewX, nViewY, nViewW, nViewH)
+          Else
+            X11.glViewport(nViewX, nViewY, nViewW, nViewH)
+          End If
 
-        nMouseWheelDelta = nMouseWheelDeltaCache
-        nMouseWheelDeltaCache = 0
-
-        ' Handle Frame Update
-        If Not OnUserUpdate(elapsedTime) Then
-          Singleton.AtomActive = False
-        End If
-
-        ' Display Graphics
-        glViewport(nViewX, nViewY, nViewW, nViewH)
-
-        ' Copy pixel array into texture
-        Dim data = pDefaultDrawTarget.GetData ' NOTE: DO NOT INLINE... perf hit big time!
-        Dim b((data.Length * 4) - 1) As Byte
-        For index = 0 To data.Length - 1
-          b(index * 4) = data(index).R
-          b((index * 4) + 1) = data(index).G
-          b((index * 4) + 2) = data(index).B
-          b((index * 4) + 3) = data(index).A
-        Next
-        Dim ptr = Marshal.AllocHGlobal(b.Length)
-        Marshal.Copy(b, 0, ptr, b.Length)
-        glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, nScreenWidth, nScreenHeight, GL_RGBA, GL_UNSIGNED_BYTE, ptr)
-        Marshal.FreeHGlobal(ptr)
-
-        ' Display texture on screen
-        glBegin(GL_QUADS)
-        glTexCoord2f(0.0, 1.0) : glVertex3f(-1.0F + fSubPixelOffsetX, -1.0F + fSubPixelOffsetY, 0.0F)
-        glTexCoord2f(0.0, 0.0) : glVertex3f(-1.0F + fSubPixelOffsetX, 1.0F + fSubPixelOffsetY, 0.0F)
-        glTexCoord2f(1.0, 0.0) : glVertex3f(1.0F + fSubPixelOffsetX, 1.0F + fSubPixelOffsetY, 0.0F)
-        glTexCoord2f(1.0, 1.0) : glVertex3f(1.0F + fSubPixelOffsetX, -1.0F + fSubPixelOffsetY, 0.0F)
-        glEnd()
-
-        ' Preset Graphics to screen
-        If IsOSPlatform(Windows) Then
-          SwapBuffers(glDeviceContext)
-        ElseIf IsOSPlatform(Linux) Then
-          glXSwapBuffers(pge_Display, pge_Window)
-        End If
-
-        ' Update Title Bar
-        fFrameTimer += elapsedTime
-        nFrameCount += 1
-
-        If fFrameTimer >= 1.0F Then
-
-          fFrameTimer -= 1.0F
-
-          Dim sTitle = $"vbPixelGameEngine v0.0.1 - {AppName} - FPS: {nFrameCount}"
+          ' Copy pixel array into texture
+          Dim data = pDefaultDrawTarget.GetData
+          Dim sz = Marshal.SizeOf(GetType(Pixel))
+          Dim ts As Integer = sz * data.Length
+          Dim b(ts - 1) As Byte
+          Dim handle As GCHandle = GCHandle.Alloc(data, GCHandleType.Pinned)
+          Try
+            Marshal.Copy(handle.AddrOfPinnedObject(), b, 0, ts)
+          Finally
+            handle.Free()
+          End Try
+          Dim ptr = Marshal.AllocHGlobal(b.Length)
+          Marshal.Copy(b, 0, ptr, b.Length)
+          If IsOSPlatform(Windows) Then
+            Win32.glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, nScreenWidth, nScreenHeight, GL_RGBA, GL_UNSIGNED_BYTE, ptr)
+          Else
+            X11.glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, nScreenWidth, nScreenHeight, GL_RGBA, GL_UNSIGNED_BYTE, ptr)
+          End If
+          Marshal.FreeHGlobal(ptr)
 
           If IsOSPlatform(Windows) Then
-            SetWindowText(pge_hWnd, sTitle)
+            ' Display texture on screen
+            Win32.glBegin(GL_QUADS)
+            Win32.glTexCoord2f(0.0, 1.0) : Win32.glVertex3f(-1.0F + fSubPixelOffsetX, -1.0F + fSubPixelOffsetY, 0.0F)
+            Win32.glTexCoord2f(0.0, 0.0) : Win32.glVertex3f(-1.0F + fSubPixelOffsetX, 1.0F + fSubPixelOffsetY, 0.0F)
+            Win32.glTexCoord2f(1.0, 0.0) : Win32.glVertex3f(1.0F + fSubPixelOffsetX, 1.0F + fSubPixelOffsetY, 0.0F)
+            Win32.glTexCoord2f(1.0, 1.0) : Win32.glVertex3f(1.0F + fSubPixelOffsetX, -1.0F + fSubPixelOffsetY, 0.0F)
+            Win32.glEnd()
+            ' Preset Graphics to screen
+            Win32.SwapBuffers(glDeviceContext)
           ElseIf IsOSPlatform(Linux) Then
-            Dim hrslt = XStoreName(pge_Display, pge_Window, sTitle)
+            ' Display texture on screen
+            X11.glBegin(GL_QUADS)
+            X11.glTexCoord2f(0.0, 1.0) : X11.glVertex3f(-1.0F + fSubPixelOffsetX, -1.0F + fSubPixelOffsetY, 0.0F)
+            X11.glTexCoord2f(0.0, 0.0) : X11.glVertex3f(-1.0F + fSubPixelOffsetX, 1.0F + fSubPixelOffsetY, 0.0F)
+            X11.glTexCoord2f(1.0, 0.0) : X11.glVertex3f(1.0F + fSubPixelOffsetX, 1.0F + fSubPixelOffsetY, 0.0F)
+            X11.glTexCoord2f(1.0, 1.0) : X11.glVertex3f(1.0F + fSubPixelOffsetX, -1.0F + fSubPixelOffsetY, 0.0F)
+            X11.glEnd()
+            ' Preset Graphics to screen
+            X11.glXSwapBuffers(pge_Display, pge_Window)
           End If
 
-          nFrameCount = 0
+          ' Update Title Bar
+          fFrameTimer += elapsedTime
+          nFrameCount += 1
 
+          If fFrameTimer >= 1.0F Then
+
+            fFrameTimer -= 1.0F
+
+            Dim sTitle = $"vbPixelGameEngine v0.0.1 - {AppName} - FPS: {nFrameCount}"
+
+            If IsOSPlatform(Windows) Then
+              Win32.SetWindowText(pge_hWnd, sTitle)
+            ElseIf IsOSPlatform(Linux) Then
+              X11.XStoreName(pge_Display, pge_Window, sTitle)
+            End If
+
+            nFrameCount = 0
+
+          End If
+
+        End While
+
+        ' Allow the user to free resources if they have overridden the destroy function
+        If OnUserDestroy() Then
+          ' User has permitted destroy, so exit and clean up
+        Else
+          ' User denied destroy for some reason, so continue running
+          Singleton.AtomActive = True
         End If
 
       End While
 
-      ' Allow the user to free resources if they have overridden the destroy function
-      If OnUserDestroy() Then
-        ' User has permitted destroy, so exit and clean up
-      Else
-        ' User denied destroy for some reason, so continue running
-        Singleton.AtomActive = True
-      End If
-
-    End While
+    Finally
+      Marshal.FreeHGlobal(xe)
+    End Try
 
     If IsOSPlatform(Windows) Then
-      wglDeleteContext(glRenderContext)
-      PostMessage(pge_hWnd, WM_DESTROY, IntPtr.Zero, IntPtr.Zero)
+      Win32.wglDeleteContext(glRenderContext)
+      Win32.PostMessage(pge_hWnd, WM_DESTROY, IntPtr.Zero, IntPtr.Zero)
     ElseIf IsOSPlatform(Linux) Then
-      glXMakeCurrent(pge_Display, IntPtr.Zero, Nothing)
-      Dim hrslt = glXDestroyContext(pge_Display, glDeviceContext)
-      hrslt = XDestroyWindow(pge_Display, pge_Window)
-      hrslt = XCloseDisplay(pge_Display)
+      Dim hrslt = X11.glXMakeCurrent(pge_Display, IntPtr.Zero, Nothing)
+      hrslt = X11.glXDestroyContext(pge_Display, glDeviceContext)
+      hrslt = X11.XDestroyWindow(pge_Display, pge_Window)
+      X11.XCloseDisplay(pge_Display)
     End If
 
   End Sub
-
-  ' GDIPlusStartup?
 
   Private Sub Pge_ConstructFontSheet()
 
@@ -1975,11 +2943,11 @@ next4:
 
   Private Function Pge_WindowCreate_Windows() As IntPtr
 
-    Dim wc As New WNDCLASS
-    wc.hIcon = LoadIcon(IntPtr.Zero, IDI_APPLICATION)
-    wc.hCursor = LoadCursor(IntPtr.Zero, IDC_ARROW)
+    Dim wc As New Win32.WNDCLASS
+    wc.hIcon = Win32.LoadIcon(IntPtr.Zero, IDI_APPLICATION)
+    wc.hCursor = Win32.LoadCursor(IntPtr.Zero, IDC_ARROW)
     wc.Style = CS_HREDRAW Or CS_VREDRAW Or CS_OWNDC
-    wc.hInstance = GetModuleHandle(Nothing)
+    wc.hInstance = Win32.GetModuleHandle(Nothing)
     wc.WndProc = Marshal.GetFunctionPointerForDelegate(m_delegWndProc)
     wc.ClsExtra = 0
     wc.WndExtra = 0
@@ -1987,9 +2955,9 @@ next4:
     wc.hBackground = CType(COLOR_BACKGROUND, IntPtr) + 1 'Nothing
     wc.ClassName = "VB_PIXEL_GAME_ENGINE"
 
-    Dim atom = RegisterClass(wc)
+    Dim atom = Win32.RegisterClass(wc)
     If atom = 0 Then
-      Dim er = GetLastError
+      Dim er = Win32.GetLastError
       Return IntPtr.Zero
     End If
 
@@ -2009,9 +2977,9 @@ next4:
       dwExStyle = 0
       dwStyle = WS_VISIBLE Or WS_POPUP
       nCosmeticOffset = 0
-      Dim hmon = MonitorFromWindow(pge_hWnd, MONITOR_DEFAULTTONEAREST)
-      Dim mi = New MONITORINFO With {.cbSize = Marshal.SizeOf(GetType(MONITORINFO))}
-      If Not GetMonitorInfo(hmon, mi) Then Return Nothing
+      Dim hmon = Win32.MonitorFromWindow(pge_hWnd, MONITOR_DEFAULTTONEAREST)
+      Dim mi = New Win32.MONITORINFO With {.cbSize = Marshal.SizeOf(GetType(Win32.MONITORINFO))}
+      If Not Win32.GetMonitorInfo(hmon, mi) Then Return Nothing
       nWindowWidth = mi.rcMonitor.Right
       nWindowHeight = mi.rcMonitor.Bottom
     End If
@@ -2019,15 +2987,15 @@ next4:
     Pge_UpdateViewport()
 
     ' Keep client size as requested
-    Dim rWndRect = New RECT With {.Left = 0, .Top = 0, .Right = nWindowWidth, .Bottom = nWindowHeight}
-    AdjustWindowRectEx(rWndRect, dwStyle, False, dwExStyle)
+    Dim rWndRect = New Win32.RECT With {.Left = 0, .Top = 0, .Right = nWindowWidth, .Bottom = nWindowHeight}
+    Win32.AdjustWindowRectEx(rWndRect, dwStyle, False, dwExStyle)
     Dim width = rWndRect.Right - rWndRect.Left
     Dim height = rWndRect.Bottom - rWndRect.Top
 
     'Singleton.Pge = Me
-    pge_hWnd = CreateWindowEx(dwExStyle, atom, "", dwStyle,
-                              nCosmeticOffset, nCosmeticOffset, width, height, Nothing, Nothing,
-                              GetModuleHandle(Nothing), IntPtr.Zero)
+    pge_hWnd = Win32.CreateWindowEx(dwExStyle, atom, "", dwStyle,
+                          nCosmeticOffset, nCosmeticOffset, width, height, Nothing, Nothing,
+                          Win32.GetModuleHandle(Nothing), IntPtr.Zero)
 
     'Dim tme = New TRACKMOUSEEVENTSTRUCT
     'tme.cbSize = Marshal.SizeOf(GetType(TRACKMOUSEEVENTSTRUCT))
@@ -2071,44 +3039,44 @@ next4:
   Private Function Pge_OpenGLCreate_Windows() As Boolean
 
     ' Create Device Context
-    glDeviceContext = GetDC(pge_hWnd)
-    Dim pfd As New PIXELFORMATDESCRIPTOR With {.nSize = CUShort(Marshal.SizeOf(GetType(PIXELFORMATDESCRIPTOR))),
-                                               .nVersion = 1,
-                                               .dwFlags = PFD_DRAW_TO_WINDOW Or PFD_SUPPORT_OPENGL Or PFD_DOUBLEBUFFER,
-                                               .iPixelType = PFD_TYPE_RGBA,
-                                               .cColorBits = 32,
-                                               .cRedBits = 0,
-                                               .cRedShift = 0,
-                                               .cGreenBits = 0,
-                                               .cGreenShift = 0,
-                                               .cBlueBits = 0,
-                                               .cBlueShift = 0,
-                                               .cAlphaBits = 0,
-                                               .cAlphaShift = 0,
-                                               .cAccumBits = 0,
-                                               .cAccumRedBits = 0,
-                                               .cAccumGreenBits = 0,
-                                               .cAccumBlueBits = 0,
-                                               .cAccumAlphaBits = 0,
-                                               .cDepthBits = 24, '0,
-                                               .cStencilBits = 8, '0,
-                                               .cAuxBuffers = 0,
-                                               .iLayerType = PFD_MAIN_PLANE,
-                                               .bReserved = 0,
-                                               .dwLayerMask = 0,
-                                               .dwVisibleMask = 0,
-                                               .dwDamageMask = 0}
+    glDeviceContext = Win32.GetDC(pge_hWnd)
+    Dim pfd As New Win32.PIXELFORMATDESCRIPTOR With {.nSize = CUShort(Marshal.SizeOf(GetType(Win32.PIXELFORMATDESCRIPTOR))),
+                                           .nVersion = 1,
+                                           .dwFlags = PFD_DRAW_TO_WINDOW Or PFD_SUPPORT_OPENGL Or PFD_DOUBLEBUFFER,
+                                           .iPixelType = PFD_TYPE_RGBA,
+                                           .cColorBits = 32,
+                                           .cRedBits = 0,
+                                           .cRedShift = 0,
+                                           .cGreenBits = 0,
+                                           .cGreenShift = 0,
+                                           .cBlueBits = 0,
+                                           .cBlueShift = 0,
+                                           .cAlphaBits = 0,
+                                           .cAlphaShift = 0,
+                                           .cAccumBits = 0,
+                                           .cAccumRedBits = 0,
+                                           .cAccumGreenBits = 0,
+                                           .cAccumBlueBits = 0,
+                                           .cAccumAlphaBits = 0,
+                                           .cDepthBits = 24, '0,
+                                           .cStencilBits = 8, '0,
+                                           .cAuxBuffers = 0,
+                                           .iLayerType = PFD_MAIN_PLANE,
+                                           .bReserved = 0,
+                                           .dwLayerMask = 0,
+                                           .dwVisibleMask = 0,
+                                           .dwDamageMask = 0}
 
-    Dim pf = ChoosePixelFormat(glDeviceContext, pfd) : If pf = 0 Then Return False
-    Dim hrslt = SetPixelFormat(glDeviceContext, pf, pfd)
+    Dim pf = Win32.ChoosePixelFormat(glDeviceContext, pfd) : If pf = 0 Then Return False
+    Dim hrslt = Win32.SetPixelFormat(glDeviceContext, pf, pfd)
 
-    glRenderContext = wglCreateContext(glDeviceContext) : If glRenderContext = IntPtr.Zero Then Return False
-    hrslt = wglMakeCurrent(glDeviceContext, glRenderContext)
+    glRenderContext = Win32.wglCreateContext(glDeviceContext) : If glRenderContext = IntPtr.Zero Then Return False
+    hrslt = Win32.wglMakeCurrent(glDeviceContext, glRenderContext)
 
-    glViewport(nViewX, nViewY, nViewW, nViewH)
+    Win32.glViewport(nViewX, nViewY, nViewW, nViewH)
 
     ' Remove Frame cap
-    wglSwapInterval = CType(Marshal.GetDelegateForFunctionPointer(wglGetProcAddress("wglSwapIntervalEXT"), GetType(wglSwapInterval_t)), wglSwapInterval_t)
+    wglSwapInterval = CType(Marshal.GetDelegateForFunctionPointer(Win32.wglGetProcAddress("wglSwapIntervalEXT"), GetType(wglSwapInterval_t)), wglSwapInterval_t)
     If wglSwapInterval IsNot Nothing AndAlso Not bEnableVSYNC Then wglSwapInterval(0)
 
     Return True
@@ -2178,10 +3146,10 @@ next4:
         Singleton.AtomActive = False
         Return IntPtr.Zero
       Case WM_DESTROY
-        PostQuitMessage(0)
+        Win32.PostQuitMessage(0)
         Return IntPtr.Zero
     End Select
-    Return DefWindowProc(hWnd, uMsg, wParam, lParam)
+    Return Win32.DefWindowProc(hWnd, uMsg, wParam, lParam)
   End Function
 
 #End Region
@@ -2191,83 +3159,60 @@ next4:
   ' Do the Linux stuff!
   Private Function Pge_WindowCreate_Linux() As IntPtr
 
-    Console.WriteLine("XInitThreads")
-    Dim hrslt = XInitThreads()
-    Console.WriteLine($"    hresult = {hrslt}")
+    Dim rslt = X11.XInitThreads()
 
     ' Grab the deafult display and window
-    Console.WriteLine("XOpenDisplay")
-    pge_Display = XOpenDisplay(Nothing)
-    Console.WriteLine($"    pge_Display = {pge_Display}")
-    Console.WriteLine("XDefaultRootWindow")
-    pge_WindowRoot = XDefaultRootWindow(pge_Display)
-    Console.WriteLine($"    pge_WindowRoot = {pge_WindowRoot}")
+    pge_Display = X11.XOpenDisplay(Nothing)
+    pge_WindowRoot = X11.XDefaultRootWindow(pge_Display)
 
     ' Based on the display capabilities, configure the appearance of the window
-    Dim pge_GLAttribs() As Integer = {GLX_RGBA, GLX_DEPTH_SIZE, 24, GLX_DOUBLEBUFFER, None}
-    Console.WriteLine("glXChooseVisual")
-    pge_VisualInfo = glXChooseVisual(pge_Display, 0, pge_GLAttribs)
-    Console.WriteLine($"    pge_VisualInfo...
-      visual = {pge_VisualInfo.visual}
-      visualid = {pge_VisualInfo.visualid}
-      screen = {pge_VisualInfo.screen}
-      depth = {pge_VisualInfo.depth}
-      klass = {pge_VisualInfo.klass}
-      red_mask = {pge_VisualInfo.red_mask}
-      green_mask = {pge_VisualInfo.green_mask}
-      blue_mask = {pge_VisualInfo.blue_mask}
-      colormap_size = {pge_VisualInfo.colormap_size}
-      bits_per_rgb = {pge_VisualInfo.bits_per_rgb}")
-    Console.WriteLine("XCreateColormap")
-    pge_ColourMap = XCreateColormap(pge_Display, pge_WindowRoot, pge_VisualInfo.visual, AllocNone)
-    Console.WriteLine($"    pge_ColourMap = {pge_ColourMap}")
-    pge_SetWindowAttribs.colormap = pge_ColourMap
+    Dim pge_GLAttribs() = {GLX_RGBA, GLX_DEPTH_SIZE, 24, GLX_DOUBLEBUFFER, None}
+    pge_VisualInfo = X11.glXChooseVisual(pge_Display, 0, pge_GLAttribs)
+    Dim vi = Marshal.PtrToStructure(Of X11.XVisualInfo)(pge_VisualInfo)
+    pge_ColourMap = X11.XCreateColormap(pge_Display, pge_WindowRoot, vi.visual, AllocNone)
+    pge_SetWindowAttribs.Colormap = pge_ColourMap
 
     ' Register which events we are interested in receiving
-    pge_SetWindowAttribs.event_mask = ExposureMask Or KeyPressMask Or KeyReleaseMask Or ButtonPressMask Or ButtonReleaseMask Or PointerMotionMask Or FocusChangeMask Or StructureNotifyMask
+    pge_SetWindowAttribs.EventMask = X11.XEventMask.ExposureMask Or
+                                     X11.XEventMask.KeyPressMask Or
+                                     X11.XEventMask.KeyReleaseMask Or
+                                     X11.XEventMask.ButtonPressMask Or
+                                     X11.XEventMask.ButtonReleaseMask Or
+                                     X11.XEventMask.PointerMotionMask Or
+                                     X11.XEventMask.FocusChangeMask Or
+                                     X11.XEventMask.StructureNotifyMask
 
     ' Create the window
-    Console.WriteLine("XCreateWindow")
-    pge_Window = XCreateWindow(pge_Display, pge_WindowRoot, 30, 30, nScreenWidth * nPixelWidth, nScreenHeight * nPixelHeight, 0, pge_VisualInfo.depth, InputOutput, pge_VisualInfo.visual, CWColormap Or CWEventMask, pge_SetWindowAttribs)
-    Console.WriteLine($"    pge_Window = {pge_Window}")
+    pge_Window = X11.XCreateWindow(pge_Display, pge_WindowRoot, 30, 30, nScreenWidth * nPixelWidth, nScreenHeight * nPixelHeight, 0, vi.depth, InputOutput, vi.visual, X11.XWindowAttributeFlags.CWColormap Or X11.XWindowAttributeFlags.CWEventMask, pge_SetWindowAttribs)
 
-    Console.WriteLine("XInternAtom")
-    Dim wmDelete = XInternAtom(pge_Display, "WM_DELETE_WINDOW", True)
-    Console.WriteLine("XSetWMProtocols")
-    hrslt = XSetWMProtocols(pge_Display, pge_Window, {wmDelete}, 1)
+    Dim wmDelete = X11.XInternAtom(pge_Display, "WM_DELETE_WINDOW", True)
+    X11.XSetWMProtocols(pge_Display, pge_Window, {wmDelete}, 1)
 
-    Console.WriteLine("XMapWindow")
-    hrslt = XMapWindow(pge_Display, pge_Window)
-    Console.WriteLine("XStoreName")
-    hrslt = XStoreName(pge_Display, pge_Window, "vbPixelGameEngine")
+    X11.XMapWindow(pge_Display, pge_Window)
+    X11.XStoreName(pge_Display, pge_Window, "vbPixelGameEngine")
 
     If bFullScreen Then ' Thanks DragonEye, again :D
-      Dim wm_state As IntPtr
-      Dim fullscreen As Byte
-      Console.WriteLine("XInternAtom")
-      wm_state = XInternAtom(pge_Display, "_NET_WM_STATE", False)
-      Console.WriteLine("XInternAtom")
-      fullscreen = CByte(XInternAtom(pge_Display, "_NET_WM_STATE_FULLSCREEN", False))
-      Dim xev As XEvent = Nothing
-      xev.type = ClientMessage
-      xev.xclient.window = pge_Window
-      xev.xclient.message_type = wm_state
-      xev.xclient.format = 32
-      xev.xclient.data.l(0) = CByte(If(bFullScreen, 1, 0)) ' the action (0: off, 1: on, 2: toggle)
-      xev.xclient.data.l(1) = fullscreen ' first property to alter
-      xev.xclient.data.l(2) = 0 ' second property to alter
-      xev.xclient.data.l(3) = 0 ' source indication
-      Console.WriteLine("XMapWindow")
-      hrslt = XMapWindow(pge_Display, pge_Window)
-      Console.WriteLine("XSendEvent/XDefaultRootWindow")
-      hrslt = XSendEvent(pge_Display, XDefaultRootWindow(pge_Display), False, SubstructureRedirectMask Or SubstructureNotifyMask, xev)
-      Console.WriteLine("XFlush")
-      hrslt = XFlush(pge_Display)
-      Dim gwa As XWindowAttributes
-      Console.WriteLine("XGetWindowAttributes")
-      hrslt = XGetWindowAttributes(pge_Display, pge_Window, gwa)
-      nWindowWidth = gwa.width
-      nWindowHeight = gwa.height
+      Dim wm_state = X11.XInternAtom(pge_Display, "_NET_WM_STATE", False)
+      Dim fullscreen = CByte(X11.XInternAtom(pge_Display, "_NET_WM_STATE_FULLSCREEN", False))
+      Dim xev As X11.XClientMessageEvent ' = Nothing
+      xev.Type = X11.XEventType.ClientMessage
+      xev.Window = pge_Window
+      xev.Message_Type = CULng(wm_state)
+      xev.Format = 32
+      xev.L0 = If(bFullScreen, 1, 0) ' the action (0: off, 1: on, 2: toggle)
+      xev.L1 = fullscreen ' first property to alter
+      xev.L2 = 0 ' second property to alter
+      xev.L3 = 0 ' source indication
+      X11.XMapWindow(pge_Display, pge_Window)
+      Dim eventSend = Marshal.AllocHGlobal(Marshal.SizeOf(xev))
+      Marshal.StructureToPtr(xev, eventSend, False)
+      rslt = X11.XSendEvent(pge_Display, X11.XDefaultRootWindow(pge_Display), False, X11.XEventMask.SubstructureRedirectMask Or X11.XEventMask.SubstructureNotifyMask, eventSend)
+      Marshal.FreeHGlobal(eventSend)
+      rslt = X11.XFlush(pge_Display)
+      Dim gwa As X11.XWindowAttributes
+      rslt = X11.XGetWindowAttributes(pge_Display, pge_Window, gwa)
+      nWindowWidth = gwa.Width
+      nWindowHeight = gwa.Height
       Pge_UpdateViewport()
     End If
 
@@ -2306,20 +3251,15 @@ next4:
 
   Function Pge_OpenGLCreate_Linux() As Boolean
 
-    Debug.WriteLine("glXCreateContext")
-    Dim glDeviceContext As GLXContext = glXCreateContext(pge_Display, pge_VisualInfo, IntPtr.Zero, GL_TRUE = 1)
-    Debug.WriteLine("glXMakeCurrent")
-    glXMakeCurrent(pge_Display, pge_Window, glDeviceContext)
+    Dim glDeviceContext = X11.glXCreateContext(pge_Display, pge_VisualInfo, IntPtr.Zero, GL_TRUE = 1)
+    Dim rslt = X11.glXMakeCurrent(pge_Display, pge_Window, glDeviceContext)
 
-    Dim gwa As XWindowAttributes
-    Debug.WriteLine("XGetWindowAttributes")
-    Dim hrslt = XGetWindowAttributes(pge_Display, pge_Window, gwa)
-    Debug.WriteLine("glViewPort")
-    glViewport(0, 0, gwa.width, gwa.height)
+    Dim gwa As X11.XWindowAttributes
+    Dim hrslt = X11.XGetWindowAttributes(pge_Display, pge_Window, gwa)
+    X11.glViewport(0, 0, gwa.Width, gwa.Height)
 
-    Dim glSwapIntervalEXT As glSwapInterval_t = Nothing
-    Debug.WriteLine("glXGetProcAddress")
-    glSwapIntervalEXT = CType(Marshal.GetDelegateForFunctionPointer(glXGetProcAddress("glXSwapIntervalEXT"), GetType(glSwapInterval_t)), glSwapInterval_t)
+    'Dim glSwapIntervalEXT As glSwapInterval_t = Nothing
+    glSwapIntervalEXT = CType(Marshal.GetDelegateForFunctionPointer(X11.glXGetProcAddress("glXSwapIntervalEXT"), GetType(glSwapInterval_t)), glSwapInterval_t)
 
     If glSwapIntervalEXT Is Nothing AndAlso Not bEnableVSYNC Then
       Console.WriteLine("NOTE: Could not disable VSYNC, glXSwapIntervalEXT() was not found!")
@@ -2367,6 +3307,11 @@ next4:
 
 #Region "C++'isms"
 
+  ' Since a lot of the olcPGE examples use `rand`,
+  ' including similar functionality here to reduce
+  ' constantly trying to translate C++ code to VB
+  ' for this common scenario.
+
   Private ReadOnly m_random As New Random
   Protected Const RAND_MAX As Integer = 2147483647
 
@@ -2386,6 +3331,8 @@ next4:
 #End Region
 
 #Region "CGE"
+
+  ' I've added these so that compatibility with CGE can be retained.
 
   Private Shared Function ConsoleColor2PixelColor(c As COLOUR) As Pixel
     Select Case c
