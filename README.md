@@ -2,7 +2,7 @@
 
 The official distribution of *vbPixelGameEngine*.
 
-Provides a fast, richly featured, ~~cross platform~~ pixel drawing and user interface framework for:
+Provides a fast, richly featured, cross platform pixel drawing and user interface framework for:
 
 - The development of games.
 - Visualization of algorithms.
@@ -17,8 +17,7 @@ Provides a fast, richly featured, ~~cross platform~~ pixel drawing and user inte
 - Add documentation.
 - Continue adding samples.
 - Improve performance.
-- Port to Debian (Linux).
-- Port to Raspberry Pi OS.
+- Test on Raspberry Pi OS.
 
 *vbPixelGameEngine* is heavily inspired by [olcPixelGameEngine](https://github.com/OneLoneCoder/olcPixelGameEngine); specifically the v1.24 version. Even more specifically, I've developed this project while following along with [javidx9](https://www.youtube.com/@javidx9) videos; so very likely that not all features in v1.24 have been implemented at parity. Once parity has been reached with the v1.24 version, will evaluate if making the jump to v2.x (or greater) makes sense.
 
