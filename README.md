@@ -31,6 +31,12 @@ Now that I've completed the *olcConsoleGameEngine*-related videos and having had
 
 Right now the main focus is on the [olcPixelGameEngine](https://github.com/OneLoneCoder/olcPixelGameEngine) v1.x ("PGE1") which has since been retired and replaced with [olcPixelGameEngine](https://github.com/OneLoneCoder/olcPixelGameEngine) v2.x ("PGE2"). As I continue to work through his videos (in reverse chronological order), I'll continue to update this project as I progress.
 
+## Discord
+
+Please reach out to me on Discord:
+
+- [Discord Invite](https://discord.gg/Y8EH5fF6WG)
+
 ## Documentation
 
 Please see [wiki](https://github.com/DualBrain/vbPixelGameEngine/wiki).
