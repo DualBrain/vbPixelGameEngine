@@ -16,8 +16,8 @@ Friend Class HelloWorld
 
   Private m_state As Integer = 0
 
-  Private playerX As Single
-  Private playerY As Single
+  Private m_playerX As Single
+  Private m_playerY As Single
 
   Friend Sub New()
     AppName = "Hello World"
@@ -25,8 +25,8 @@ Friend Class HelloWorld
 
   Protected Overrides Function OnUserCreate() As Boolean
 
-    playerX = 10
-    playerY = 10
+    m_playerX = 10
+    m_playerY = 10
 
     Return True
 
@@ -75,14 +75,14 @@ Friend Class HelloWorld
         ' Simple character movement
         ' ------
 
-        If GetKey(Key.LEFT).Held Then playerX -= 15 * elapsedTime
-        If GetKey(Key.RIGHT).Held Then playerX += 15 * elapsedTime
-        If GetKey(Key.UP).Held Then playerY -= 15 * elapsedTime
-        If GetKey(Key.DOWN).Held Then playerY += 15 * elapsedTime
+        If GetKey(Key.LEFT).Held Then m_playerX -= 15 * elapsedTime
+        If GetKey(Key.RIGHT).Held Then m_playerX += 15 * elapsedTime
+        If GetKey(Key.UP).Held Then m_playerY -= 15 * elapsedTime
+        If GetKey(Key.DOWN).Held Then m_playerY += 15 * elapsedTime
 
         Clear()
 
-        FillRect(CInt(Fix(playerX)), CInt(Fix(playerY)), 5, 5)
+        FillRect(CInt(Fix(m_playerX)), CInt(Fix(m_playerY)), 5, 5)
 
       Case 3
 
