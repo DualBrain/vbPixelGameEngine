@@ -67,26 +67,26 @@ Public MustInherit Class PixelGameEngine
   Private Const VK_SUBTRACT As Integer = &H6D
   Private Const VK_DECIMAL As Integer = &H6E
 
-  Private Const CS_USEDEFAULT As UInteger = &H80000000UI
-  Private Const CS_DBLCLKS As UInteger = 8
+  'Private Const CS_USEDEFAULT As UInteger = &H80000000UI
+  'Private Const CS_DBLCLKS As UInteger = 8
   Private Const CS_VREDRAW As UInteger = 1
   Private Const CS_HREDRAW As UInteger = 2
   Private Const CS_OWNDC As Integer = &H20
 
-  Private Const TME_LEAVE As Integer = &H2
+  'Private Const TME_LEAVE As Integer = &H2
 
-  Private Const COLOR_WINDOW As UInteger = 5
+  'Private Const COLOR_WINDOW As UInteger = 5
   Private Const COLOR_BACKGROUND As UInteger = 1
 
   Private Const IDI_APPLICATION As Integer = &H7F00
 
-  Private Const IDC_CROSS As UInteger = 32515
+  'Private Const IDC_CROSS As UInteger = 32515
   Private Const IDC_ARROW As Integer = 32512
 
   Private Const WM_DESTROY As UInteger = 2
-  Private Const WM_PAINT As UInteger = &HF
+  'Private Const WM_PAINT As UInteger = &HF
   Private Const WM_LBUTTONUP As UInteger = &H202
-  Private Const WM_LBUTTONDBLCLK As UInteger = &H203
+  'Private Const WM_LBUTTONDBLCLK As UInteger = &H203
   Private Const WM_MOUSEMOVE As UInteger = &H200
   Private Const WM_CLOSE As UInteger = &H10
   Private Const WM_MBUTTONUP As Integer = &H208
@@ -103,7 +103,7 @@ Public MustInherit Class PixelGameEngine
   Private Const WM_SIZE As Integer = &H5
   Private Const WM_CREATE As Integer = &H1
 
-  Private Const WS_OVERLAPPEDWINDOW As UInteger = &HCF0000
+  'Private Const WS_OVERLAPPEDWINDOW As UInteger = &HCF0000
   Private Const WS_VISIBLE As UInteger = &H10000000
   Private Const WS_EX_APPWINDOW As UInteger = &H40000UI
   Private Const WS_EX_WINDOWEDGE As UInteger = &H100
@@ -131,7 +131,7 @@ Public MustInherit Class PixelGameEngine
   Private Const GL_DECAL As UInteger = &H2101
   Private Const GL_RGBA As UInteger = &H1908
   Private Const GL_UNSIGNED_BYTE As UInteger = &H1401
-  Private Const GL_INT As UInteger = &H1404
+  'Private Const GL_INT As UInteger = &H1404
   Private Const GL_QUADS As UInteger = &H7
   Private Const GL_COLOR_BUFFER_BIT As UInteger = &H4000
 
@@ -251,10 +251,44 @@ Public MustInherit Class PixelGameEngine
 
 #Region "Win32 - P/Invoke"
 
+#Disable Warning CA2101 ' Specify marshaling for P/Invoke string arguments
+
+    <DllImport("opengl32", CharSet:=CharSet.Ansi, EntryPoint:="wglGetProcAddress")>
+    Friend Shared Function WglGetProcAddress(lpProcName As String) As IntPtr
+    End Function
+
+    <DllImport("user32.dll", CharSet:=CharSet.Ansi, EntryPoint:="CreateWindowA")>
+    Friend Shared Function CreateWindow(lpClassName As String, lpWindowName As String, dwStyle As Integer, x As Integer, y As Integer, nWidth As Integer, nHeight As Integer, hWndParent As IntPtr, hMenu As IntPtr, hInstance As IntPtr, lpParam As IntPtr) As IntPtr
+    End Function
+
+    <DllImport("user32.dll", CharSet:=CharSet.Ansi, EntryPoint:="SetWindowTextA")>
+    Friend Shared Function SetWindowText(hwnd As IntPtr, lpString As String) As Boolean
+    End Function
+
+#Enable Warning CA2101 ' Specify marshaling for P/Invoke string arguments
+
+    <DllImport("user32.dll", CharSet:=CharSet.Unicode, EntryPoint:="CreateWindowExW")>
+    Friend Shared Function CreateWindowEx(exStyle As UInteger,
+                                          atom As UShort, 'className As String,
+                                          windowName As String,
+                                          style As UInteger,
+                                          x As Integer,
+                                          y As Integer,
+                                          width As Integer,
+                                          height As Integer,
+                                          wndParent As IntPtr,
+                                          menu As IntPtr,
+                                          hInstance As IntPtr,
+                                          lpParam As IntPtr) As IntPtr
+    End Function
+
+    <DllImport("user32.dll", CharSet:=CharSet.Unicode)>
+    Friend Shared Function FindWindow(lpClassName As String, lpWindowName As String) As IntPtr
+    End Function
+
     Friend Declare Function wglCreateContext Lib "opengl32" (hdc As IntPtr) As IntPtr
     Friend Declare Function wglMakeCurrent Lib "opengl32" (hdc As IntPtr, hglrc As IntPtr) As Integer
     Friend Declare Sub glViewport Lib "opengl32" (x As Integer, y As Integer, width As Integer, height As Integer)
-    Friend Declare Function wglGetProcAddress Lib "opengl32" (lpProcName As String) As IntPtr
     Friend Declare Sub glEnable Lib "opengl32.dll" (cap As UInteger)
     Friend Declare Sub glGenTextures Lib "opengl32.dll" (n As Integer, ByRef textures As UInteger)
     Friend Declare Sub glBindTexture Lib "opengl32.dll" (target As UInteger, texture As UInteger)
@@ -286,18 +320,6 @@ Public MustInherit Class PixelGameEngine
     '                                                                                  hMenu As IntPtr,
     '                                                                                  hInstance As IntPtr,
     '                                                                                  lpParam As IntPtr) As IntPtr
-    Friend Declare Function CreateWindowEx Lib "user32.dll" Alias "CreateWindowExW" (exStyle As UInteger,
-                                                                                    atom As UShort, 'className As String,
-                                                                                    windowName As String,
-                                                                                    style As UInteger,
-                                                                                    x As Integer,
-                                                                                    y As Integer,
-                                                                                    width As Integer,
-                                                                                    height As Integer,
-                                                                                    wndParent As IntPtr,
-                                                                                    menu As IntPtr,
-                                                                                    hInstance As IntPtr,
-                                                                                    lpParam As IntPtr) As IntPtr
     Friend Declare Function DefWindowProc Lib "user32.dll" Alias "DefWindowProcA" (hWnd As IntPtr, msg As UInteger, wParam As IntPtr, lParam As IntPtr) As IntPtr
     Friend Declare Sub PostQuitMessage Lib "user32.dll" (exitCode As Integer)
     Friend Declare Function LoadCursor Lib "user32.dll" Alias "LoadCursorA" (hInstance As IntPtr, cursorName As Integer) As IntPtr
@@ -309,11 +331,8 @@ Public MustInherit Class PixelGameEngine
     Friend Declare Function MonitorFromWindow Lib "user32.dll" (hwnd As IntPtr, dwFlags As UInteger) As IntPtr
     Friend Declare Function GetMonitorInfo Lib "user32.dll" Alias "GetMonitorInfoA" (hMonitor As IntPtr, ByRef lpmi As MONITORINFO) As Boolean
     Friend Declare Function AdjustWindowRectEx Lib "user32.dll" (ByRef lpRect As RECT, dwStyle As UInteger, bMenu As Boolean, dwExStyle As UInteger) As Boolean
-    Friend Declare Function CreateWindow Lib "user32.dll" Alias "CreateWindowA" (lpClassName As String, lpWindowName As String, dwStyle As Integer, x As Integer, y As Integer, nWidth As Integer, nHeight As Integer, hWndParent As IntPtr, hMenu As IntPtr, hInstance As IntPtr, lpParam As IntPtr) As IntPtr
     Friend Declare Function TrackMouseEvent Lib "user32.dll" (ByRef tme As TRACKMOUSEEVENTSTRUCT) As Boolean
-    Friend Declare Function FindWindow Lib "user32.dll" (lpClassName As String, lpWindowName As String) As IntPtr
     Friend Declare Function GetDC Lib "user32" (hWnd As IntPtr) As IntPtr
-    Friend Declare Function SetWindowText Lib "user32.dll" Alias "SetWindowTextA" (hwnd As IntPtr, lpString As String) As Boolean
     Friend Declare Function PostMessage Lib "user32.dll" Alias "PostMessageA" (hwnd As IntPtr, wMsg As UInteger, wParam As IntPtr, lParam As IntPtr) As Boolean
     'Private Declare Function FindWindow Lib "user32.dll" Alias "FindWindowA" (lpClassName As String, lpWindowName As String) As IntPtr
     'Private Declare Function ShowWindow Lib "user32.dll" (hWnd As IntPtr, nCmdShow As Integer) As Boolean
@@ -1358,7 +1377,7 @@ Public MustInherit Class PixelGameEngine
     End Structure
 
     <StructLayout(LayoutKind.Sequential, Size:=192)>
-    Public Structure _XEvent
+    Public Structure XEvent
       Public Type As XEventType
     End Structure
 
@@ -1459,9 +1478,13 @@ Public MustInherit Class PixelGameEngine
 
 #Region "OpenGL"
 
+#Disable Warning CA2101 ' Specify marshaling for P/Invoke string arguments
+
     <DllImport("libGL.so.1", CharSet:=CharSet.Ansi)>
     Friend Shared Function glXGetProcAddress(procname As String) As IntPtr
     End Function
+
+#Enable Warning CA2101 ' Specify marshaling for P/Invoke string arguments
 
     Friend Declare Function glXChooseVisual Lib "libGL.so.1" (display As IntPtr,
                                                              screen As Integer,
@@ -1489,6 +1512,8 @@ Public MustInherit Class PixelGameEngine
 
 #Region "Linux P/Invoke - X11"
 
+#Disable Warning CA2101 ' Specify marshaling for P/Invoke string arguments
+
     <DllImport("libX11.so.6", CharSet:=CharSet.Ansi)>
     Friend Shared Function XInternAtom(display As IntPtr, atomName As String, onlyIfExists As Boolean) As Integer
     End Function
@@ -1500,6 +1525,8 @@ Public MustInherit Class PixelGameEngine
     <DllImport("libX11.so.6", CharSet:=CharSet.Ansi)>
     Friend Shared Sub XStoreName(display As IntPtr, window As IntPtr, title As String)
     End Sub
+
+#Enable Warning CA2101 ' Specify marshaling for P/Invoke string arguments
 
     Friend Declare Sub XCloseDisplay Lib "libX11.so.6" (display As IntPtr)
     Friend Declare Function XCreateColormap Lib "libX11.so.6" (display As IntPtr,
@@ -1547,7 +1574,7 @@ Public MustInherit Class PixelGameEngine
   Private pge_WindowRoot As IntPtr
   Private pge_Window As IntPtr
   Private pge_VisualInfo As IntPtr
-  Private pge_ColourMap As IntPtr
+  Private pge_ColorMap As IntPtr
   Private pge_SetWindowAttribs As X11.XSetWindowAttributes
 
 #End Region
@@ -1557,54 +1584,54 @@ Public MustInherit Class PixelGameEngine
 
   Protected Property AppName As String
 
-  Private pge_hWnd As IntPtr
-  Private glBuffer As UInteger
+  Private m_hWnd As IntPtr
+  Private m_glBuffer As UInteger
 
-  Private nPixelMode As Pixel.Mode
-  Private fBlendFactor As Single = 1.0F
+  Private m_pixelMode As Pixel.Mode
+  Private m_blendFactor As Single = 1.0F
 
-  Private nScreenWidth As Integer
-  Private nScreenHeight As Integer
-  Private nPixelWidth As Integer
-  Private nPixelHeight As Integer
-  Private bFullScreen As Boolean
-  Private bEnableVSYNC As Boolean
-  Private fPixelX As Single
-  Private fPixelY As Single
-  Private pDefaultDrawTarget As Sprite
-  Private pDrawTarget As Sprite
+  Private m_screenWidth As Integer
+  Private m_screenHeight As Integer
+  Private m_pixelWidth As Integer
+  Private m_pixelHeight As Integer
+  Private m_fullScreen As Boolean
+  Private m_enableVSYNC As Boolean
+  Private m_pixelX As Single
+  Private m_pixelY As Single
+  Private m_defaultDrawTarget As Sprite
+  Private m_drawTarget As Sprite
 
-  Private Shared m_shutdown As Boolean
-  Private nWindowWidth As Integer
-  Private nWindowHeight As Integer
-  Private bHasInputFocus As Boolean
-  Private bHasMouseFocus As Boolean
-  Private fFrameTimer As Single = 1.0F
-  Private nFrameCount As Integer
+  'Private Shared m_shutdown As Boolean
+  Private m_windowWidth As Integer
+  Private m_windowHeight As Integer
+  Private m_hasInputFocus As Boolean
+  Private m_hasMouseFocus As Boolean
+  Private m_frameTimer As Single = 1.0F
+  Private m_frameCount As Integer
 
-  Private ReadOnly pKeyNewState(255) As Boolean
-  Private ReadOnly pKeyOldState(255) As Boolean
-  Private ReadOnly pKeyboardState(255) As HwButton
+  Private ReadOnly m_keyNewState(255) As Boolean
+  Private ReadOnly m_keyOldState(255) As Boolean
+  Private ReadOnly m_keyboardState(255) As HwButton
 
-  Private ReadOnly pMouseNewState(4) As Boolean
-  Private ReadOnly pMouseOldState(4) As Boolean
-  Private ReadOnly pMouseState(4) As HwButton
-  Private nMousePosXcache As Integer
-  Private nMousePosYcache As Integer
-  Private nMousePosX As Integer
-  Private nMousePosY As Integer
-  Private nMouseWheelDelta As Integer
-  Private nMouseWheelDeltaCache As Integer
-  Private nViewX As Integer
-  Private nViewY As Integer
-  Private nViewW As Integer
-  Private nViewH As Integer
+  Private ReadOnly m_mouseNewState(4) As Boolean
+  Private ReadOnly m_mouseOldState(4) As Boolean
+  Private ReadOnly m_mouseState(4) As HwButton
+  Private m_mousePosXcache As Integer
+  Private m_mousePosYcache As Integer
+  Private m_mousePosX As Integer
+  Private m_mousePosY As Integer
+  Private m_mouseWheelDelta As Integer
+  Private m_mouseWheelDeltaCache As Integer
+  Private m_viewX As Integer
+  Private m_viewY As Integer
+  Private m_viewW As Integer
+  Private m_viewH As Integer
 
-  Private glRenderContext As IntPtr
-  Private glDeviceContext As IntPtr
+  Private m_glRenderContext As IntPtr
+  Private m_glDeviceContext As IntPtr
 
-  Private fSubPixelOffsetX As Single
-  Private fSubPixelOffsetY As Single
+  Private m_subPixelOffsetX As Single
+  Private m_subPixelOffsetY As Single
 
   Protected Structure HwButton
     Public Pressed As Boolean ' Set once during the frame the event occurs
@@ -1613,9 +1640,9 @@ Public MustInherit Class PixelGameEngine
   End Structure
 
   Public Enum RCode
-    OK
-    FAIL
-    NO_FILE
+    Ok
+    Fail
+    NoFile
   End Enum
 
   Public Enum Key
@@ -1728,17 +1755,17 @@ Public MustInherit Class PixelGameEngine
 
   Public Function Construct(screenW As Integer, screenH As Integer, pixelW As Integer, pixelH As Integer, Optional fullScreen As Boolean = False, Optional vsync As Boolean = False) As Boolean 'RCode
 
-    nScreenWidth = screenW
-    nScreenHeight = screenH
-    nPixelWidth = pixelW
-    nPixelHeight = pixelH
-    bFullScreen = fullScreen
-    bEnableVSYNC = vsync
+    m_screenWidth = screenW
+    m_screenHeight = screenH
+    m_pixelWidth = pixelW
+    m_pixelHeight = pixelH
+    m_fullScreen = fullScreen
+    m_enableVSYNC = vsync
 
-    fPixelX = 2.0F / nScreenWidth
-    fPixelY = 2.0F / nScreenHeight
+    m_pixelX = 2.0F / m_screenWidth
+    m_pixelY = 2.0F / m_screenHeight
 
-    If nPixelWidth = 0 OrElse nPixelHeight = 0 OrElse nScreenWidth = 0 OrElse nScreenHeight = 0 Then
+    If m_pixelWidth = 0 OrElse m_pixelHeight = 0 OrElse m_screenWidth = 0 OrElse m_screenHeight = 0 Then
       Return False 'RCode.FAIL
     End If
 
@@ -1746,7 +1773,7 @@ Public MustInherit Class PixelGameEngine
     Pge_ConstructFontSheet()
 
     ' Create a sprite that represents the primary drawing target
-    pDefaultDrawTarget = New Sprite(nScreenWidth, nScreenHeight)
+    m_defaultDrawTarget = New Sprite(m_screenWidth, m_screenHeight)
     SetDrawTarget(Nothing)
 
     Return True 'RCode.OK
@@ -1755,15 +1782,15 @@ Public MustInherit Class PixelGameEngine
 
   Protected Sub SetScreenSize(w As Integer, h As Integer)
 
-    pDefaultDrawTarget = Nothing '.Dispose()
-    nScreenWidth = w
-    nScreenHeight = h
-    pDefaultDrawTarget = New Sprite(nScreenWidth, nScreenHeight)
+    m_defaultDrawTarget = Nothing '.Dispose()
+    m_screenWidth = w
+    m_screenHeight = h
+    m_defaultDrawTarget = New Sprite(m_screenWidth, m_screenHeight)
     SetDrawTarget(Nothing)
 
     If IsOSPlatform(Windows) Then
       Win32.glClear(GL_COLOR_BUFFER_BIT)
-      Win32.SwapBuffers(glDeviceContext)
+      Win32.SwapBuffers(m_glDeviceContext)
       Win32.glClear(GL_COLOR_BUFFER_BIT)
     Else
       X11.glClear(GL_COLOR_BUFFER_BIT)
@@ -1780,11 +1807,11 @@ Public MustInherit Class PixelGameEngine
 
     ' Construct the window
     If IsOSPlatform(Windows) Then
-      If Pge_WindowCreate_Windows() = IntPtr.Zero Then Return RCode.FAIL
+      If WindowCreateWindows() = IntPtr.Zero Then Return RCode.Fail
     ElseIf IsOSPlatform(Linux) Then
-      If Pge_WindowCreate_Linux() = IntPtr.Zero Then Return RCode.FAIL
+      If WindowCreateLinux() = IntPtr.Zero Then Return RCode.Fail
     Else
-      Return RCode.FAIL
+      Return RCode.Fail
     End If
 
     If IsOSPlatform(Windows) Then
@@ -1800,43 +1827,42 @@ Public MustInherit Class PixelGameEngine
 
     If IsOSPlatform(Windows) Then
       ' Handle Windows Message Loop
-      Dim m = New Win32.MSG
-      m.message = 0 ' Set the message parameter to zero to retrieve any message.
-      m.hWnd = IntPtr.Zero ' Set the window handle parameter to zero to retrieve messages for any window.
-      m.wParam = IntPtr.Zero ' Set the wParam parameter to zero.
-      m.lParam = IntPtr.Zero ' Set the lParam parameter to zero.
-      m.time = 0 ' Set the time parameter to zero.
-      m.pt = New Win32.Point(0, 0) ' Set the cursor position to (0,0).
+      Dim m = New Win32.MSG With {.message = 0, ' Set the message parameter to zero to retrieve any message.
+                                  .hWnd = IntPtr.Zero, ' Set the window handle parameter to zero to retrieve messages for any window.
+                                  .wParam = IntPtr.Zero, ' Set the wParam parameter to zero.
+                                  .lParam = IntPtr.Zero, ' Set the lParam parameter to zero.
+                                  .time = 0, ' Set the time parameter to zero.
+                                  .pt = New Win32.Point(0, 0)} ' Set the cursor position to (0,0).
       While Win32.GetMessage(m, IntPtr.Zero, 0, 0) > 0
         Win32.TranslateMessage(m)
-        Dim hrslt = Win32.DispatchMessage(m)
+        Dim unused = Win32.DispatchMessage(m)
       End While
     End If
 
     ' Wait for thread to be exited
 
-    Return RCode.OK
+    Return RCode.Ok
 
   End Function
 
   Public Sub SetDrawTarget(target As Sprite)
     If target IsNot Nothing Then
-      pDrawTarget = target
+      m_drawTarget = target
     Else
-      pDrawTarget = pDefaultDrawTarget
+      m_drawTarget = m_defaultDrawTarget
     End If
   End Sub
 
   Friend ReadOnly Property GetDrawTarget() As Sprite
     Get
-      Return pDrawTarget
+      Return m_drawTarget
     End Get
   End Property
 
   Private Protected ReadOnly Property GetDrawTargetWidth() As Integer
     Get
-      If pDrawTarget IsNot Nothing Then
-        Return pDrawTarget.Width
+      If m_drawTarget IsNot Nothing Then
+        Return m_drawTarget.Width
       Else
         Return 0
       End If
@@ -1845,8 +1871,8 @@ Public MustInherit Class PixelGameEngine
 
   Private Protected ReadOnly Property GetDrawTargetHeight() As Integer
     Get
-      If pDrawTarget IsNot Nothing Then
-        Return pDrawTarget.Height
+      If m_drawTarget IsNot Nothing Then
+        Return m_drawTarget.Height
       Else
         Return 0
       End If
@@ -1855,49 +1881,49 @@ Public MustInherit Class PixelGameEngine
 
   Protected ReadOnly Property IsFocused() As Boolean
     Get
-      Return bHasInputFocus
+      Return m_hasInputFocus
     End Get
   End Property
 
   Protected ReadOnly Property GetKey(k As Key) As HwButton
     Get
-      Return pKeyboardState(k)
+      Return m_keyboardState(k)
     End Get
   End Property
 
   Protected ReadOnly Property GetMouse(b As Integer) As HwButton
     Get
-      Return pMouseState(b)
+      Return m_mouseState(b)
     End Get
   End Property
 
   Protected ReadOnly Property GetMouseX() As Integer
     Get
-      Return nMousePosX
+      Return m_mousePosX
     End Get
   End Property
 
   Protected ReadOnly Property GetMouseY() As Integer
     Get
-      Return nMousePosY
+      Return m_mousePosY
     End Get
   End Property
 
   Protected ReadOnly Property GetMouseWheel() As Integer
     Get
-      Return nMouseWheelDelta
+      Return m_mouseWheelDelta
     End Get
   End Property
 
   Public ReadOnly Property ScreenWidth As Integer
     Get
-      Return nScreenWidth
+      Return m_screenWidth
     End Get
   End Property
 
   Public ReadOnly Property ScreenHeight As Integer
     Get
-      Return nScreenHeight
+      Return m_screenHeight
     End Get
   End Property
 
@@ -1915,32 +1941,32 @@ Public MustInherit Class PixelGameEngine
 
   Public Function Draw(x As Integer, y As Integer, p As Pixel) As Boolean
 
-    If pDrawTarget Is Nothing Then
+    If m_drawTarget Is Nothing Then
       Return False
     End If
 
-    If nPixelMode = Pixel.Mode.Normal Then
-      Return pDrawTarget.SetPixel(x, y, p)
+    If m_pixelMode = Pixel.Mode.Normal Then
+      Return m_drawTarget.SetPixel(x, y, p)
     End If
 
-    If nPixelMode = Pixel.Mode.Mask Then
+    If m_pixelMode = Pixel.Mode.Mask Then
       If p.A = 255 Then
-        Return pDrawTarget.SetPixel(x, y, p)
+        Return m_drawTarget.SetPixel(x, y, p)
       End If
     End If
 
-    If nPixelMode = Pixel.Mode.Alpha Then
-      Dim d = pDrawTarget.GetPixel(x, y)
-      Dim a = (p.A / 255.0F) * fBlendFactor
+    If m_pixelMode = Pixel.Mode.Alpha Then
+      Dim d = m_drawTarget.GetPixel(x, y)
+      Dim a = (p.A / 255.0F) * m_blendFactor
       Dim c = 1.0F - a
       Dim r = a * p.R + c * d.R
       Dim g = a * p.G + c * d.G
       Dim b = a * p.B + c * d.B
-      Return pDrawTarget.SetPixel(x, y, New Pixel(CByte(r), CByte(g), CByte(b)))
+      Return m_drawTarget.SetPixel(x, y, New Pixel(CByte(r), CByte(g), CByte(b)))
     End If
 
-    If nPixelMode = Pixel.Mode.Custom Then
-      Return pDrawTarget.SetPixel(x, y, funcPixelMode(x, y, p, pDrawTarget.GetPixel(x, y)))
+    If m_pixelMode = Pixel.Mode.Custom Then
+      Return m_drawTarget.SetPixel(x, y, funcPixelMode(x, y, p, m_drawTarget.GetPixel(x, y)))
     End If
 
     Return False
@@ -1948,8 +1974,8 @@ Public MustInherit Class PixelGameEngine
   End Function
 
   Protected Sub SetSubPixelOffset(ox As Single, oy As Single)
-    fSubPixelOffsetX = ox * fPixelX
-    fSubPixelOffsetY = oy * fPixelY
+    m_subPixelOffsetX = ox * m_pixelX
+    m_subPixelOffsetY = oy * m_pixelY
   End Sub
 
   Protected Sub DrawLine(pos1 As Vi2d, pos2 As Vi2d)
@@ -2487,7 +2513,7 @@ next4:
 
     Dim sx = 0
     Dim sy = 0
-    Dim m = nPixelMode
+    Dim m = m_pixelMode
 
     If col.A <> 255 Then
       SetPixelMode(Pixel.Mode.Alpha)
@@ -2533,24 +2559,24 @@ next4:
   End Sub
 
   Public Sub SetPixelMode(m As Pixel.Mode)
-    nPixelMode = m
+    m_pixelMode = m
   End Sub
 
   Protected ReadOnly Property GetPixelMode() As Pixel.Mode
     Get
-      Return nPixelMode
+      Return m_pixelMode
     End Get
   End Property
 
   Public Sub SetPixelMode(pixelMode As PixelModeDelegate)
     funcPixelMode = pixelMode
-    nPixelMode = Pixel.Mode.Custom
+    m_pixelMode = Pixel.Mode.Custom
   End Sub
 
   Protected Sub SetPixelBlend(blend As Single)
-    fBlendFactor = blend
-    If fBlendFactor < 0.0F Then fBlendFactor = 0.0F
-    If fBlendFactor > 1.0F Then fBlendFactor = 1.0F
+    m_blendFactor = blend
+    If m_blendFactor < 0.0F Then m_blendFactor = 0.0F
+    If m_blendFactor > 1.0F Then m_blendFactor = 1.0F
   End Sub
 
   Protected Overridable Function OnUserCreate() As Boolean
@@ -2565,31 +2591,31 @@ next4:
 
   Private Sub Pge_UpdateViewport()
 
-    Dim ww = nScreenWidth * nPixelWidth
-    Dim wh = nScreenHeight * nPixelHeight
+    Dim ww = m_screenWidth * m_pixelWidth
+    Dim wh = m_screenHeight * m_pixelHeight
     Dim wasp = CSng(ww / wh)
 
-    nViewW = nWindowWidth
-    nViewH = CInt(Fix(nViewW / wasp))
+    m_viewW = m_windowWidth
+    m_viewH = CInt(Fix(m_viewW / wasp))
 
-    If nViewH > nWindowHeight Then
-      nViewH = nWindowHeight
-      nViewW = CInt(Fix(nViewH * wasp))
+    If m_viewH > m_windowHeight Then
+      m_viewH = m_windowHeight
+      m_viewW = CInt(Fix(m_viewH * wasp))
     End If
 
-    nViewX = (nWindowWidth - nViewW) \ 2
-    nViewY = (nWindowHeight - nViewH) \ 2
+    m_viewX = (m_windowWidth - m_viewW) \ 2
+    m_viewY = (m_windowHeight - m_viewH) \ 2
 
   End Sub
 
   Private Sub Pge_UpdateWindowSize(x As Integer, y As Integer)
-    nWindowWidth = x
-    nWindowHeight = y
+    m_windowWidth = x
+    m_windowHeight = y
     Pge_UpdateViewport()
   End Sub
 
   Private Sub Pge_UpdateMouseWheel(delta As Integer)
-    nMouseWheelDeltaCache += delta
+    m_mouseWheelDeltaCache += delta
   End Sub
 
   Private Sub Pge_UpdateMouse(x As Integer, y As Integer)
@@ -2598,17 +2624,17 @@ next4:
     ' But leave in pixel space
 
     ' Full Screen mode may have a weird viewport we must clamp to
-    x -= nViewX
-    y -= nViewY
+    x -= m_viewX
+    y -= m_viewY
 
-    nMousePosXcache = CInt(Fix((x / (nWindowWidth - (nViewX * 2))) * nScreenWidth))
-    nMousePosYcache = CInt(Fix((y / (nWindowHeight - (nViewY * 2))) * nScreenHeight))
+    m_mousePosXcache = CInt(Fix((x / (m_windowWidth - (m_viewX * 2))) * m_screenWidth))
+    m_mousePosYcache = CInt(Fix((y / (m_windowHeight - (m_viewY * 2))) * m_screenHeight))
 
-    If nMousePosXcache >= nScreenWidth Then nMousePosXcache = nScreenWidth - 1
-    If nMousePosYcache >= nScreenHeight Then nMousePosYcache = nScreenHeight - 1
+    If m_mousePosXcache >= m_screenWidth Then m_mousePosXcache = m_screenWidth - 1
+    If m_mousePosYcache >= m_screenHeight Then m_mousePosYcache = m_screenHeight - 1
 
-    If nMousePosXcache < 0 Then nMousePosXcache = 0
-    If nMousePosYcache < 0 Then nMousePosYcache = 0
+    If m_mousePosXcache < 0 Then m_mousePosXcache = 0
+    If m_mousePosYcache < 0 Then m_mousePosYcache = 0
 
   End Sub
 
@@ -2619,8 +2645,8 @@ next4:
       Pge_OpenGLCreate_Windows()
       ' Create Screen Texture - disable filtering
       Win32.glEnable(GL_TEXTURE_2D)
-      Win32.glGenTextures(1, glBuffer)
-      Win32.glBindTexture(GL_TEXTURE_2D, glBuffer)
+      Win32.glGenTextures(1, m_glBuffer)
+      Win32.glBindTexture(GL_TEXTURE_2D, m_glBuffer)
       Win32.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
       Win32.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
       Win32.glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL)
@@ -2629,15 +2655,15 @@ next4:
       Pge_OpenGLCreate_Linux()
       ' Create Screen Texture - disable filtering
       X11.glEnable(GL_TEXTURE_2D)
-      X11.glGenTextures(1, glBuffer)
-      X11.glBindTexture(GL_TEXTURE_2D, glBuffer)
+      X11.glGenTextures(1, m_glBuffer)
+      X11.glBindTexture(GL_TEXTURE_2D, m_glBuffer)
       X11.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
       X11.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
       X11.glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL)
     End If
 
     If True Then
-      Dim data = pDefaultDrawTarget.GetData
+      Dim data = m_defaultDrawTarget.GetData
       Dim sz = Marshal.SizeOf(GetType(Pixel))
       Dim ts As Integer = sz * data.Length
       Dim b(ts - 1) As Byte
@@ -2650,9 +2676,9 @@ next4:
       Dim ptr = Marshal.AllocHGlobal(b.Length)
       Marshal.Copy(b, 0, ptr, b.Length)
       If IsOSPlatform(Linux) Then
-        X11.glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, nScreenWidth, nScreenHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, ptr)
+        X11.glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_screenWidth, m_screenHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, ptr)
       Else
-        Win32.glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, nScreenWidth, nScreenHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, ptr)
+        Win32.glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_screenWidth, m_screenHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, ptr)
       End If
       Marshal.FreeHGlobal(ptr)
     End If
@@ -2665,7 +2691,7 @@ next4:
     Dim tp1 = Now()
     'Dim tp2 = Now()
 
-    Dim xe = Marshal.AllocHGlobal(Marshal.SizeOf(GetType(X11._XEvent)))
+    Dim xe = Marshal.AllocHGlobal(Marshal.SizeOf(GetType(X11.XEvent)))
 
     Try
 
@@ -2689,24 +2715,24 @@ next4:
             While X11.XPending(pge_Display) > 0
 
               Dim status = X11.XNextEvent(pge_Display, xe)
-              Dim xevent = CType(Marshal.PtrToStructure(xe, GetType(X11._XEvent)), X11._XEvent)
+              Dim xevent = CType(Marshal.PtrToStructure(xe, GetType(X11.XEvent)), X11.XEvent)
 
               Select Case xevent.Type
                 Case X11.XEventType.Expose
                   Dim gwa As X11.XWindowAttributes
                   Dim rslt = X11.XGetWindowAttributes(pge_Display, pge_Window, gwa)
-                  nWindowWidth = gwa.Width
-                  nWindowHeight = gwa.Height
+                  m_windowWidth = gwa.Width
+                  m_windowHeight = gwa.Height
                   Pge_UpdateViewport()
                   X11.glClear(GL_COLOR_BUFFER_BIT) ' Thanks Benedani!
                 Case X11.XEventType.ConfigureNotify
                   Dim xce = CType(Marshal.PtrToStructure(xe, GetType(X11.XConfigureEvent)), X11.XConfigureEvent)
-                  nWindowWidth = xce.Width
-                  nWindowHeight = xce.Height
+                  m_windowWidth = xce.Width
+                  m_windowHeight = xce.Height
                 Case X11.XEventType.KeyPress
                   Dim key = CType(Marshal.PtrToStructure(xe, GetType(X11.XKeyEvent)), X11.XKeyEvent)
                   Dim sym = X11.XLookupKeysym(key, 0)
-                  pKeyNewState(MapKeys(sym)) = True
+                  m_keyNewState(MapKeys(sym)) = True
                 'Dim sym As X11.XKeySym = X11.XLookupKeysym(xev.xkey, 0)
                 'pKeyNewState(MapKeys(sym)) = True
                 'Dim e As X11.XKeyEvent = CType(xev, X11.XKeyEvent) ' Because DragonEye loves numpads
@@ -2715,7 +2741,7 @@ next4:
                 Case X11.XEventType.KeyRelease
                   Dim key = CType(Marshal.PtrToStructure(xe, GetType(X11.XKeyEvent)), X11.XKeyEvent)
                   Dim sym = X11.XLookupKeysym(key, 0)
-                  pKeyNewState(MapKeys(sym)) = False
+                  m_keyNewState(MapKeys(sym)) = False
                 'Dim sym As X11.XKeySym = X11.XLookupKeysym(xev.xkey, 0)
                 'pKeyNewState(MapKeys(sym)) = False
                 'Dim e As X11.XKeyEvent = CType(xev, X11.XKeyEvent)
@@ -2724,9 +2750,9 @@ next4:
                 Case X11.XEventType.ButtonPress
                   Dim btn = CType(Marshal.PtrToStructure(xe, GetType(X11.XButtonEvent)), X11.XButtonEvent)
                   Select Case btn.Button
-                    Case 1 : pMouseNewState(0) = True
-                    Case 2 : pMouseNewState(2) = True
-                    Case 3 : pMouseNewState(1) = True
+                    Case 1 : m_mouseNewState(0) = True
+                    Case 2 : m_mouseNewState(2) = True
+                    Case 3 : m_mouseNewState(1) = True
                     Case 4 : Pge_UpdateMouseWheel(120)
                     Case 5 : Pge_UpdateMouseWheel(-120)
                     Case Else
@@ -2734,18 +2760,18 @@ next4:
                 Case X11.XEventType.ButtonRelease
                   Dim btn = CType(Marshal.PtrToStructure(xe, GetType(X11.XButtonEvent)), X11.XButtonEvent)
                   Select Case btn.Button
-                    Case 1 : pMouseNewState(0) = False
-                    Case 2 : pMouseNewState(2) = False
-                    Case 3 : pMouseNewState(1) = False
+                    Case 1 : m_mouseNewState(0) = False
+                    Case 2 : m_mouseNewState(2) = False
+                    Case 3 : m_mouseNewState(1) = False
                     Case Else
                   End Select
                 Case X11.XEventType.MotionNotify
                   Dim motion = CType(Marshal.PtrToStructure(xe, GetType(X11.XMotionEvent)), X11.XMotionEvent)
                   Pge_UpdateMouse(motion.X, motion.Y)
                 Case X11.XEventType.FocusIn
-                  bHasInputFocus = True
+                  m_hasInputFocus = True
                 Case X11.XEventType.FocusOut
-                  bHasInputFocus = False
+                  m_hasInputFocus = False
                 Case X11.XEventType.ClientMessage
                   Singleton.AtomActive = False
                 Case Else
@@ -2756,43 +2782,43 @@ next4:
 
           ' Handle User Input - Keyboard
           For i = 0 To 255
-            pKeyboardState(i).Pressed = False
-            pKeyboardState(i).Released = False
-            If pKeyNewState(i) <> pKeyOldState(i) Then
-              If pKeyNewState(i) Then
-                pKeyboardState(i).Pressed = Not pKeyboardState(i).Held
-                pKeyboardState(i).Held = True
+            m_keyboardState(i).Pressed = False
+            m_keyboardState(i).Released = False
+            If m_keyNewState(i) <> m_keyOldState(i) Then
+              If m_keyNewState(i) Then
+                m_keyboardState(i).Pressed = Not m_keyboardState(i).Held
+                m_keyboardState(i).Held = True
               Else
-                pKeyboardState(i).Released = True
-                pKeyboardState(i).Held = False
+                m_keyboardState(i).Released = True
+                m_keyboardState(i).Held = False
               End If
             End If
-            pKeyOldState(i) = pKeyNewState(i)
+            m_keyOldState(i) = m_keyNewState(i)
           Next
 
           ' Handle User Input - Mouse
           For i = 0 To 4
-            pMouseState(i).Pressed = False
-            pMouseState(i).Released = False
-            If pMouseNewState(i) <> pMouseOldState(i) Then
-              If pMouseNewState(i) Then
-                pMouseState(i).Pressed = Not pMouseState(i).Held
-                pMouseState(i).Held = True
+            m_mouseState(i).Pressed = False
+            m_mouseState(i).Released = False
+            If m_mouseNewState(i) <> m_mouseOldState(i) Then
+              If m_mouseNewState(i) Then
+                m_mouseState(i).Pressed = Not m_mouseState(i).Held
+                m_mouseState(i).Held = True
               Else
-                pMouseState(i).Released = True
-                pMouseState(i).Held = False
+                m_mouseState(i).Released = True
+                m_mouseState(i).Held = False
               End If
             End If
-            pMouseOldState(i) = pMouseNewState(i)
+            m_mouseOldState(i) = m_mouseNewState(i)
           Next
 
           ' Cache mouse coordinates so they remain
           ' consistent during frame
-          nMousePosX = nMousePosXcache
-          nMousePosY = nMousePosYcache
+          m_mousePosX = m_mousePosXcache
+          m_mousePosY = m_mousePosYcache
 
-          nMouseWheelDelta = nMouseWheelDeltaCache
-          nMouseWheelDeltaCache = 0
+          m_mouseWheelDelta = m_mouseWheelDeltaCache
+          m_mouseWheelDeltaCache = 0
 
           ' Handle Frame Update
           If Not OnUserUpdate(elapsedTime) Then
@@ -2801,13 +2827,13 @@ next4:
 
           ' Display Graphics
           If IsOSPlatform(Windows) Then
-            Win32.glViewport(nViewX, nViewY, nViewW, nViewH)
+            Win32.glViewport(m_viewX, m_viewY, m_viewW, m_viewH)
           Else
-            X11.glViewport(nViewX, nViewY, nViewW, nViewH)
+            X11.glViewport(m_viewX, m_viewY, m_viewW, m_viewH)
           End If
 
           ' Copy pixel array into texture
-          Dim data = pDefaultDrawTarget.GetData
+          Dim data = m_defaultDrawTarget.GetData
           Dim sz = Marshal.SizeOf(GetType(Pixel))
           Dim ts As Integer = sz * data.Length
           Dim b(ts - 1) As Byte
@@ -2820,51 +2846,51 @@ next4:
           Dim ptr = Marshal.AllocHGlobal(b.Length)
           Marshal.Copy(b, 0, ptr, b.Length)
           If IsOSPlatform(Windows) Then
-            Win32.glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, nScreenWidth, nScreenHeight, GL_RGBA, GL_UNSIGNED_BYTE, ptr)
+            Win32.glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_screenWidth, m_screenHeight, GL_RGBA, GL_UNSIGNED_BYTE, ptr)
           Else
-            X11.glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, nScreenWidth, nScreenHeight, GL_RGBA, GL_UNSIGNED_BYTE, ptr)
+            X11.glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_screenWidth, m_screenHeight, GL_RGBA, GL_UNSIGNED_BYTE, ptr)
           End If
           Marshal.FreeHGlobal(ptr)
 
           If IsOSPlatform(Windows) Then
             ' Display texture on screen
             Win32.glBegin(GL_QUADS)
-            Win32.glTexCoord2f(0.0, 1.0) : Win32.glVertex3f(-1.0F + fSubPixelOffsetX, -1.0F + fSubPixelOffsetY, 0.0F)
-            Win32.glTexCoord2f(0.0, 0.0) : Win32.glVertex3f(-1.0F + fSubPixelOffsetX, 1.0F + fSubPixelOffsetY, 0.0F)
-            Win32.glTexCoord2f(1.0, 0.0) : Win32.glVertex3f(1.0F + fSubPixelOffsetX, 1.0F + fSubPixelOffsetY, 0.0F)
-            Win32.glTexCoord2f(1.0, 1.0) : Win32.glVertex3f(1.0F + fSubPixelOffsetX, -1.0F + fSubPixelOffsetY, 0.0F)
+            Win32.glTexCoord2f(0.0, 1.0) : Win32.glVertex3f(-1.0F + m_subPixelOffsetX, -1.0F + m_subPixelOffsetY, 0.0F)
+            Win32.glTexCoord2f(0.0, 0.0) : Win32.glVertex3f(-1.0F + m_subPixelOffsetX, 1.0F + m_subPixelOffsetY, 0.0F)
+            Win32.glTexCoord2f(1.0, 0.0) : Win32.glVertex3f(1.0F + m_subPixelOffsetX, 1.0F + m_subPixelOffsetY, 0.0F)
+            Win32.glTexCoord2f(1.0, 1.0) : Win32.glVertex3f(1.0F + m_subPixelOffsetX, -1.0F + m_subPixelOffsetY, 0.0F)
             Win32.glEnd()
             ' Preset Graphics to screen
-            Win32.SwapBuffers(glDeviceContext)
+            Win32.SwapBuffers(m_glDeviceContext)
           ElseIf IsOSPlatform(Linux) Then
             ' Display texture on screen
             X11.glBegin(GL_QUADS)
-            X11.glTexCoord2f(0.0, 1.0) : X11.glVertex3f(-1.0F + fSubPixelOffsetX, -1.0F + fSubPixelOffsetY, 0.0F)
-            X11.glTexCoord2f(0.0, 0.0) : X11.glVertex3f(-1.0F + fSubPixelOffsetX, 1.0F + fSubPixelOffsetY, 0.0F)
-            X11.glTexCoord2f(1.0, 0.0) : X11.glVertex3f(1.0F + fSubPixelOffsetX, 1.0F + fSubPixelOffsetY, 0.0F)
-            X11.glTexCoord2f(1.0, 1.0) : X11.glVertex3f(1.0F + fSubPixelOffsetX, -1.0F + fSubPixelOffsetY, 0.0F)
+            X11.glTexCoord2f(0.0, 1.0) : X11.glVertex3f(-1.0F + m_subPixelOffsetX, -1.0F + m_subPixelOffsetY, 0.0F)
+            X11.glTexCoord2f(0.0, 0.0) : X11.glVertex3f(-1.0F + m_subPixelOffsetX, 1.0F + m_subPixelOffsetY, 0.0F)
+            X11.glTexCoord2f(1.0, 0.0) : X11.glVertex3f(1.0F + m_subPixelOffsetX, 1.0F + m_subPixelOffsetY, 0.0F)
+            X11.glTexCoord2f(1.0, 1.0) : X11.glVertex3f(1.0F + m_subPixelOffsetX, -1.0F + m_subPixelOffsetY, 0.0F)
             X11.glEnd()
             ' Preset Graphics to screen
             X11.glXSwapBuffers(pge_Display, pge_Window)
           End If
 
           ' Update Title Bar
-          fFrameTimer += elapsedTime
-          nFrameCount += 1
+          m_frameTimer += elapsedTime
+          m_frameCount += 1
 
-          If fFrameTimer >= 1.0F Then
+          If m_frameTimer >= 1.0F Then
 
-            fFrameTimer -= 1.0F
+            m_frameTimer -= 1.0F
 
-            Dim sTitle = $"vbPixelGameEngine v0.0.1 - {AppName} - FPS: {nFrameCount}"
+            Dim sTitle = $"vbPixelGameEngine v0.0.1 - {AppName} - FPS: {m_frameCount}"
 
             If IsOSPlatform(Windows) Then
-              Win32.SetWindowText(pge_hWnd, sTitle)
+              Win32.SetWindowText(m_hWnd, sTitle)
             ElseIf IsOSPlatform(Linux) Then
               X11.XStoreName(pge_Display, pge_Window, sTitle)
             End If
 
-            nFrameCount = 0
+            m_frameCount = 0
 
           End If
 
@@ -2885,11 +2911,11 @@ next4:
     End Try
 
     If IsOSPlatform(Windows) Then
-      Win32.wglDeleteContext(glRenderContext)
-      Win32.PostMessage(pge_hWnd, WM_DESTROY, IntPtr.Zero, IntPtr.Zero)
+      Win32.wglDeleteContext(m_glRenderContext)
+      Win32.PostMessage(m_hWnd, WM_DESTROY, IntPtr.Zero, IntPtr.Zero)
     ElseIf IsOSPlatform(Linux) Then
       Dim hrslt = X11.glXMakeCurrent(pge_Display, IntPtr.Zero, Nothing)
-      hrslt = X11.glXDestroyContext(pge_Display, glDeviceContext)
+      hrslt = X11.glXDestroyContext(pge_Display, m_glDeviceContext)
       hrslt = X11.XDestroyWindow(pge_Display, pge_Window)
       X11.XCloseDisplay(pge_Display)
     End If
@@ -2941,19 +2967,18 @@ next4:
 
 #Region "Windows"
 
-  Private Function Pge_WindowCreate_Windows() As IntPtr
-
-    Dim wc As New Win32.WNDCLASS
-    wc.hIcon = Win32.LoadIcon(IntPtr.Zero, IDI_APPLICATION)
-    wc.hCursor = Win32.LoadCursor(IntPtr.Zero, IDC_ARROW)
-    wc.Style = CS_HREDRAW Or CS_VREDRAW Or CS_OWNDC
-    wc.hInstance = Win32.GetModuleHandle(Nothing)
-    wc.WndProc = Marshal.GetFunctionPointerForDelegate(m_delegWndProc)
-    wc.ClsExtra = 0
-    wc.WndExtra = 0
-    wc.MenuName = Nothing
-    wc.hBackground = CType(COLOR_BACKGROUND, IntPtr) + 1 'Nothing
-    wc.ClassName = "VB_PIXEL_GAME_ENGINE"
+  Private Function WindowCreateWindows() As IntPtr
+    Dim wc As New Win32.WNDCLASS With {
+      .hIcon = Win32.LoadIcon(IntPtr.Zero, IDI_APPLICATION),
+      .hCursor = Win32.LoadCursor(IntPtr.Zero, IDC_ARROW),
+      .Style = CS_HREDRAW Or CS_VREDRAW Or CS_OWNDC,
+      .hInstance = Win32.GetModuleHandle(Nothing),
+      .WndProc = Marshal.GetFunctionPointerForDelegate(m_delegWndProc),
+      .ClsExtra = 0,
+      .WndExtra = 0,
+      .MenuName = Nothing,
+      .hBackground = CType(COLOR_BACKGROUND, IntPtr) + 1, 'Nothing
+      .ClassName = "VB_PIXEL_GAME_ENGINE"}
 
     Dim atom = Win32.RegisterClass(wc)
     If atom = 0 Then
@@ -2961,39 +2986,39 @@ next4:
       Return IntPtr.Zero
     End If
 
-    nWindowWidth = nScreenWidth * nPixelWidth
-    nWindowHeight = nScreenHeight * nPixelHeight
+    m_windowWidth = m_screenWidth * m_pixelWidth
+    m_windowHeight = m_screenHeight * m_pixelHeight
 
     ' Define window furniture
     Dim dwExStyle = WS_EX_APPWINDOW Or WS_EX_WINDOWEDGE
     Dim dwStyle = WS_CAPTION Or WS_SYSMENU Or WS_VISIBLE Or WS_THICKFRAME
 
     Dim nCosmeticOffset = 30
-    nViewW = nWindowWidth
-    nViewH = nWindowHeight
+    m_viewW = m_windowWidth
+    m_viewH = m_windowHeight
 
     ' Handle Fullscreen
-    If bFullScreen Then
+    If m_fullScreen Then
       dwExStyle = 0
       dwStyle = WS_VISIBLE Or WS_POPUP
       nCosmeticOffset = 0
-      Dim hmon = Win32.MonitorFromWindow(pge_hWnd, MONITOR_DEFAULTTONEAREST)
+      Dim hmon = Win32.MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTONEAREST)
       Dim mi = New Win32.MONITORINFO With {.cbSize = Marshal.SizeOf(GetType(Win32.MONITORINFO))}
       If Not Win32.GetMonitorInfo(hmon, mi) Then Return Nothing
-      nWindowWidth = mi.rcMonitor.Right
-      nWindowHeight = mi.rcMonitor.Bottom
+      m_windowWidth = mi.rcMonitor.Right
+      m_windowHeight = mi.rcMonitor.Bottom
     End If
 
     Pge_UpdateViewport()
 
     ' Keep client size as requested
-    Dim rWndRect = New Win32.RECT With {.Left = 0, .Top = 0, .Right = nWindowWidth, .Bottom = nWindowHeight}
+    Dim rWndRect = New Win32.RECT With {.Left = 0, .Top = 0, .Right = m_windowWidth, .Bottom = m_windowHeight}
     Win32.AdjustWindowRectEx(rWndRect, dwStyle, False, dwExStyle)
     Dim width = rWndRect.Right - rWndRect.Left
     Dim height = rWndRect.Bottom - rWndRect.Top
 
     'Singleton.Pge = Me
-    pge_hWnd = Win32.CreateWindowEx(dwExStyle, atom, "", dwStyle,
+    m_hWnd = Win32.CreateWindowEx(dwExStyle, atom, "", dwStyle,
                           nCosmeticOffset, nCosmeticOffset, width, height, Nothing, Nothing,
                           Win32.GetModuleHandle(Nothing), IntPtr.Zero)
 
@@ -3032,14 +3057,14 @@ next4:
     Singleton.MapKeys(VK_NUMPAD5) = Key.NP5 : Singleton.MapKeys(VK_NUMPAD6) = Key.NP6 : Singleton.MapKeys(VK_NUMPAD7) = Key.NP7 : Singleton.MapKeys(VK_NUMPAD8) = Key.NP8 : Singleton.MapKeys(VK_NUMPAD9) = Key.NP9
     Singleton.MapKeys(VK_MULTIPLY) = Key.NP_MUL : Singleton.MapKeys(VK_ADD) = Key.NP_ADD : Singleton.MapKeys(VK_DIVIDE) = Key.NP_DIV : Singleton.MapKeys(VK_SUBTRACT) = Key.NP_SUB : Singleton.MapKeys(VK_DECIMAL) = Key.NP_DECIMAL
 
-    Return pge_hWnd
+    Return m_hWnd
 
   End Function
 
   Private Function Pge_OpenGLCreate_Windows() As Boolean
 
     ' Create Device Context
-    glDeviceContext = Win32.GetDC(pge_hWnd)
+    m_glDeviceContext = Win32.GetDC(m_hWnd)
     Dim pfd As New Win32.PIXELFORMATDESCRIPTOR With {.nSize = CUShort(Marshal.SizeOf(GetType(Win32.PIXELFORMATDESCRIPTOR))),
                                            .nVersion = 1,
                                            .dwFlags = PFD_DRAW_TO_WINDOW Or PFD_SUPPORT_OPENGL Or PFD_DOUBLEBUFFER,
@@ -3067,17 +3092,17 @@ next4:
                                            .dwVisibleMask = 0,
                                            .dwDamageMask = 0}
 
-    Dim pf = Win32.ChoosePixelFormat(glDeviceContext, pfd) : If pf = 0 Then Return False
-    Dim hrslt = Win32.SetPixelFormat(glDeviceContext, pf, pfd)
+    Dim pf = Win32.ChoosePixelFormat(m_glDeviceContext, pfd) : If pf = 0 Then Return False
+    Dim unused = Win32.SetPixelFormat(m_glDeviceContext, pf, pfd)
 
-    glRenderContext = Win32.wglCreateContext(glDeviceContext) : If glRenderContext = IntPtr.Zero Then Return False
-    hrslt = Win32.wglMakeCurrent(glDeviceContext, glRenderContext)
+    m_glRenderContext = Win32.wglCreateContext(m_glDeviceContext) : If m_glRenderContext = IntPtr.Zero Then Return False
+    Dim unused2 = Win32.wglMakeCurrent(m_glDeviceContext, m_glRenderContext)
 
-    Win32.glViewport(nViewX, nViewY, nViewW, nViewH)
+    Win32.glViewport(m_viewX, m_viewY, m_viewW, m_viewH)
 
     ' Remove Frame cap
     wglSwapInterval = CType(Marshal.GetDelegateForFunctionPointer(Win32.wglGetProcAddress("wglSwapIntervalEXT"), GetType(wglSwapInterval_t)), wglSwapInterval_t)
-    If wglSwapInterval IsNot Nothing AndAlso Not bEnableVSYNC Then wglSwapInterval(0)
+    If wglSwapInterval IsNot Nothing AndAlso Not m_enableVSYNC Then wglSwapInterval(0)
 
     Return True
 
@@ -3094,6 +3119,10 @@ next4:
         'sge = CType(Marshal.PtrToStructure(createStruct.lpCreateParams, GetType(PixelGameEngine)), PixelGameEngine)
         Return IntPtr.Zero
       Case WM_MOUSEMOVE
+        If Not Singleton.Pge.m_hasMouseFocus Then
+          ' Set the first time we detect mouse movement.
+          Singleton.Pge.m_hasMouseFocus = True
+        End If
         Dim v = CInt(lParam)
         Dim x = v And &HFFFF
         Dim y = (v >> 16) And &HFFFF
@@ -3110,37 +3139,37 @@ next4:
         Return IntPtr.Zero
       Case WM_MOUSELEAVE
         'TODO: WM_MOUSELEAVE is working *once*, not sure why...
-        Singleton.Pge.bHasMouseFocus = False
+        Singleton.Pge.m_hasMouseFocus = False
         Return IntPtr.Zero
       Case WM_SETFOCUS
-        Singleton.Pge.bHasInputFocus = True
+        Singleton.Pge.m_hasInputFocus = True
         Return IntPtr.Zero
       Case WM_KILLFOCUS
-        Singleton.Pge.bHasInputFocus = False
+        Singleton.Pge.m_hasInputFocus = False
         Return IntPtr.Zero
       Case WM_KEYDOWN
-        Singleton.Pge.pKeyNewState(Singleton.MapKeys(wParam.ToInt32())) = True
+        Singleton.Pge.m_keyNewState(Singleton.MapKeys(wParam.ToInt32())) = True
         Return IntPtr.Zero
       Case WM_KEYUP
-        Singleton.Pge.pKeyNewState(Singleton.MapKeys(wParam.ToInt32())) = False
+        Singleton.Pge.m_keyNewState(Singleton.MapKeys(wParam.ToInt32())) = False
         Return IntPtr.Zero
       Case WM_LBUTTONDOWN
-        Singleton.Pge.pMouseNewState(0) = True
+        Singleton.Pge.m_mouseNewState(0) = True
         Return IntPtr.Zero
       Case WM_LBUTTONUP
-        Singleton.Pge.pMouseNewState(0) = False
+        Singleton.Pge.m_mouseNewState(0) = False
         Return IntPtr.Zero
       Case WM_RBUTTONDOWN
-        Singleton.Pge.pMouseNewState(1) = True
+        Singleton.Pge.m_mouseNewState(1) = True
         Return IntPtr.Zero
       Case WM_RBUTTONUP
-        Singleton.Pge.pMouseNewState(1) = False
+        Singleton.Pge.m_mouseNewState(1) = False
         Return IntPtr.Zero
       Case WM_MBUTTONDOWN
-        Singleton.Pge.pMouseNewState(2) = True
+        Singleton.Pge.m_mouseNewState(2) = True
         Return IntPtr.Zero
       Case WM_MBUTTONUP
-        Singleton.Pge.pMouseNewState(2) = False
+        Singleton.Pge.m_mouseNewState(2) = False
         Return IntPtr.Zero
       Case WM_CLOSE
         Singleton.AtomActive = False
@@ -3157,7 +3186,7 @@ next4:
 #Region "Linux"
 
   ' Do the Linux stuff!
-  Private Function Pge_WindowCreate_Linux() As IntPtr
+  Private Function WindowCreateLinux() As IntPtr
 
     Dim rslt = X11.XInitThreads()
 
@@ -3169,8 +3198,8 @@ next4:
     Dim pge_GLAttribs() = {GLX_RGBA, GLX_DEPTH_SIZE, 24, GLX_DOUBLEBUFFER, None}
     pge_VisualInfo = X11.glXChooseVisual(pge_Display, 0, pge_GLAttribs)
     Dim vi = Marshal.PtrToStructure(Of X11.XVisualInfo)(pge_VisualInfo)
-    pge_ColourMap = X11.XCreateColormap(pge_Display, pge_WindowRoot, vi.visual, AllocNone)
-    pge_SetWindowAttribs.Colormap = pge_ColourMap
+    pge_ColorMap = X11.XCreateColormap(pge_Display, pge_WindowRoot, vi.Visual, AllocNone)
+    pge_SetWindowAttribs.Colormap = pge_ColorMap
 
     ' Register which events we are interested in receiving
     pge_SetWindowAttribs.EventMask = X11.XEventMask.ExposureMask Or
@@ -3183,7 +3212,7 @@ next4:
                                      X11.XEventMask.StructureNotifyMask
 
     ' Create the window
-    pge_Window = X11.XCreateWindow(pge_Display, pge_WindowRoot, 30, 30, nScreenWidth * nPixelWidth, nScreenHeight * nPixelHeight, 0, vi.depth, InputOutput, vi.visual, X11.XWindowAttributeFlags.CWColormap Or X11.XWindowAttributeFlags.CWEventMask, pge_SetWindowAttribs)
+    pge_Window = X11.XCreateWindow(pge_Display, pge_WindowRoot, 30, 30, m_screenWidth * m_pixelWidth, m_screenHeight * m_pixelHeight, 0, vi.Depth, InputOutput, vi.Visual, X11.XWindowAttributeFlags.CWColormap Or X11.XWindowAttributeFlags.CWEventMask, pge_SetWindowAttribs)
 
     Dim wmDelete = X11.XInternAtom(pge_Display, "WM_DELETE_WINDOW", True)
     X11.XSetWMProtocols(pge_Display, pge_Window, {wmDelete}, 1)
@@ -3191,7 +3220,7 @@ next4:
     X11.XMapWindow(pge_Display, pge_Window)
     X11.XStoreName(pge_Display, pge_Window, "vbPixelGameEngine")
 
-    If bFullScreen Then ' Thanks DragonEye, again :D
+    If m_fullScreen Then ' Thanks DragonEye, again :D
       Dim wm_state = X11.XInternAtom(pge_Display, "_NET_WM_STATE", False)
       Dim fullscreen = CByte(X11.XInternAtom(pge_Display, "_NET_WM_STATE_FULLSCREEN", False))
       Dim xev As X11.XClientMessageEvent ' = Nothing
@@ -3199,7 +3228,7 @@ next4:
       xev.Window = pge_Window
       xev.Message_Type = CULng(wm_state)
       xev.Format = 32
-      xev.L0 = If(bFullScreen, 1, 0) ' the action (0: off, 1: on, 2: toggle)
+      xev.L0 = If(m_fullScreen, 1, 0) ' the action (0: off, 1: on, 2: toggle)
       xev.L1 = fullscreen ' first property to alter
       xev.L2 = 0 ' second property to alter
       xev.L3 = 0 ' source indication
@@ -3211,8 +3240,8 @@ next4:
       rslt = X11.XFlush(pge_Display)
       Dim gwa As X11.XWindowAttributes
       rslt = X11.XGetWindowAttributes(pge_Display, pge_Window, gwa)
-      nWindowWidth = gwa.Width
-      nWindowHeight = gwa.Height
+      m_windowWidth = gwa.Width
+      m_windowHeight = gwa.Height
       Pge_UpdateViewport()
     End If
 
@@ -3261,13 +3290,13 @@ next4:
     'Dim glSwapIntervalEXT As glSwapInterval_t = Nothing
     glSwapIntervalEXT = CType(Marshal.GetDelegateForFunctionPointer(X11.glXGetProcAddress("glXSwapIntervalEXT"), GetType(glSwapInterval_t)), glSwapInterval_t)
 
-    If glSwapIntervalEXT Is Nothing AndAlso Not bEnableVSYNC Then
+    If glSwapIntervalEXT Is Nothing AndAlso Not m_enableVSYNC Then
       Console.WriteLine("NOTE: Could not disable VSYNC, glXSwapIntervalEXT() was not found!")
       Console.WriteLine("      Don't worry though, things will still work, it's just the")
       Console.WriteLine("      frame rate will be capped to your monitors refresh rate - javidx9")
     End If
 
-    If glSwapIntervalEXT IsNot Nothing AndAlso Not bEnableVSYNC Then
+    If glSwapIntervalEXT IsNot Nothing AndAlso Not m_enableVSYNC Then
       glSwapIntervalEXT(pge_Display, pge_Window, 0)
     End If
 
@@ -3334,40 +3363,40 @@ next4:
 
   ' I've added these so that compatibility with CGE can be retained.
 
-  Private Shared Function ConsoleColor2PixelColor(c As COLOUR) As Pixel
+  Private Shared Function ConsoleColor2PixelColor(c As Color) As Pixel
     Select Case c
-      Case COLOUR.FG_BLACK : Return Presets.Black
-      Case COLOUR.FG_DARK_BLUE : Return Presets.DarkBlue
-      Case COLOUR.FG_DARK_GREEN : Return Presets.DarkGreen
-      Case COLOUR.FG_DARK_CYAN : Return Presets.DarkCyan
-      Case COLOUR.FG_DARK_RED : Return Presets.DarkRed
-      Case COLOUR.FG_DARK_MAGENTA : Return Presets.DarkMagenta
-      Case COLOUR.FG_DARK_YELLOW : Return Presets.DarkYellow
-      Case COLOUR.FG_GREY : Return Presets.Grey
-      Case COLOUR.FG_DARK_GREY : Return Presets.DarkGrey
-      Case COLOUR.FG_BLUE : Return Presets.Blue
-      Case COLOUR.FG_GREEN : Return Presets.Green
-      Case COLOUR.FG_CYAN : Return Presets.Cyan
-      Case COLOUR.FG_RED : Return Presets.Red
-      Case COLOUR.FG_MAGENTA : Return Presets.Magenta
-      Case COLOUR.FG_YELLOW : Return Presets.Yellow
-      Case COLOUR.FG_WHITE : Return Presets.White
-      Case COLOUR.BG_BLACK : Return Presets.Black
-      Case COLOUR.BG_DARK_BLUE : Return Presets.DarkBlue
-      Case COLOUR.BG_DARK_GREEN : Return Presets.DarkGreen
-      Case COLOUR.BG_DARK_CYAN : Return Presets.DarkCyan
-      Case COLOUR.BG_DARK_RED : Return Presets.DarkRed
-      Case COLOUR.BG_DARK_MAGENTA : Return Presets.DarkMagenta
-      Case COLOUR.BG_DARK_YELLOW : Return Presets.DarkYellow
-      Case COLOUR.BG_GREY : Return Presets.Grey
-      Case COLOUR.BG_DARK_GREY : Return Presets.DarkGrey
-      Case COLOUR.BG_BLUE : Return Presets.Blue
-      Case COLOUR.BG_GREEN : Return Presets.Green
-      Case COLOUR.BG_CYAN : Return Presets.Cyan
-      Case COLOUR.BG_RED : Return Presets.Red
-      Case COLOUR.BG_MAGENTA : Return Presets.Magenta
-      Case COLOUR.BG_YELLOW : Return Presets.Yellow
-      Case COLOUR.BG_WHITE : Return Presets.White
+      Case Color.FgBlack : Return Presets.Black
+      Case Color.FgDarkBlue : Return Presets.DarkBlue
+      Case Color.FgDarkGreen : Return Presets.DarkGreen
+      Case Color.FgDarkCyan : Return Presets.DarkCyan
+      Case Color.FgDarkRed : Return Presets.DarkRed
+      Case Color.FgDarkMagenta : Return Presets.DarkMagenta
+      Case Color.FgDarkYellow : Return Presets.DarkYellow
+      Case Color.FgGray : Return Presets.Gray
+      Case Color.FgDarkGray : Return Presets.DarkGrey
+      Case Color.FgBlue : Return Presets.Blue
+      Case Color.FgGreen : Return Presets.Green
+      Case Color.FgCyan : Return Presets.Cyan
+      Case Color.FgRed : Return Presets.Red
+      Case Color.FgMagenta : Return Presets.Magenta
+      Case Color.FgYellow : Return Presets.Yellow
+      Case Color.FgWhite : Return Presets.White
+      Case Color.BgBlack : Return Presets.Black
+      Case Color.BgDarkBlue : Return Presets.DarkBlue
+      Case Color.BgDarkGreen : Return Presets.DarkGreen
+      Case Color.BgDarkCyan : Return Presets.DarkCyan
+      Case Color.BgDarkRed : Return Presets.DarkRed
+      Case Color.BgDarkMagenta : Return Presets.DarkMagenta
+      Case Color.BgDarkYellow : Return Presets.DarkYellow
+      Case Color.BgGray : Return Presets.Gray
+      Case Color.BgDarkGray : Return Presets.DarkGrey
+      Case Color.BgBlue : Return Presets.Blue
+      Case Color.BgGreen : Return Presets.Green
+      Case Color.BgCyan : Return Presets.Cyan
+      Case Color.BgRed : Return Presets.Red
+      Case Color.BgMagenta : Return Presets.Magenta
+      Case Color.BgYellow : Return Presets.Yellow
+      Case Color.BgWhite : Return Presets.White
       Case Else
         Return Presets.White
     End Select
@@ -3377,25 +3406,35 @@ next4:
     Return Construct(w, h, pw, ph)
   End Function
 
-  Protected Sub Fill(x1 As Integer, y1 As Integer, x2 As Integer, y2 As Integer, dummy As PIXEL_TYPE, c As COLOUR)
+  Protected Sub Fill(x1 As Integer, y1 As Integer, x2 As Integer, y2 As Integer, dummy As PixelType, c As Color)
+    If dummy = PixelType.Half Then
+    End If
     Dim w = (x2 - x1) + 1
     Dim h = (y2 - y1) + 1
     FillRect(x1, y1, w, h, ConsoleColor2PixelColor(c))
   End Sub
 
-  Protected Sub FillCircle(x As Single, y As Single, radius As Single, dummy As PIXEL_TYPE, c As COLOUR)
+  Protected Sub FillCircle(x As Single, y As Single, radius As Single, dummy As PixelType, c As Color)
+    If dummy = PixelType.Half Then
+    End If
     FillCircle(CInt(Fix(x)), CInt(Fix(y)), CInt(Fix(radius)), ConsoleColor2PixelColor(c))
   End Sub
 
-  Protected Sub FillCircle(x As Integer, y As Integer, radius As Single, dummy As PIXEL_TYPE, c As COLOUR)
+  Protected Sub FillCircle(x As Integer, y As Integer, radius As Single, dummy As PixelType, c As Color)
+    If dummy = PixelType.Half Then
+    End If
     FillCircle(x, y, CInt(Fix(radius)), ConsoleColor2PixelColor(c))
   End Sub
 
-  Protected Sub DrawLine(x1 As Single, y1 As Single, x2 As Single, y2 As Single, dummy As PIXEL_TYPE, c As COLOUR)
+  Protected Sub DrawLine(x1 As Single, y1 As Single, x2 As Single, y2 As Single, dummy As PixelType, c As Color)
+    If dummy = PixelType.Half Then
+    End If
     DrawLine(CInt(Fix(x1)), CInt(Fix(y1)), CInt(Fix(x2)), CInt(Fix(y2)), ConsoleColor2PixelColor(c))
   End Sub
 
-  Protected Sub DrawLine(x1 As Integer, y1 As Integer, x2 As Integer, y2 As Integer, dummy As PIXEL_TYPE, c As COLOUR)
+  Protected Sub DrawLine(x1 As Integer, y1 As Integer, x2 As Integer, y2 As Integer, dummy As PixelType, c As Color)
+    If dummy = PixelType.Half Then
+    End If
     DrawLine(x1, y1, x2, y2, ConsoleColor2PixelColor(c))
   End Sub
 
@@ -3411,48 +3450,48 @@ End Class
 
 #Region "CGE"
 
-Public Enum COLOUR As Short
-  FG_BLACK = &H0
-  FG_DARK_BLUE = &H1
-  FG_DARK_GREEN = &H2
-  FG_DARK_CYAN = &H3
-  FG_DARK_RED = &H4
-  FG_DARK_MAGENTA = &H5
-  FG_DARK_YELLOW = &H6
-  FG_GREY = &H7 ' Thanks MS :-/
-  FG_DARK_GREY = &H8
-  FG_BLUE = &H9
-  FG_GREEN = &HA
-  FG_CYAN = &HB
-  FG_RED = &HC
-  FG_MAGENTA = &HD
-  FG_YELLOW = &HE
-  FG_WHITE = &HF
+Public Enum Color As Short
+  FgBlack = &H0
+  FgDarkBlue = &H1
+  FgDarkGreen = &H2
+  FgDarkCyan = &H3
+  FgDarkRed = &H4
+  FgDarkMagenta = &H5
+  FgDarkYellow = &H6
+  FgGray = &H7
+  FgDarkGray = &H8
+  FgBlue = &H9
+  FgGreen = &HA
+  FgCyan = &HB
+  FgRed = &HC
+  FgMagenta = &HD
+  FgYellow = &HE
+  FgWhite = &HF
 #Disable Warning CA1069 ' Enums values should not be duplicated
-  BG_BLACK = &H0
+  BgBlack = &H0
 #Enable Warning CA1069 ' Enums values should not be duplicated
-  BG_DARK_BLUE = &H10
-  BG_DARK_GREEN = &H20
-  BG_DARK_CYAN = &H30
-  BG_DARK_RED = &H40
-  BG_DARK_MAGENTA = &H50
-  BG_DARK_YELLOW = &H60
-  BG_GREY = &H70
-  BG_DARK_GREY = &H80
-  BG_BLUE = &H90
-  BG_GREEN = &HA0
-  BG_CYAN = &HB0
-  BG_RED = &HC0
-  BG_MAGENTA = &HD0
-  BG_YELLOW = &HE0
-  BG_WHITE = &HF0
+  BgDarkBlue = &H10
+  BgDarkGreen = &H20
+  BgDarkCyan = &H30
+  BgDarkRed = &H40
+  BgDarkMagenta = &H50
+  BgDarkYellow = &H60
+  BgGray = &H70
+  BgDarkGray = &H80
+  BgBlue = &H90
+  BgGreen = &HA0
+  BgCyan = &HB0
+  BgRed = &HC0
+  BgMagenta = &HD0
+  BgYellow = &HE0
+  BgWhite = &HF0
 End Enum
 
-Public Enum PIXEL_TYPE As Short
-  PIXEL_SOLID = &H2588
-  PIXEL_THREEQUARTERS = &H2593
-  PIXEL_HALF = &H2592
-  PIXEL_QUARTER = &H2591
+Public Enum PixelType As Short
+  Solid = &H2588
+  ThreeQuarters = &H2593
+  Half = &H2592
+  Quarter = &H2591
 End Enum
 
 #End Region

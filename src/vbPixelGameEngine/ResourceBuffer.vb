@@ -1,8 +1,4 @@
-﻿Option Explicit On
-Option Strict On
-Option Infer On
-
-Friend Class ResourceBuffer
+﻿Friend Class ResourceBuffer
 
   Friend vMemory As Byte()
 

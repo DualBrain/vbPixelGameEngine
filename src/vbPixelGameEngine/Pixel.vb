@@ -1,12 +1,8 @@
-﻿Option Explicit On
-Option Strict On
-Option Infer On
-
-Imports System.Runtime.InteropServices
+﻿Imports System.Runtime.InteropServices
 
 Public Enum Presets As UInteger
   White = &HFFFFFF
-  Grey = &HA9A9A9
+  Gray = &HA9A9A9
   Red = &HFF0000
   Yellow = &HFFFF00
   Green = &HFF00
@@ -167,6 +163,7 @@ Public Structure Pixel
     Return False
   End Function
 
+#Disable Warning IDE0070 ' Use 'System.HashCode'
   Public Overrides Function GetHashCode() As Integer
     Dim hashCode = 196078
     hashCode = hashCode * -152113 + R.GetHashCode()
@@ -175,5 +172,6 @@ Public Structure Pixel
     hashCode = hashCode * -152113 + A.GetHashCode()
     Return hashCode
   End Function
+#Enable Warning IDE0070 ' Use 'System.HashCode'
 
 End Structure

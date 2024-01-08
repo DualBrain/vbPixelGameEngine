@@ -47,6 +47,9 @@ Public Class Gfx3D
 
   Public Shared Sub DrawTriangleTex(tri As Triangle, spr As Sprite)
 
+    If tri Is Nothing OrElse spr Is Nothing Then
+    End If
+
     'If tri.P(1).Y < tri.P(0).Y Then
     '  Swap(tri.P(0).Y, tri.P(1).Y)
     '  Swap(tri.P(0).X, tri.P(1).X)
@@ -323,7 +326,7 @@ Public Class Gfx3D
           If tex_w > m_DepthBuffer(i * Pge.ScreenWidth() + j) Then
             'Pge.Draw(j, i, spr.Sample(tex_u / tex_w, tex_v / tex_w))
             'm_DepthBuffer(i * Pge.ScreenWidth() + j) = tex_w
-            If (Pge.Draw(j, i, If(spr IsNot Nothing, spr.Sample(tex_u / tex_w, tex_v / tex_w), Presets.Grey))) Then
+            If (Pge.Draw(j, i, If(spr IsNot Nothing, spr.Sample(tex_u / tex_w, tex_v / tex_w), Presets.Gray))) Then
               m_DepthBuffer(i * Pge.ScreenWidth() + j) = tex_w
             End If
           End If
@@ -388,7 +391,7 @@ Public Class Gfx3D
           If tex_w > m_DepthBuffer(i * Pge.ScreenWidth() + j) Then
             'Pge.Draw(j, i, spr.Sample(tex_u / tex_w, tex_v / tex_w))
             'm_DepthBuffer(i * Pge.ScreenWidth() + j) = tex_w
-            If (Pge.Draw(j, i, If(spr IsNot Nothing, spr.Sample(tex_u / tex_w, tex_v / tex_w), Presets.Grey))) Then
+            If (Pge.Draw(j, i, If(spr IsNot Nothing, spr.Sample(tex_u / tex_w, tex_v / tex_w), Presets.Gray))) Then
               m_DepthBuffer(i * Pge.ScreenWidth() + j) = tex_w
             End If
           End If
@@ -758,11 +761,10 @@ Public Class Gfx3D
     End Sub
 
     Public Shared Function Mat_MultiplyVector(ByRef m As Mat4x4, ByRef i As Vec3d) As Vec3d
-      Dim v As New Vec3d
-      v.X = i.X * m.M(0, 0) + i.Y * m.M(1, 0) + i.Z * m.M(2, 0) + i.W * m.M(3, 0)
-      v.Y = i.X * m.M(0, 1) + i.Y * m.M(1, 1) + i.Z * m.M(2, 1) + i.W * m.M(3, 1)
-      v.Z = i.X * m.M(0, 2) + i.Y * m.M(1, 2) + i.Z * m.M(2, 2) + i.W * m.M(3, 2)
-      v.W = i.X * m.M(0, 3) + i.Y * m.M(1, 3) + i.Z * m.M(2, 3) + i.W * m.M(3, 3)
+      Dim v As New Vec3d With {.X = i.X * m.M(0, 0) + i.Y * m.M(1, 0) + i.Z * m.M(2, 0) + i.W * m.M(3, 0),
+                               .Y = i.X * m.M(0, 1) + i.Y * m.M(1, 1) + i.Z * m.M(2, 1) + i.W * m.M(3, 1),
+                               .Z = i.X * m.M(0, 2) + i.Y * m.M(1, 2) + i.Z * m.M(2, 2) + i.W * m.M(3, 2),
+                               .W = i.X * m.M(0, 3) + i.Y * m.M(1, 3) + i.Z * m.M(2, 3) + i.W * m.M(3, 3)}
       Return v
     End Function
 
@@ -954,10 +956,9 @@ Public Class Gfx3D
     End Function
 
     Public Shared Function Vec_CrossProduct(ByRef v1 As Vec3d, ByRef v2 As Vec3d) As Vec3d
-      Dim v As New Vec3d
-      v.X = v1.Y * v2.Z - v1.Z * v2.Y
-      v.Y = v1.Z * v2.X - v1.X * v2.Z
-      v.Z = v1.X * v2.Y - v1.Y * v2.X
+      Dim v As New Vec3d With {.X = v1.Y * v2.Z - v1.Z * v2.Y,
+                               .Y = v1.Z * v2.X - v1.X * v2.Z,
+                               .Z = v1.X * v2.Y - v1.Y * v2.X}
       Return v
     End Function
 
@@ -977,17 +978,17 @@ Public Class Gfx3D
       Return (plane_n.X * p.X + plane_n.Y * p.Y + plane_n.Z * p.Z - Vec_DotProduct(plane_n, plane_p))
     End Function
 
-    Public Shared Function Triangle_ClipAgainstPlane(ByRef plane_p As Vec3d, ByRef plane_n As Vec3d, ByRef in_tri As Triangle, ByRef out_tri1 As Triangle, ByRef out_tri2 As Triangle) As Integer
+    Public Shared Function Triangle_ClipAgainstPlane(ByRef planeP As Vec3d, ByRef planeN As Vec3d, ByRef inTri As Triangle, ByRef outTri1 As Triangle, ByRef outTri2 As Triangle) As Integer
 
       ' Make sure plane normal is indeed normal
-      plane_n = Vec_Normalise(plane_n)
+      planeN = Vec_Normalise(planeN)
 
-      out_tri1.T(0) = New Vec2d(in_tri.T(0))
-      out_tri2.T(0) = New Vec2d(in_tri.T(0))
-      out_tri1.T(1) = New Vec2d(in_tri.T(1))
-      out_tri2.T(1) = New Vec2d(in_tri.T(1))
-      out_tri1.T(2) = New Vec2d(in_tri.T(2))
-      out_tri2.T(2) = New Vec2d(in_tri.T(2))
+      outTri1.T(0) = New Vec2d(inTri.T(0))
+      outTri2.T(0) = New Vec2d(inTri.T(0))
+      outTri1.T(1) = New Vec2d(inTri.T(1))
+      outTri2.T(1) = New Vec2d(inTri.T(1))
+      outTri1.T(2) = New Vec2d(inTri.T(2))
+      outTri2.T(2) = New Vec2d(inTri.T(2))
 
       '' Return signed shortest distance from point to plane, plane normal must be normalised
       'Dim dist = Function(p As Vec3d)
@@ -997,48 +998,48 @@ Public Class Gfx3D
 
       ' Create two temporary storage arrays to classify points either side of plane
       ' If distance sign is positive, point lies on "inside" of plane
-      Dim inside_points(2) As Vec3d : Dim nInsidePointCount = 0
-      Dim outside_points(2) As Vec3d : Dim nOutsidePointCount = 0
-      Dim inside_tex(2) As Vec2d : Dim nInsideTexCount = 0
-      Dim outside_tex(2) As Vec2d : Dim nOutsideTexCount = 0
+      Dim insidePoints(2) As Vec3d : Dim insidePointCount = 0
+      Dim outsidePoints(2) As Vec3d : Dim outsidePointCount = 0
+      Dim insideTex(2) As Vec2d : Dim insideTexCount = 0
+      Dim outsideTex(2) As Vec2d : Dim outsideTexCount = 0
       For i = 0 To 2
-        inside_points(i) = New Vec3d : outside_points(i) = New Vec3d : inside_tex(i) = New Vec2d : outside_tex(i) = New Vec2d
+        insidePoints(i) = New Vec3d : outsidePoints(i) = New Vec3d : insideTex(i) = New Vec2d : outsideTex(i) = New Vec2d
       Next
 
       ' Get signed distance of each point in triangle to plane
-      Dim d0 = Distance(in_tri.P(0), plane_n, plane_p)
-      Dim d1 = Distance(in_tri.P(1), plane_n, plane_p)
-      Dim d2 = Distance(in_tri.P(2), plane_n, plane_p)
+      Dim d0 = Distance(inTri.P(0), planeN, planeP)
+      Dim d1 = Distance(inTri.P(1), planeN, planeP)
+      Dim d2 = Distance(inTri.P(2), planeN, planeP)
 
       If d0 >= 0 Then
-        inside_points(nInsidePointCount) = New Vec3d(in_tri.P(0)) : nInsidePointCount += 1
-        inside_tex(nInsideTexCount) = New Vec2d(in_tri.T(0)) : nInsideTexCount += 1
+        insidePoints(insidePointCount) = New Vec3d(inTri.P(0)) : insidePointCount += 1
+        insideTex(insideTexCount) = New Vec2d(inTri.T(0)) : insideTexCount += 1
       Else
-        outside_points(nOutsidePointCount) = New Vec3d(in_tri.P(0)) : nOutsidePointCount += 1
-        outside_tex(nOutsideTexCount) = New Vec2d(in_tri.T(0)) : nOutsideTexCount += 1
+        outsidePoints(outsidePointCount) = New Vec3d(inTri.P(0)) : outsidePointCount += 1
+        outsideTex(outsideTexCount) = New Vec2d(inTri.T(0)) : outsideTexCount += 1
       End If
 
       If d1 >= 0 Then
-        inside_points(nInsidePointCount) = New Vec3d(in_tri.P(1)) : nInsidePointCount += 1
-        inside_tex(nInsideTexCount) = New Vec2d(in_tri.T(1)) : nInsideTexCount += 1
+        insidePoints(insidePointCount) = New Vec3d(inTri.P(1)) : insidePointCount += 1
+        insideTex(insideTexCount) = New Vec2d(inTri.T(1)) : insideTexCount += 1
       Else
-        outside_points(nOutsidePointCount) = New Vec3d(in_tri.P(1)) : nOutsidePointCount += 1
-        outside_tex(nOutsideTexCount) = New Vec2d(in_tri.T(1)) : nOutsideTexCount += 1
+        outsidePoints(outsidePointCount) = New Vec3d(inTri.P(1)) : outsidePointCount += 1
+        outsideTex(outsideTexCount) = New Vec2d(inTri.T(1)) : outsideTexCount += 1
       End If
 
       If d2 >= 0 Then
-        inside_points(nInsidePointCount) = New Vec3d(in_tri.P(2)) : nInsidePointCount += 1
-        inside_tex(nInsideTexCount) = New Vec2d(in_tri.T(2)) : nInsideTexCount += 1
+        insidePoints(insidePointCount) = New Vec3d(inTri.P(2)) : insidePointCount += 1
+        insideTex(insideTexCount) = New Vec2d(inTri.T(2)) ': insideTexCount += 1
       Else
-        outside_points(nOutsidePointCount) = New Vec3d(in_tri.P(2)) : nOutsidePointCount += 1
-        outside_tex(nOutsideTexCount) = New Vec2d(in_tri.T(2)) : nOutsideTexCount += 1
+        outsidePoints(outsidePointCount) = New Vec3d(inTri.P(2)) : outsidePointCount += 1
+        outsideTex(outsideTexCount) = New Vec2d(inTri.T(2)) ': outsideTexCount += 1
       End If
 
       ' Now classify triangle points, and break the input triangle into 
       ' smaller output triangles if required. There are four possible
       ' outcomes...
 
-      If nInsidePointCount = 0 Then
+      If insidePointCount = 0 Then
 
         ' All points lie on the outside of plane, so clip whole triangle
         ' It ceases to exist
@@ -1047,86 +1048,86 @@ Public Class Gfx3D
 
       End If
 
-      If nInsidePointCount = 3 Then
+      If insidePointCount = 3 Then
 
         ' All points lie on the inside of plane, so do nothing
         ' and allow the triangle to simply pass through
 
-        out_tri1 = New Triangle(in_tri)
+        outTri1 = New Triangle(inTri)
 
         Return 1 ' Just the one returned original triangle is valid
 
       End If
 
-      If nInsidePointCount = 1 AndAlso nOutsidePointCount = 2 Then
+      If insidePointCount = 1 AndAlso outsidePointCount = 2 Then
 
         ' Triangle should be clipped. As two points lie outside
         ' the plane, the triangle simply becomes a smaller triangle
         ' Copy appearance info to new triangle
-        out_tri1.Col(0) = in_tri.Col(0)
-        out_tri1.Col(1) = in_tri.Col(1)
-        out_tri1.Col(2) = in_tri.Col(2)
+        outTri1.Col(0) = inTri.Col(0)
+        outTri1.Col(1) = inTri.Col(1)
+        outTri1.Col(2) = inTri.Col(2)
 
         ' The inside point is valid, so keep that...
-        out_tri1.P(0) = New Vec3d(inside_points(0))
-        out_tri1.T(0) = New Vec2d(inside_tex(0))
+        outTri1.P(0) = New Vec3d(insidePoints(0))
+        outTri1.T(0) = New Vec2d(insideTex(0))
 
         ' but the two new points are at the locations where the 
         ' original sides of the triangle (lines) intersect with the plane
         Dim t As Single
-        out_tri1.P(1) = Vec_IntersectPlane(plane_p, plane_n, inside_points(0), outside_points(0), t)
-        out_tri1.T(1).X = t * (outside_tex(0).X - inside_tex(0).X) + inside_tex(0).X
-        out_tri1.T(1).Y = t * (outside_tex(0).Y - inside_tex(0).Y) + inside_tex(0).Y
-        out_tri1.T(1).Z = t * (outside_tex(0).Z - inside_tex(0).Z) + inside_tex(0).Z
+        outTri1.P(1) = Vec_IntersectPlane(planeP, planeN, insidePoints(0), outsidePoints(0), t)
+        outTri1.T(1).X = t * (outsideTex(0).X - insideTex(0).X) + insideTex(0).X
+        outTri1.T(1).Y = t * (outsideTex(0).Y - insideTex(0).Y) + insideTex(0).Y
+        outTri1.T(1).Z = t * (outsideTex(0).Z - insideTex(0).Z) + insideTex(0).Z
 
-        out_tri1.P(2) = Vec_IntersectPlane(plane_p, plane_n, inside_points(0), outside_points(1), t)
-        out_tri1.T(2).X = t * (outside_tex(1).X - inside_tex(0).X) + inside_tex(0).X
-        out_tri1.T(2).Y = t * (outside_tex(1).Y - inside_tex(0).Y) + inside_tex(0).Y
-        out_tri1.T(2).Z = t * (outside_tex(1).Z - inside_tex(0).Z) + inside_tex(0).Z
+        outTri1.P(2) = Vec_IntersectPlane(planeP, planeN, insidePoints(0), outsidePoints(1), t)
+        outTri1.T(2).X = t * (outsideTex(1).X - insideTex(0).X) + insideTex(0).X
+        outTri1.T(2).Y = t * (outsideTex(1).Y - insideTex(0).Y) + insideTex(0).Y
+        outTri1.T(2).Z = t * (outsideTex(1).Z - insideTex(0).Z) + insideTex(0).Z
 
         Return 1 ' Return the newly formed single triangle
 
       End If
 
-      If nInsidePointCount = 2 AndAlso nOutsidePointCount = 1 Then
+      If insidePointCount = 2 AndAlso outsidePointCount = 1 Then
 
         ' Triangle should be clipped. As two points lie inside the plane,
         ' the clipped triangle becomes a "quad". Fortunately, we can
         ' represent a quad with two new triangles
 
         ' Copy appearance info to new triangles
-        out_tri1.Col(0) = in_tri.Col(0)
-        out_tri2.Col(0) = in_tri.Col(0)
-        out_tri1.Col(1) = in_tri.Col(1)
-        out_tri2.Col(1) = in_tri.Col(1)
-        out_tri1.Col(2) = in_tri.Col(2)
-        out_tri2.Col(2) = in_tri.Col(2)
+        outTri1.Col(0) = inTri.Col(0)
+        outTri2.Col(0) = inTri.Col(0)
+        outTri1.Col(1) = inTri.Col(1)
+        outTri2.Col(1) = inTri.Col(1)
+        outTri1.Col(2) = inTri.Col(2)
+        outTri2.Col(2) = inTri.Col(2)
 
         ' The first triangle consists of the two inside points and a new
         ' point determined by the location where one side of the triangle
         ' intersects with the plane
-        out_tri1.P(0) = New Vec3d(inside_points(0))
-        out_tri1.T(0) = New Vec2d(inside_tex(0))
-        out_tri1.P(1) = New Vec3d(inside_points(1))
-        out_tri1.T(1) = New Vec2d(inside_tex(1))
+        outTri1.P(0) = New Vec3d(insidePoints(0))
+        outTri1.T(0) = New Vec2d(insideTex(0))
+        outTri1.P(1) = New Vec3d(insidePoints(1))
+        outTri1.T(1) = New Vec2d(insideTex(1))
 
         Dim t As Single
-        out_tri1.P(2) = Vec_IntersectPlane(plane_p, plane_n, inside_points(0), outside_points(0), t)
-        out_tri1.T(2).X = t * (outside_tex(0).X - inside_tex(0).X) + inside_tex(0).X
-        out_tri1.T(2).Y = t * (outside_tex(0).Y - inside_tex(0).Y) + inside_tex(0).Y
-        out_tri1.T(2).Z = t * (outside_tex(0).Z - inside_tex(0).Z) + inside_tex(0).Z
+        outTri1.P(2) = Vec_IntersectPlane(planeP, planeN, insidePoints(0), outsidePoints(0), t)
+        outTri1.T(2).X = t * (outsideTex(0).X - insideTex(0).X) + insideTex(0).X
+        outTri1.T(2).Y = t * (outsideTex(0).Y - insideTex(0).Y) + insideTex(0).Y
+        outTri1.T(2).Z = t * (outsideTex(0).Z - insideTex(0).Z) + insideTex(0).Z
 
         ' The second triangle is composed of one of he inside points, a
         ' new point determined by the intersection of the other side of the 
         ' triangle and the plane, and the newly created point above
-        out_tri2.P(1) = New Vec3d(inside_points(1))
-        out_tri2.T(1) = New Vec2d(inside_tex(1))
-        out_tri2.P(0) = New Vec3d(out_tri1.P(2))
-        out_tri2.T(0) = New Vec2d(out_tri1.T(2))
-        out_tri2.P(2) = Vec_IntersectPlane(plane_p, plane_n, inside_points(1), outside_points(0), t)
-        out_tri2.T(2).X = t * (outside_tex(0).X - inside_tex(1).X) + inside_tex(1).X
-        out_tri2.T(2).Y = t * (outside_tex(0).Y - inside_tex(1).Y) + inside_tex(1).Y
-        out_tri2.T(2).Z = t * (outside_tex(0).Z - inside_tex(1).Z) + inside_tex(1).Z
+        outTri2.P(1) = New Vec3d(insidePoints(1))
+        outTri2.T(1) = New Vec2d(insideTex(1))
+        outTri2.P(0) = New Vec3d(outTri1.P(2))
+        outTri2.T(0) = New Vec2d(outTri1.T(2))
+        outTri2.P(2) = Vec_IntersectPlane(planeP, planeN, insidePoints(1), outsidePoints(0), t)
+        outTri2.T(2).X = t * (outsideTex(0).X - insideTex(1).X) + insideTex(1).X
+        outTri2.T(2).Y = t * (outsideTex(0).Y - insideTex(1).Y) + insideTex(1).Y
+        outTri2.T(2).Z = t * (outsideTex(0).Z - insideTex(1).Z) + insideTex(1).Z
 
         Return 2 ' Return two newly formed triangles which form a quad
 
@@ -1150,11 +1151,11 @@ Public Class Gfx3D
     Private m_viewH As Single
 
     Public Class Light
-      Public type As Integer
-      Public pos As Vec3d
-      Public dir As Vec3d
-      Public col As Pixel
-      Public param As Single
+      Public Type As Integer
+      Public Pos As Vec3d
+      Public Dir As Vec3d
+      Public Col As Pixel
+      Public Param As Single
     End Class
 
     Private ReadOnly m_lights(3) As Light
@@ -1174,8 +1175,8 @@ Public Class Gfx3D
       m_viewH = height
     End Sub
 
-    Public Sub SetCamera(pos As Vec3d, lookat As Vec3d, up As Vec3d)
-      m_matView = Math.Mat_PointAt(pos, lookat, up)
+    Public Sub SetCamera(pos As Vec3d, lookAt As Vec3d, up As Vec3d)
+      m_matView = Math.Mat_PointAt(pos, lookAt, up)
       m_matView = Math.Mat_QuickInverse(m_matView)
     End Sub
 
@@ -1190,18 +1191,17 @@ Public Class Gfx3D
     'Public Sub SetLightSource(pos As Vec3d, dir As Vec3d, col As Pixel)
     'End Sub
 
-    Public Sub SetLightSource(nSlot As Integer, nType As Gfx3D.Light, col As Pixel, pos As Vec3d, Optional fParam As Single = 0.0F)
-      SetLightSource(nSlot, nType, col, pos, New Vec3d(0.0F, 0.0F, 1.0F), fParam)
+    Public Sub SetLightSource(slot As Integer, type As Gfx3D.Light, col As Pixel, pos As Vec3d, Optional param As Single = 0.0F)
+      SetLightSource(slot, type, col, pos, New Vec3d(0.0F, 0.0F, 1.0F), param)
     End Sub
 
-    Public Sub SetLightSource(nSlot As Integer, nType As Gfx3D.Light, col As Pixel, pos As Vec3d, dir As Vec3d, Optional fParam As Single = 0.0F)
-      If nSlot < 4 Then
-        m_lights(nSlot) = New Light
-        m_lights(nSlot).type = nType
-        m_lights(nSlot).pos = pos
-        m_lights(nSlot).dir = dir
-        m_lights(nSlot).col = col
-        m_lights(nSlot).param = fParam
+    Public Sub SetLightSource(slot As Integer, type As Gfx3D.Light, col As Pixel, pos As Vec3d, dir As Vec3d, Optional param As Single = 0.0F)
+      If slot < 4 Then
+        m_lights(slot) = New Light With {.Type = type,
+                                          .Pos = pos,
+                                          .Dir = dir,
+                                          .Col = col,
+                                          .Param = param}
       End If
     End Sub
 
@@ -1498,7 +1498,7 @@ Public Class Gfx3D
         triTransformed.T(1) = New Vec2d(tri.T(1).X, tri.T(1).Y, tri.T(1).Z)
         triTransformed.T(2) = New Vec2d(tri.T(2).X, tri.T(2).Y, tri.T(2).Z)
 
-        ' Dont forget vertex colours
+        ' Dont forget vertex colors
         triTransformed.Col(0) = tri.Col(0)
         triTransformed.Col(1) = tri.Col(1)
         triTransformed.Col(2) = tri.Col(2)
@@ -1528,24 +1528,24 @@ Public Class Gfx3D
           Dim nLightR = 0.0F, nLightG = 0.0F, nLightB = 0.0F
 
           For i = 0 To 3
-            Select Case m_lights(i).type
+            Select Case m_lights(i).Type
 
               Case Gfx3D.Light.Disabled
 
               Case Gfx3D.Light.Ambient
-                ambient_clamp = m_lights(i).col
+                ambient_clamp = m_lights(i).Col
 
               Case Gfx3D.Light.Directional
                 nLightSources += 1
-                Dim light_dir = Math.Vec_Normalise(m_lights(i).dir)
+                Dim light_dir = Math.Vec_Normalise(m_lights(i).Dir)
                 Dim light = Math.Vec_DotProduct(light_dir, normal)
                 'If light > 0 Then
                 '  Dim j As Integer = 0
                 'End If
                 light = Single.Max(light, 0.0F)
-                nLightR += light * (m_lights(i).col.R / 255.0F)
-                nLightG += light * (m_lights(i).col.G / 255.0F)
-                nLightB += light * (m_lights(i).col.B / 255.0F)
+                nLightR += light * (m_lights(i).Col.R / 255.0F)
+                nLightG += light * (m_lights(i).Col.G / 255.0F)
+                nLightB += light * (m_lights(i).Col.B / 255.0F)
 
               Case Gfx3D.Light.Point
 
@@ -1581,12 +1581,11 @@ Public Class Gfx3D
         End If
 
         ' Clip triangle against near plane
-        Dim nClippedTriangles = 0
         Dim clipped(1) As Triangle : clipped(0) = New Triangle : clipped(1) = New Triangle
-        nClippedTriangles = Math.Triangle_ClipAgainstPlane(New Vec3d(0.0F, 0.0F, 0.1F), New Vec3d(0.0F, 0.0F, 1.0F), triTransformed, clipped(0), clipped(1))
+        Dim clippedTriangles = Math.Triangle_ClipAgainstPlane(New Vec3d(0.0F, 0.0F, 0.1F), New Vec3d(0.0F, 0.0F, 1.0F), triTransformed, clipped(0), clipped(1))
 
         ' This may yield two new triangles
-        For n = 0 To nClippedTriangles - 1
+        For n = 0 To clippedTriangles - 1
 
           Dim triProjected As Triangle = clipped(n)
 
@@ -1840,10 +1839,10 @@ Public Class Gfx3D
       If dy2 <> 0 Then dcb2_step = dcb2 / CSng(MathF.Abs(dy2))
       If dy2 <> 0 Then dca2_step = dca2 / CSng(MathF.Abs(dy2))
 
-      Dim pixel_r = 0.0F
-      Dim pixel_g = 0.0F
-      Dim pixel_b = 0.0F
-      Dim pixel_a = 1.0F
+      'Dim pixel_r = 0.0F
+      'Dim pixel_g = 0.0F
+      'Dim pixel_b = 0.0F
+      'Dim pixel_a = 1.0F
 
       If dy1 <> 0 Then
 
@@ -1881,6 +1880,7 @@ Public Class Gfx3D
             Swap(col_sa, col_ea)
           End If
 
+#Disable Warning IDE0059 ' Unnecessary assignment of a value
           tex_u = tex_su
           tex_v = tex_sv
           tex_w = tex_sw
@@ -1888,6 +1888,7 @@ Public Class Gfx3D
           col_g = col_sg
           col_b = col_sb
           col_a = col_sa
+#Enable Warning IDE0059 ' Unnecessary assignment of a value
 
           Dim tstep = 1.0F / (bx - ax)
           Dim t = 0.0F
@@ -1902,10 +1903,10 @@ Public Class Gfx3D
             col_b = (1.0F - t) * col_sb + t * col_eb
             col_a = (1.0F - t) * col_sa + t * col_ea
 
-            pixel_r = col_r
-            pixel_g = col_g
-            pixel_b = col_b
-            pixel_a = col_a
+            Dim pixel_r = col_r
+            Dim pixel_g = col_g
+            Dim pixel_b = col_b
+            Dim pixel_a = col_a
 
             If (flags And RenderFlags.RenderTextured) <> 0 Then
               If spr IsNot Nothing Then
@@ -1999,6 +2000,7 @@ Public Class Gfx3D
             Swap(col_sa, col_ea)
           End If
 
+#Disable Warning IDE0059 ' Unnecessary assignment of a value
           tex_u = tex_su
           tex_v = tex_sv
           tex_w = tex_sw
@@ -2006,6 +2008,7 @@ Public Class Gfx3D
           col_g = col_sg
           col_b = col_sb
           col_a = col_sa
+#Enable Warning IDE0059 ' Unnecessary assignment of a value
 
           Dim tstep = 1.0F / (bx - ax)
           Dim t = 0.0F
@@ -2020,10 +2023,10 @@ Public Class Gfx3D
             col_b = (1.0F - t) * col_sb + t * col_eb
             col_a = (1.0F - t) * col_sa + t * col_ea
 
-            pixel_r = col_r
-            pixel_g = col_g
-            pixel_b = col_b
-            pixel_a = col_a
+            Dim pixel_r = col_r
+            Dim pixel_g = col_g
+            Dim pixel_b = col_b
+            Dim pixel_a = col_a
 
             If (flags And RenderFlags.RenderTextured) <> 0 Then
               If spr IsNot Nothing Then

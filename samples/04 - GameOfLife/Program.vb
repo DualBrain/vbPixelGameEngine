@@ -64,7 +64,7 @@ Class GameOfLife
 
     Threading.Thread.Sleep(50)
 
-    'If m_keys(VK_SPACE).bHeld Then Return True
+    'If GetKey(Key.SPACE).Pressed Then Return True
 
     Dim cell As Func(Of Integer, Integer, Integer) = Function(x As Integer, y As Integer)
                                                        Return m_output(y * ScreenWidth() + x)

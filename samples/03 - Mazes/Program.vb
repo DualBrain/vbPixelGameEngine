@@ -5,7 +5,7 @@
 ' https://youtu.be/kRH6oJLFYxY
 
 Imports VbPixelGameEngine
-Imports VbPixelGameEngine.COLOUR
+Imports VbPixelGameEngine.Color
 
 Friend Module Program
 
@@ -152,7 +152,7 @@ Friend Class Mazes
     ' Draw Unit - the top of the stack
     For py = 0 To m_pathWidth - 1
       For px = 0 To m_pathWidth - 1
-        Draw(m_stack.Peek.X * (m_pathWidth + 1) + px, m_stack.Peek.Y * (m_pathWidth + 1) + py, FG_GREEN) ' Draw Cell
+        Draw(m_stack.Peek.X * (m_pathWidth + 1) + px, m_stack.Peek.Y * (m_pathWidth + 1) + py, FgGreen) ' Draw Cell
       Next
     Next
 

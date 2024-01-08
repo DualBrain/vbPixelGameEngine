@@ -2,7 +2,7 @@ Imports VbPixelGameEngine
 
 Friend Module Program
 
-  Sub Main() 'args As String())
+  Sub Main()
     Dim game As New Empty
     If game.Construct(160, 80, 10, 10) Then
       game.Start()

@@ -1,7 +1,3 @@
-Option Explicit On
-Option Strict On
-Option Infer On
-
 Friend Module Randoms
 
   Private m_rnd As New Random
@@ -21,7 +17,7 @@ Friend Module Randoms
     m_seed = Environment.TickCount
   End Sub
 
-  Public Function RandomByte(count As Integer) As Byte
+  Public Function RandomByte() As Byte
     Return RandomBytes(1)(0)
   End Function
 

@@ -1,8 +1,4 @@
-﻿Option Explicit On
-Option Strict On
-Option Infer On
-
-Imports System.IO
+﻿Imports System.IO
 Imports System.Runtime.InteropServices
 
 '=============================================================
@@ -11,31 +7,31 @@ Imports System.Runtime.InteropServices
 Public Class ResourcePack
 
   Private Structure ResourceFile
-    Public nSize As Integer
-    Public nOffset As Integer
+    Public Size As Integer
+    Public Offset As Integer
   End Structure
 
-  Private baseFile As FileStream
-  Private ReadOnly mapFiles As New Dictionary(Of String, ResourceFile)
+  Private m_baseFile As FileStream
+  Private ReadOnly m_mapFiles As New Dictionary(Of String, ResourceFile)
 
   Public Sub New()
   End Sub
 
   'Protected Overrides Sub Finalize()
   '  MyBase.Finalize()
-  '  baseFile.Close()
+  '  m_baseFile.Close()
   'End Sub
 
-  Public Function AddFile(sFile As String) As Boolean
+  Public Function AddFile(filename As String) As Boolean
 
-    Dim file As String = MakePosix(sFile)
+    Dim file = MakePosix(filename)
 
     If IO.File.Exists(file) Then
-      Dim e As New ResourceFile()
-      Dim fileInfo As New IO.FileInfo(file)
-      e.nSize = CInt(fileInfo.Length)
-      e.nOffset = 0 ' Unknown at this stage
-      mapFiles(file) = e
+      Dim e = New ResourceFile()
+      Dim fileInfo = New IO.FileInfo(file)
+      e.Size = CInt(fileInfo.Length)
+      e.Offset = 0 ' Unknown at this stage
+      m_mapFiles(file) = e
       Return True
     End If
 
@@ -43,20 +39,20 @@ Public Class ResourcePack
 
   End Function
 
-  Public Function LoadPack(sFile As String, sKey As String) As Boolean
+  Public Function LoadPack(filename As String, key As String) As Boolean
 
     ' Open the resource file
-    baseFile = New IO.FileStream(sFile, IO.FileMode.Open, IO.FileAccess.Read, IO.FileShare.ReadWrite)
-    If Not baseFile.CanRead Then Return False
+    m_baseFile = New IO.FileStream(filename, IO.FileMode.Open, IO.FileAccess.Read, IO.FileShare.ReadWrite)
+    If Not m_baseFile.CanRead Then Return False
 
     ' 1) Read Scrambled index
-    Dim nIndexSize As Integer = 0
-    baseFile.Read(BitConverter.GetBytes(nIndexSize), 0, 4)
+    Dim indexSize As Integer = 0
+    m_baseFile.Read(BitConverter.GetBytes(indexSize), 0, 4)
 
-    Dim buffer(nIndexSize - 1) As Byte
-    baseFile.Read(buffer, 0, nIndexSize)
+    Dim buffer(indexSize - 1) As Byte
+    m_baseFile.Read(buffer, 0, indexSize)
 
-    Dim decoded = Scramble(buffer, sKey)
+    Dim decoded = Scramble(buffer, key)
     Dim pos As Integer = 0
     Dim read = Sub(dst As Byte(), size As Integer)
                  Array.Copy(decoded, pos, dst, 0, size)
@@ -70,21 +66,24 @@ Public Class ResourcePack
                 End Function
 
     ' 2) Read Map
-    Dim nMapEntries As Integer = 0
-    read(BitConverter.GetBytes(nMapEntries), 4)
-    For i As Integer = 0 To nMapEntries - 1
-      Dim nFilePathSize As Integer = 0
-      read(BitConverter.GetBytes(nFilePathSize), 4)
+    Dim mapEntries = 0
+    read(BitConverter.GetBytes(mapEntries), 4)
 
-      Dim sFileName As String = ""
-      For j As Integer = 0 To nFilePathSize - 1
-        sFileName &= ChrW([get]())
+    For i = 0 To mapEntries - 1
+
+      Dim filePathSize = 0
+      read(BitConverter.GetBytes(filePathSize), 4)
+
+      Dim useFileName = ""
+      For j = 0 To filePathSize - 1
+        useFileName &= ChrW([get]())
       Next
 
-      Dim e As New ResourceFile()
-      read(BitConverter.GetBytes(e.nSize), 4)
-      read(BitConverter.GetBytes(e.nOffset), 4)
-      mapFiles(sFileName) = e
+      Dim e = New ResourceFile()
+      read(BitConverter.GetBytes(e.Size), 4)
+      read(BitConverter.GetBytes(e.Offset), 4)
+      m_mapFiles(useFileName) = e
+
     Next
 
     ' Don't close base file! we will provide a stream
@@ -93,122 +92,131 @@ Public Class ResourcePack
 
   End Function
 
-  Public Function SavePack(sFile As String, sKey As String) As Boolean
+  Public Function SavePack(filename As String, key As String) As Boolean
     ' Create/Overwrite the resource file
-    Dim ofs As New System.IO.FileStream(sFile, IO.FileMode.Create)
+    Dim ofs = New FileStream(filename, IO.FileMode.Create)
     If Not ofs.CanWrite Then Return False
     ' Iterate through map
-    Dim nIndexSize As Integer = 0 ' Unknown for now
-    Dim nIndexSizeBytes As Byte() = BitConverter.GetBytes(nIndexSize)
-    ofs.Write(nIndexSizeBytes, 0, nIndexSizeBytes.Length)
+    Dim indexSize = 0 ' Unknown for now
+    Dim indexSizeBytes = BitConverter.GetBytes(indexSize)
+    ofs.Write(indexSizeBytes, 0, indexSizeBytes.Length)
 
-    Dim nMapSize As Integer = CInt(mapFiles.Count)
-    Dim nMapSizeBytes As Byte() = BitConverter.GetBytes(nMapSize)
-    ofs.Write(nMapSizeBytes, 0, nMapSizeBytes.Length)
+    Dim mapSize = m_mapFiles.Count
+    Dim mapSizeBytes = BitConverter.GetBytes(mapSize)
+    ofs.Write(mapSizeBytes, 0, mapSizeBytes.Length)
 
-    For Each kvp As KeyValuePair(Of String, ResourceFile) In mapFiles
-      Dim e As ResourceFile = kvp.Value
+    For Each pair In m_mapFiles
+
+      Dim e = pair.Value
 
       ' Write the path of the file
-      Dim nPathSize As Integer = CInt(kvp.Key.Length)
-      Dim nPathSizeBytes As Byte() = BitConverter.GetBytes(nPathSize)
-      ofs.Write(nPathSizeBytes, 0, nPathSizeBytes.Length)
-      Dim pathBytes As Byte() = System.Text.Encoding.ASCII.GetBytes(kvp.Key)
+      Dim pathSize = pair.Key.Length
+      Dim pathSizeBytes = BitConverter.GetBytes(pathSize)
+      ofs.Write(pathSizeBytes, 0, pathSizeBytes.Length)
+      Dim pathBytes = Text.Encoding.ASCII.GetBytes(pair.Key)
       ofs.Write(pathBytes, 0, pathBytes.Length)
 
       ' Write the file entry properties
-      Dim nSizeBytes As Byte() = BitConverter.GetBytes(e.nSize)
-      ofs.Write(nSizeBytes, 0, nSizeBytes.Length)
+      Dim sizeBytes = BitConverter.GetBytes(e.Size)
+      ofs.Write(sizeBytes, 0, sizeBytes.Length)
 
-      Dim nOffsetBytes As Byte() = BitConverter.GetBytes(e.nOffset)
-      ofs.Write(nOffsetBytes, 0, nOffsetBytes.Length)
+      Dim offsetBytes = BitConverter.GetBytes(e.Offset)
+      ofs.Write(offsetBytes, 0, offsetBytes.Length)
+
     Next
 
     ' 2) Write the individual Data
-    Dim offset As Long = ofs.Position
-    nIndexSize = CInt(offset)
-    For Each kvp As KeyValuePair(Of String, ResourceFile) In mapFiles
-      Dim e As ResourceFile = kvp.Value
+    Dim offset = ofs.Position
+    'indexSize = CInt(offset)
+
+    For Each pair In m_mapFiles
+
+      Dim e = pair.Value
 
       ' Store beginning of file offset within resource pack file
-      e.nOffset = CInt(offset)
+      e.Offset = CInt(offset)
 
       ' Load the file to be added
-      Dim vBuffer(e.nSize - 1) As Byte
-      Using i As New System.IO.FileStream(kvp.Key, IO.FileMode.Open)
-        i.Read(vBuffer, 0, e.nSize)
+      Dim vBuffer(e.Size - 1) As Byte
+      Using i = New System.IO.FileStream(pair.Key, IO.FileMode.Open)
+        i.Read(vBuffer, 0, e.Size)
       End Using
 
       ' Write the loaded file into resource pack file
-      ofs.Write(vBuffer, 0, e.nSize)
-      offset += e.nSize
+      ofs.Write(vBuffer, 0, e.Size)
+      offset += e.Size
+
     Next
 
     ' 3) Scramble Index
-    Dim stream As New List(Of Byte)()
+    Dim stream = New List(Of Byte)()
     Dim write As Action(Of Byte(), Integer) = Sub(data, size)
-                                                Dim sizeNow As Integer = stream.Count()
+                                                Dim sizeNow = stream.Count()
                                                 stream.AddRange(data.Take(size))
                                               End Sub
 
     ' Iterate through map
-    Dim nMapSizeBytes2 As Byte() = BitConverter.GetBytes(nMapSize)
-    write(nMapSizeBytes2, Marshal.SizeOf(GetType(Integer)))
-    For Each kvp As KeyValuePair(Of String, ResourceFile) In mapFiles
-      Dim e As ResourceFile = kvp.Value
+    Dim mapSizeBytes2 = BitConverter.GetBytes(mapSize)
+    write(mapSizeBytes2, Marshal.SizeOf(GetType(Integer)))
+
+    For Each pair In m_mapFiles
+
+      Dim e = pair.Value
 
       ' Write the path of the file
-      Dim nPathSizeBytes2 As Byte() = BitConverter.GetBytes(kvp.Key.Length)
-      write(nPathSizeBytes2, Marshal.SizeOf(GetType(Integer)))
-      Dim pathBytes2 As Byte() = System.Text.Encoding.ASCII.GetBytes(kvp.Key)
-      write(pathBytes2, kvp.Key.Length)
+      Dim pathSizeBytes2 = BitConverter.GetBytes(pair.Key.Length)
+      write(pathSizeBytes2, Marshal.SizeOf(GetType(Integer)))
+      Dim pathBytes2 = Text.Encoding.ASCII.GetBytes(pair.Key)
+      write(pathBytes2, pair.Key.Length)
 
       ' Write the file entry properties
-      Dim nSizeBytes2 As Byte() = BitConverter.GetBytes(e.nSize)
-      write(nSizeBytes2, Marshal.SizeOf(GetType(Integer)))
+      Dim sizeBytes2 = BitConverter.GetBytes(e.Size)
+      write(sizeBytes2, Marshal.SizeOf(GetType(Integer)))
 
-      Dim nOffsetBytes2 As Byte() = BitConverter.GetBytes(e.nOffset)
-      write(nOffsetBytes2, Marshal.SizeOf(GetType(Integer)))
+      Dim offsetBytes2 = BitConverter.GetBytes(e.Offset)
+      write(offsetBytes2, Marshal.SizeOf(GetType(Integer)))
+
     Next
 
-    Dim sIndexString As Byte() = Scramble(stream.ToArray, sKey)
-    Dim nIndexStringLen As Integer = sIndexString.Length
-    ' 4) Rewrite Map (it has been updated with offsets now)
-    ' at start of file
+    Dim indexString = Scramble(stream.ToArray, key)
+    Dim indexStringLen = indexString.Length
+
+    ' 4) Rewrite Map (it has been updated with offsets now) at start of file
     ofs.Seek(0, SeekOrigin.Begin)
-    ofs.Write(BitConverter.GetBytes(nIndexStringLen), 0, Marshal.SizeOf(GetType(Integer)))
-    ofs.Write(sIndexString.ToArray(), 0, sIndexString.Length)
+    ofs.Write(BitConverter.GetBytes(indexStringLen), 0, Marshal.SizeOf(GetType(Integer)))
+    ofs.Write(indexString.ToArray(), 0, indexString.Length)
     ofs.Close()
+
     Return True
 
   End Function
 
-  Friend Function GetFileBuffer(sFile As String) As ResourceBuffer
-    Dim e As ResourceFile = mapFiles(sFile)
-    Return New ResourceBuffer(baseFile, e.nOffset, e.nSize)
+  Friend Function GetFileBuffer(filename As String) As ResourceBuffer
+    Dim e = m_mapFiles(filename)
+    Return New ResourceBuffer(m_baseFile, e.Offset, e.Size)
   End Function
 
   Public Function Loaded() As Boolean
-    Return baseFile IsNot Nothing
+    Return m_baseFile IsNot Nothing
   End Function
 
   Private Shared Function Scramble(data As Byte(), key As String) As Byte()
     If String.IsNullOrEmpty(key) Then Return data
-    Dim o As New List(Of Byte)
-    Dim c As Integer = 0
+    Dim result = New List(Of Byte)
+    Dim c = 0
     For Each s In data
-      o.Add(s Xor CByte(AscW(key(c Mod key.Length))))
+      result.Add(s Xor CByte(AscW(key(c Mod key.Length))))
       c += 1
     Next
-    Return o.ToArray
+    Return result.ToArray
   End Function
 
   Private Shared Function MakePosix(path As String) As String
-    Dim o As String = ""
-    For Each s As Char In path
-      o += If(s = "\", "/", s)
+    Dim result = ""
+    For Each c In path
+      result += If(c = "\", "/", c)
     Next
-    Return o
+    Return result
   End Function
 
 End Class
