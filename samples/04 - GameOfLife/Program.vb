@@ -19,6 +19,10 @@ Class GameOfLife
   Private m_output() As Integer
   Private m_state() As Integer
 
+  Friend Sub New()
+    AppName = "Game of Life"
+  End Sub
+
   Protected Overrides Function OnUserCreate() As Boolean
 
     ReDim m_output(ScreenWidth() * ScreenHeight())

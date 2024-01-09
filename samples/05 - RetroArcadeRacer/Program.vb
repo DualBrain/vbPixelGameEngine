@@ -10,7 +10,7 @@ Module Program
     ' Note: Having to increase the resolution of the screen significantly
     '       in order to handle drawing text to the screen while still
     '       keeping the general look of the vbConsoleGameEngine example.
-    If game.Construct(640, 400, 2, 2) Then
+    If game.Construct(640, 400, 1, 1) Then
       game.Start()
     End If
   End Sub
@@ -33,6 +33,10 @@ Class RetroArcadeRacer
   Private ReadOnly m_lapTimes As New List(Of Double)
 
   Private ReadOnly m_track As New List(Of (Curve As Single, Distance As Single))
+
+  Friend Sub New()
+    AppName = "Retro Arcade Racer"
+  End Sub
 
   Protected Overrides Function OnUserCreate() As Boolean
 

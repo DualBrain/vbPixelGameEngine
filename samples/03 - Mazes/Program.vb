@@ -36,6 +36,10 @@ Friend Class Mazes
   Private ReadOnly m_stack As New Stack(Of (X As Integer, Y As Integer))
   Private m_pathWidth As Integer
 
+  Friend Sub New()
+    AppName = "Mazes"
+  End Sub
+
   Protected Overrides Function OnUserCreate() As Boolean
 
     ' Maze parameters
