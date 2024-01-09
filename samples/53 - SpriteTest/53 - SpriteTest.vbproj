@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>SpriteTest</RootNamespace>
+    <TargetFramework>net8.0</TargetFramework>
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <OptionStrict>On</OptionStrict>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="sprite1.png" />
+    <None Remove="sprite2.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="sprite1.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="sprite2.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\vbPixelGameEngine\vbPixelGameEngine.vbproj" />
+  </ItemGroup>
+
+</Project>

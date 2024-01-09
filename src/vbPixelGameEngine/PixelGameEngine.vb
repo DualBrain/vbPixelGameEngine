@@ -1608,6 +1608,8 @@ Public MustInherit Class PixelGameEngine
   Private m_hasMouseFocus As Boolean
   Private m_frameTimer As Single = 1.0F
   Private m_frameCount As Integer
+  Private m_totalFrameCount As Integer
+  Private m_totalFrames As Integer
 
   Private ReadOnly m_keyNewState(255) As Boolean
   Private ReadOnly m_keyOldState(255) As Boolean
@@ -2662,26 +2664,38 @@ next4:
       X11.glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL)
     End If
 
-    If True Then
-      Dim data = m_defaultDrawTarget.GetData
-      Dim sz = Marshal.SizeOf(GetType(Pixel))
-      Dim ts As Integer = sz * data.Length
-      Dim b(ts - 1) As Byte
-      Dim handle As GCHandle = GCHandle.Alloc(data, GCHandleType.Pinned)
-      Try
-        Marshal.Copy(handle.AddrOfPinnedObject(), b, 0, ts)
-      Finally
-        handle.Free()
-      End Try
-      Dim ptr = Marshal.AllocHGlobal(b.Length)
-      Marshal.Copy(b, 0, ptr, b.Length)
+    'If True Then
+
+    Dim pixels = GCHandle.Alloc(m_defaultDrawTarget.GetData, GCHandleType.Pinned)
+    Try
       If IsOSPlatform(Linux) Then
-        X11.glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_screenWidth, m_screenHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, ptr)
+        X11.glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_screenWidth, m_screenHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels.AddrOfPinnedObject)
       Else
-        Win32.glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_screenWidth, m_screenHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, ptr)
+        Win32.glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_screenWidth, m_screenHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels.AddrOfPinnedObject)
       End If
-      Marshal.FreeHGlobal(ptr)
-    End If
+    Finally
+      pixels.Free()
+    End Try
+
+    'Dim data = m_defaultDrawTarget.GetData
+    'Dim sz = Marshal.SizeOf(GetType(Pixel))
+    'Dim ts As Integer = sz * data.Length
+    'Dim b(ts - 1) As Byte
+    'Dim handle As GCHandle = GCHandle.Alloc(data, GCHandleType.Pinned)
+    'Try
+    '  Marshal.Copy(handle.AddrOfPinnedObject(), b, 0, ts)
+    'Finally
+    '  handle.Free()
+    'End Try
+    'Dim ptr = Marshal.AllocHGlobal(b.Length)
+    'Marshal.Copy(b, 0, ptr, b.Length)
+    'If IsOSPlatform(Linux) Then
+    '  X11.glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_screenWidth, m_screenHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, ptr)
+    'Else
+    '  Win32.glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_screenWidth, m_screenHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, ptr)
+    'End If
+    'Marshal.FreeHGlobal(ptr)
+    'End If
 
     ' Create user resources as part of this thread
     If Not OnUserCreate() Then
@@ -2825,34 +2839,16 @@ next4:
             Singleton.AtomActive = False
           End If
 
-          ' Display Graphics
+          'If True Then
+
           If IsOSPlatform(Windows) Then
             Win32.glViewport(m_viewX, m_viewY, m_viewW, m_viewH)
-          Else
-            X11.glViewport(m_viewX, m_viewY, m_viewW, m_viewH)
-          End If
-
-          ' Copy pixel array into texture
-          Dim data = m_defaultDrawTarget.GetData
-          Dim sz = Marshal.SizeOf(GetType(Pixel))
-          Dim ts As Integer = sz * data.Length
-          Dim b(ts - 1) As Byte
-          Dim handle As GCHandle = GCHandle.Alloc(data, GCHandleType.Pinned)
-          Try
-            Marshal.Copy(handle.AddrOfPinnedObject(), b, 0, ts)
-          Finally
-            handle.Free()
-          End Try
-          Dim ptr = Marshal.AllocHGlobal(b.Length)
-          Marshal.Copy(b, 0, ptr, b.Length)
-          If IsOSPlatform(Windows) Then
-            Win32.glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_screenWidth, m_screenHeight, GL_RGBA, GL_UNSIGNED_BYTE, ptr)
-          Else
-            X11.glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_screenWidth, m_screenHeight, GL_RGBA, GL_UNSIGNED_BYTE, ptr)
-          End If
-          Marshal.FreeHGlobal(ptr)
-
-          If IsOSPlatform(Windows) Then
+            pixels = GCHandle.Alloc(m_defaultDrawTarget.GetData, GCHandleType.Pinned)
+            Try
+              Win32.glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_screenWidth, m_screenHeight, GL_RGBA, GL_UNSIGNED_BYTE, pixels.AddrOfPinnedObject())
+            Finally
+              pixels.Free() : pixels = Nothing
+            End Try
             ' Display texture on screen
             Win32.glBegin(GL_QUADS)
             Win32.glTexCoord2f(0.0, 1.0) : Win32.glVertex3f(-1.0F + m_subPixelOffsetX, -1.0F + m_subPixelOffsetY, 0.0F)
@@ -2862,7 +2858,14 @@ next4:
             Win32.glEnd()
             ' Preset Graphics to screen
             Win32.SwapBuffers(m_glDeviceContext)
-          ElseIf IsOSPlatform(Linux) Then
+          Else
+            X11.glViewport(m_viewX, m_viewY, m_viewW, m_viewH)
+            Dim pixel = GCHandle.Alloc(m_defaultDrawTarget.GetData, GCHandleType.Pinned)
+            Try
+              X11.glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_screenWidth, m_screenHeight, GL_RGBA, GL_UNSIGNED_BYTE, pixel.AddrOfPinnedObject())
+            Finally
+              pixel.Free()
+            End Try
             ' Display texture on screen
             X11.glBegin(GL_QUADS)
             X11.glTexCoord2f(0.0, 1.0) : X11.glVertex3f(-1.0F + m_subPixelOffsetX, -1.0F + m_subPixelOffsetY, 0.0F)
@@ -2874,23 +2877,84 @@ next4:
             X11.glXSwapBuffers(pge_Display, pge_Window)
           End If
 
+          'Else
+
+          '  ' Display Graphics
+          '  If IsOSPlatform(Windows) Then
+          '    Win32.glViewport(m_viewX, m_viewY, m_viewW, m_viewH)
+          '  Else
+          '    X11.glViewport(m_viewX, m_viewY, m_viewW, m_viewH)
+          '  End If
+
+          '  ' Copy pixel array into texture
+          '  Dim data = m_defaultDrawTarget.GetData
+          '  Dim sz = Marshal.SizeOf(GetType(Pixel))
+          '  Dim ts As Integer = sz * data.Length
+          '  Dim b(ts - 1) As Byte
+          '  Dim handle As GCHandle = GCHandle.Alloc(data, GCHandleType.Pinned)
+          '  Try
+          '    Marshal.Copy(handle.AddrOfPinnedObject(), b, 0, ts)
+          '  Finally
+          '    handle.Free()
+          '  End Try
+          '  Dim ptr = Marshal.AllocHGlobal(b.Length)
+          '  Marshal.Copy(b, 0, ptr, b.Length)
+          '  If IsOSPlatform(Windows) Then
+          '    Win32.glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_screenWidth, m_screenHeight, GL_RGBA, GL_UNSIGNED_BYTE, ptr)
+          '  Else
+          '    X11.glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_screenWidth, m_screenHeight, GL_RGBA, GL_UNSIGNED_BYTE, ptr)
+          '  End If
+          '  Marshal.FreeHGlobal(ptr)
+
+          '  If IsOSPlatform(Windows) Then
+          '    ' Display texture on screen
+          '    Win32.glBegin(GL_QUADS)
+          '    Win32.glTexCoord2f(0.0, 1.0) : Win32.glVertex3f(-1.0F + m_subPixelOffsetX, -1.0F + m_subPixelOffsetY, 0.0F)
+          '    Win32.glTexCoord2f(0.0, 0.0) : Win32.glVertex3f(-1.0F + m_subPixelOffsetX, 1.0F + m_subPixelOffsetY, 0.0F)
+          '    Win32.glTexCoord2f(1.0, 0.0) : Win32.glVertex3f(1.0F + m_subPixelOffsetX, 1.0F + m_subPixelOffsetY, 0.0F)
+          '    Win32.glTexCoord2f(1.0, 1.0) : Win32.glVertex3f(1.0F + m_subPixelOffsetX, -1.0F + m_subPixelOffsetY, 0.0F)
+          '    Win32.glEnd()
+          '    ' Preset Graphics to screen
+          '    Win32.SwapBuffers(m_glDeviceContext)
+          '  ElseIf IsOSPlatform(Linux) Then
+          '    ' Display texture on screen
+          '    X11.glBegin(GL_QUADS)
+          '    X11.glTexCoord2f(0.0, 1.0) : X11.glVertex3f(-1.0F + m_subPixelOffsetX, -1.0F + m_subPixelOffsetY, 0.0F)
+          '    X11.glTexCoord2f(0.0, 0.0) : X11.glVertex3f(-1.0F + m_subPixelOffsetX, 1.0F + m_subPixelOffsetY, 0.0F)
+          '    X11.glTexCoord2f(1.0, 0.0) : X11.glVertex3f(1.0F + m_subPixelOffsetX, 1.0F + m_subPixelOffsetY, 0.0F)
+          '    X11.glTexCoord2f(1.0, 1.0) : X11.glVertex3f(1.0F + m_subPixelOffsetX, -1.0F + m_subPixelOffsetY, 0.0F)
+          '    X11.glEnd()
+          '    ' Preset Graphics to screen
+          '    X11.glXSwapBuffers(pge_Display, pge_Window)
+          '  End If
+
+          'End If
+
           ' Update Title Bar
           m_frameTimer += elapsedTime
           m_frameCount += 1
 
           If m_frameTimer >= 1.0F Then
 
-            m_frameTimer -= 1.0F
-
-            Dim sTitle = $"vbPixelGameEngine v0.0.1 - {AppName} - FPS: {m_frameCount}"
-
-            If IsOSPlatform(Windows) Then
-              Win32.SetWindowText(m_hWnd, sTitle)
-            ElseIf IsOSPlatform(Linux) Then
-              X11.XStoreName(pge_Display, pge_Window, sTitle)
+            If m_totalFrameCount + m_frameCount > Integer.MaxValue Then
+              m_totalFrameCount = m_frameCount
+              m_totalFrames = 1
+            Else
+              m_totalFrameCount += m_frameCount
+              m_totalFrames += 1
             End If
 
+            Dim avg = m_totalFrameCount \ m_totalFrames
+
+            m_frameTimer -= 1.0F
+            Dim title = $"vbPixelGameEngine v0.0.1 - {AppName} - FPS: {m_frameCount} ({avg})"
             m_frameCount = 0
+
+            If IsOSPlatform(Windows) Then
+              Win32.SetWindowText(m_hWnd, title)
+            ElseIf IsOSPlatform(Linux) Then
+              X11.XStoreName(pge_Display, pge_Window, title)
+            End If
 
           End If
 
@@ -3101,7 +3165,7 @@ next4:
     Win32.glViewport(m_viewX, m_viewY, m_viewW, m_viewH)
 
     ' Remove Frame cap
-    wglSwapInterval = CType(Marshal.GetDelegateForFunctionPointer(Win32.wglGetProcAddress("wglSwapIntervalEXT"), GetType(wglSwapInterval_t)), wglSwapInterval_t)
+    wglSwapInterval = CType(Marshal.GetDelegateForFunctionPointer(Win32.WglGetProcAddress("wglSwapIntervalEXT"), GetType(wglSwapInterval_t)), wglSwapInterval_t)
     If wglSwapInterval IsNot Nothing AndAlso Not m_enableVSYNC Then wglSwapInterval(0)
 
     Return True
