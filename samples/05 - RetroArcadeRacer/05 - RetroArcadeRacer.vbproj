@@ -4,8 +4,6 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>RetroArcadeRacer</RootNamespace>
     <TargetFramework>net8.0</TargetFramework>
-    <PublishAot>true</PublishAot>
-    <InvariantGlobalization>true</InvariantGlobalization>
     <OptionStrict>On</OptionStrict>
   </PropertyGroup>
 

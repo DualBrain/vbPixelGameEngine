@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "58 - Catrun": {
+      "commandName": "Project"
+    },
+    "WSL": {
+      "commandName": "WSL2",
+      "distributionName": ""
+    }
+  }
+}

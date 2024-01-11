@@ -33,8 +33,8 @@ Friend Class SpriteTest
 
   Protected Overrides Function OnUserCreate() As Boolean
     ' Load the sprites into memory...
-    m_sprite1 = New Sprite("sprite1.png")
-    m_sprite2 = New Sprite("sprite2.png")
+    m_sprite1 = New Sprite("assets/sprite1.png")
+    m_sprite2 = New Sprite("assets/sprite2.png")
     ' Initialize the location for all the active sprites...
     For entry = 0 To m_spriteCount - 1
       m_locations.Add(New Position With {.X = m_rnd.Next(0, 799), .y = m_rnd.Next(0, 599)})

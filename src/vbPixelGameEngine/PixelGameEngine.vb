@@ -2446,16 +2446,18 @@ next4:
   End Sub
 
   Protected Sub DrawSprite(x As Integer, y As Integer, sprite As Sprite, Optional scale As Integer = 1)
-    If sprite Is Nothing Then
-      Return
-    End If
+
+    If sprite Is Nothing Then Return
 
     If scale > 1 Then
       For i = 0 To sprite.Width - 1
         For j = 0 To sprite.Height - 1
           For iIs = 0 To scale - 1
             For js = 0 To scale - 1
-              Draw(x + (i * scale) + iIs, y + (j * scale) + js, sprite.GetPixel(i, j))
+              Dim dx = x + (i * scale) + iIs
+              Dim dy = y + (j * scale) + js
+              If dx < 0 OrElse dy < 0 OrElse dx > ScreenWidth - 1 OrElse dy > ScreenHeight - 1 Then Continue For
+              Draw(dx, dy, sprite.GetPixel(i, j))
             Next
           Next
         Next
@@ -2463,10 +2465,13 @@ next4:
     Else
       For i = 0 To sprite.Width - 1
         For j = 0 To sprite.Height - 1
-          Draw(x + i, y + j, sprite.GetPixel(i, j))
+          Dim dx = x + i, dy = y + j
+          If dx < 0 OrElse dy < 0 OrElse dx > ScreenWidth - 1 OrElse dy > ScreenHeight - 1 Then Continue For
+          Draw(dx, dy, sprite.GetPixel(i, j))
         Next
       Next
     End If
+
   End Sub
 
   Protected Sub DrawPartialSprite(pos As Vi2d, sprite As Sprite, sourcepos As Vi2d, size As Vi2d, Optional scale As Integer = 1)

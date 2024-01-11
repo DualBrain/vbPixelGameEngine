@@ -2,9 +2,8 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <RootNamespace>Example</RootNamespace>
+    <RootNamespace>HelloWorld</RootNamespace>
     <TargetFramework>net8.0</TargetFramework>
-    <PublishAot>true</PublishAot>
     <OptionStrict>On</OptionStrict>
   </PropertyGroup>
 
