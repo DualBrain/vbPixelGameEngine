@@ -18,8 +18,8 @@ Friend Class QBasic
   Private ReadOnly m_charHeight As Integer = 12
   Private ReadOnly m_colors As New List(Of Pixel)
   Private m_cursorColor As Integer = Colors.Black
-  Private m_fg As Colors = Colors.Black
-  Private m_bg As Colors = Colors.Green
+  Private ReadOnly m_fg As Colors = Colors.Black
+  Private ReadOnly m_bg As Colors = Colors.Green
   Private m_col As Integer = 1
   Private m_row As Integer = 1
   Private m_t As Single
@@ -106,10 +106,10 @@ Friend Class QBasic
 
   End Sub
 
-  Private Sub Color(fg As Integer, bg As Integer)
-    If fg > -1 AndAlso fg < 9 Then m_fg = CType(fg, Colors)
-    If fg > -1 AndAlso fg < 9 Then m_bg = CType(bg, Colors)
-  End Sub
+  'Private Sub Color(fg As Integer, bg As Integer)
+  '  If fg > -1 AndAlso fg < 9 Then m_fg = CType(fg, Colors)
+  '  If fg > -1 AndAlso fg < 9 Then m_bg = CType(bg, Colors)
+  'End Sub
 
   Private Sub Print(Optional text As String = "", Optional noLinefeed As Boolean = False)
 
