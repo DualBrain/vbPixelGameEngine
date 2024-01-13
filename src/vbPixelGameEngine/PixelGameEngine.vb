@@ -2751,7 +2751,9 @@ next4:
                 Case X11.XEventType.KeyPress
                   Dim key = CType(Marshal.PtrToStructure(xe, GetType(X11.XKeyEvent)), X11.XKeyEvent)
                   Dim sym = X11.XLookupKeysym(key, 0)
-                  m_keyNewState(MapKeys(sym)) = True
+                  If MapKeys.ContainsKey(sym) Then
+                    m_keyNewState(MapKeys(sym)) = True
+                  End If
                 'Dim sym As X11.XKeySym = X11.XLookupKeysym(xev.xkey, 0)
                 'pKeyNewState(MapKeys(sym)) = True
                 'Dim e As X11.XKeyEvent = CType(xev, X11.XKeyEvent) ' Because DragonEye loves numpads
@@ -2760,7 +2762,9 @@ next4:
                 Case X11.XEventType.KeyRelease
                   Dim key = CType(Marshal.PtrToStructure(xe, GetType(X11.XKeyEvent)), X11.XKeyEvent)
                   Dim sym = X11.XLookupKeysym(key, 0)
-                  m_keyNewState(MapKeys(sym)) = False
+                  If MapKeys.ContainsKey(sym) Then
+                    m_keyNewState(MapKeys(sym)) = False
+                  End If
                 'Dim sym As X11.XKeySym = X11.XLookupKeysym(xev.xkey, 0)
                 'pKeyNewState(MapKeys(sym)) = False
                 'Dim e As X11.XKeyEvent = CType(xev, X11.XKeyEvent)
@@ -3217,10 +3221,16 @@ next4:
         Singleton.Pge.m_hasInputFocus = False
         Return IntPtr.Zero
       Case WM_KEYDOWN
-        Singleton.Pge.m_keyNewState(Singleton.MapKeys(wParam.ToInt32())) = True
+        Dim value As Integer
+        If MapKeys.TryGetValue(wParam.ToInt32(), value) Then
+          Pge.m_keyNewState(value) = True
+        End If
         Return IntPtr.Zero
       Case WM_KEYUP
-        Singleton.Pge.m_keyNewState(Singleton.MapKeys(wParam.ToInt32())) = False
+        Dim value As Integer
+        If MapKeys.TryGetValue(wParam.ToInt32(), value) Then
+          Pge.m_keyNewState(value) = False
+        End If
         Return IntPtr.Zero
       Case WM_LBUTTONDOWN
         Singleton.Pge.m_mouseNewState(0) = True
