@@ -2207,7 +2207,7 @@ Public MustInherit Class PixelGameEngine
     FillRect(x, y, w, h, Presets.White)
   End Sub
 
-  Protected Sub FillRect(x As Integer, y As Integer, w As Integer, h As Integer, p As Pixel)
+  Public Sub FillRect(x As Integer, y As Integer, w As Integer, h As Integer, p As Pixel)
 
     Dim x2 = x + w
     Dim y2 = y + h
@@ -2445,7 +2445,7 @@ next4:
     DrawSprite(pos.x, pos.y, sprite, scale)
   End Sub
 
-  Protected Sub DrawSprite(x As Integer, y As Integer, sprite As Sprite, Optional scale As Integer = 1)
+  Public Sub DrawSprite(x As Integer, y As Integer, sprite As Sprite, Optional scale As Integer = 1)
 
     If sprite Is Nothing Then Return
 
