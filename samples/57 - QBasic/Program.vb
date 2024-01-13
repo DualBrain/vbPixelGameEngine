@@ -6,7 +6,7 @@ Friend Module Program
 
   Sub Main()
     Dim demo As New QBasic
-    If demo.Construct(640, 400, 1, 1, False, True) Then
+    If demo.Construct(640, 400, 1, 1) Then ', False, True) Then
       demo.Start()
     End If
   End Sub
@@ -18,24 +18,29 @@ Friend Class QBasic
 
   Private m_t As Single
 
-  Private WithEvents WorkTimer As New Timer(100)
+  Private WithEvents WorkTimer As New Timer(1)
 
   Friend Sub New()
     AppName = "QBasic?"
   End Sub
 
+  Private m_workTimerActive As Boolean
   Private Sub WorkTimer_Elapsed(sender As Object, e As ElapsedEventArgs) Handles WorkTimer.Elapsed
 
-    LOCATE(5, 40)
-    'PRINT(Now.ToString("HH:mm:ss"))
-
-    PRINT(Now.Millisecond.ToString)
+    If m_workTimerActive Then Return
+    m_workTimerActive = True
+    Try
+      Dim value = $"{Now:HH:mm:ss}.{Now.Millisecond:000}"
+      QPrintRC(value, 1, 55, 14, 8)
+    Finally
+      m_workTimerActive = False
+    End Try
 
   End Sub
 
   Protected Overrides Function OnUserCreate() As Boolean
 
-    Init(Me)
+    Init()
 
     Dim bg = 1
 
@@ -77,12 +82,11 @@ Friend Class QBasic
     QPrintRC(" Untitled ", 2, 35, bg, 8)
     QPrintRC(" Immediate ", 22, 35, 8, bg)
 
-    'Dim statusBackground = New Pixel(0, 170, 170)
+    QPrintRC(" <Shift+F1=Help> <F6=Window> <F2=Subs> <F5=Run> <F8=Step>     ", 25, 1, 15, 3)
+    QPrintRC(ChrW(179) & "       00002:001 ", 25, 63, 0, 3)
 
-    'QPrintRC(" Micrsoft (R) QuickBASIC 4.50 (C) Copyright Microsoft Corporation, 1985-1988    ", 25, 1, 15, 3)
-    QPrintRC(" <Shift+F1=Help> <F6=Window> <F2=Subs> <F5=Run> <F8=Step>     " & ChrW(179) & "       00002:001 ", 25, 1, 0, 3)
-
-    QPrintRC("PRINT ""Hello World!""", 3, 2, 8, bg)
+    LOCATE(3, 2) : PRINT("PRINT ""Hello World!""")
+    LOCATE(4, 2)
 
     WorkTimer.Enabled = True
 
@@ -94,87 +98,63 @@ Friend Class QBasic
 
     m_t += elapsedTime
 
-    QB.Video.Render()
+    If m_invalidated Then
+      For r = 0 To 24
+        For c = 0 To 79
 
-    'Dim bg = New Pixel(0, 0, 170, 255) 'Presets.DarkBlue
+          Dim index = (r * 80) + c
+          Dim ch = CByte(Screen0(index) And &HFF)
+          Dim clr = ((Screen0(index) And &HFF00) \ 256) And &HFF
+          Dim map = CharMap(m_textH, ch)
 
-    'Clear(bg)
+          Dim x = c * m_textW
+          Dim y = r * m_textH
 
-    'QPrintRC("   File  Edit  View  Search  Run  Debug  Options                          Help  ", 1, 1, Presets.Black, Presets.Gray)
+          Dim fg, bg As Integer
+          SplitColor(clr, fg, bg)
 
-    'QPrintRC(ChrW(218), 2, 1, Presets.Gray, bg)
-    'QPrintRC(ChrW(191), 2, 80, Presets.Gray, bg)
-    'For r = 3 To 24
-    '  QPrintRC(ChrW(179), r, 1, Presets.Gray, bg)
-    '  QPrintRC(ChrW(179), r, 80, Presets.Gray, bg)
-    'Next
-    'For c = 2 To 79
-    '  QPrintRC(ChrW(196), 2, c, Presets.Gray, bg)
-    '  QPrintRC(ChrW(196), 22, c, Presets.Gray, bg)
-    'Next
-    'QPrintRC(ChrW(195), 22, 1, Presets.Gray, bg)
-    'QPrintRC(ChrW(180), 22, 80, Presets.Gray, bg)
+          Dim fgc = m_palette(fg)
+          Dim bgc = m_palette(bg)
 
-    'QPrintRC(ChrW(180), 2, 76, Presets.Gray, bg)
-    'QPrintRC(ChrW(24), 2, 77, bg, Presets.Gray)
-    'QPrintRC(ChrW(195), 2, 78, Presets.Gray, bg)
+          For dy = 0 To m_textH - 1
+            Draw(x + 0, dy + y, If((map(dy) And 1) > 0, fgc, bgc))
+            Draw(x + 1, dy + y, If((map(dy) And 2) > 0, fgc, bgc))
+            Draw(x + 2, dy + y, If((map(dy) And 4) > 0, fgc, bgc))
+            Draw(x + 3, dy + y, If((map(dy) And 8) > 0, fgc, bgc))
+            Draw(x + 4, dy + y, If((map(dy) And 16) > 0, fgc, bgc))
+            Draw(x + 5, dy + y, If((map(dy) And 32) > 0, fgc, bgc))
+            Draw(x + 6, dy + y, If((map(dy) And 64) > 0, fgc, bgc))
+            Draw(x + 7, dy + y, If((map(dy) And 128) > 0, fgc, bgc))
+          Next
 
-    'QPrintRC(ChrW(24), 3, 80, bg, Presets.Gray)
-    'QPrintRC(ChrW(32), 4, 80, Presets.Black, Presets.Black)
-    'For r = 5 To 19
-    '  QPrintRC(ChrW(177), r, 80, Presets.Black, Presets.Gray)
-    'Next
-    'QPrintRC(ChrW(25), 20, 80, bg, Presets.Gray)
-
-    'QPrintRC(ChrW(27), 21, 2, bg, Presets.Gray)
-    'QPrintRC(ChrW(32), 21, 3, Presets.Black, Presets.Black)
-    'For c = 4 To 78
-    '  QPrintRC(ChrW(177), 21, c, Presets.Black, Presets.Gray)
-    'Next
-    'QPrintRC(ChrW(26), 21, 79, bg, Presets.Gray)
-
-    'QPrintRC(" Untitled ", 2, 35, bg, Presets.Gray)
-    'QPrintRC(" Immediate ", 22, 35, Presets.Gray, bg)
-
-    'Dim statusBackground = New Pixel(0, 170, 170)
-
-    'QPrintRC(" Micrsoft (R) QuickBASIC 4.50 (C) Copyright Microsoft Corporation, 1985-1988    ", 25, 1, Presets.White, statusBackground)
-    ''QPrintRC(" <Shift+F1=Help> <F6=Window> <F2=Subs> <F5=Run> <F8=Step>     " & ChrW(179) & "       00001:001 ", 25, 1, Presets.Black, statusBackground)
-
-    'QPrintRC("PRINT ""Hello World!""", 3, 2, Presets.Gray, bg)
+        Next
+      Next
+    End If
 
     If CInt(Fix(m_t * 8)) Mod 2 = 0 Then
-      DrawLine(8, 63, 16, 63, Presets.Gray)
-      DrawLine(8, 64, 16, 64, Presets.Gray)
+      Dim x = (m_cursorCol - 1) * m_textW
+      Dim y = (m_cursorRow - 1) * m_textH
+      DrawLine(x, y + m_textH - 2, x + 7, y + m_textH - 2, Presets.Gray)
+      DrawLine(x, y + m_textH - 1, x + 7, y + m_textH - 1, Presets.Gray)
     End If
 
     Return True
 
   End Function
 
-  Private Sub QPrintRC(text As String, row As Integer, col As Integer, fg As Integer, bg As Integer)
+  Private Shared Sub QPrintRC(text As String, row As Integer, col As Integer, fg As Integer, bg As Integer)
 
-    LOCATE(row, col)
-    QB.Video.COLOR(fg, bg)
+    Dim rr = m_cursorRow, rc = m_cursorCol
+    Dim rfg = m_fgColor, rbg = m_bgColor
+    m_cursorRow = row : m_cursorCol = col
+    If fg <> m_fgColor OrElse bg <> m_bgColor Then
+      m_fgColor = fg : m_bgColor = bg
+    End If
     PRINT(text, True)
-
-    '  Dim charHeight = 16
-    '  Dim x = (col * 8) - 8
-    '  Dim y = (row * charHeight) - charHeight
-    '  For Each c In text
-    '    Dim map = CharMap.CharMap(charHeight, c)
-    '    For cr = 0 To charHeight - 1
-    '      Draw(x + 0, y + cr, If((map(cr) And 1) > 0, fg, bg))
-    '      Draw(x + 1, y + cr, If((map(cr) And 2) > 0, fg, bg))
-    '      Draw(x + 2, y + cr, If((map(cr) And 4) > 0, fg, bg))
-    '      Draw(x + 3, y + cr, If((map(cr) And 8) > 0, fg, bg))
-    '      Draw(x + 4, y + cr, If((map(cr) And 16) > 0, fg, bg))
-    '      Draw(x + 5, y + cr, If((map(cr) And 32) > 0, fg, bg))
-    '      Draw(x + 6, y + cr, If((map(cr) And 64) > 0, fg, bg))
-    '      Draw(x + 7, y + cr, If((map(cr) And 128) > 0, fg, bg))
-    '    Next
-    '    x += 8
-    '  Next
+    If m_fgColor <> rfg OrElse m_bgColor <> rbg Then
+      m_fgColor = rfg : m_bgColor = rbg
+    End If
+    m_cursorRow = rr : m_cursorCol = rc
 
   End Sub
 

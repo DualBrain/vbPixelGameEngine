@@ -1,10 +1,5 @@
-﻿Imports VbPixelGameEngine
-
-Imports System.Drawing
-Imports System.Runtime.InteropServices
-
-Imports QB.Core
-Imports QB.Extensions
+﻿Imports System.Text
+Imports VbPixelGameEngine
 
 Namespace Global.QB
 
@@ -20,6 +15,8 @@ Namespace Global.QB
   End Enum
 
   Public NotInheritable Class Video
+
+#Region "Font Info"
 
     Private Shared ReadOnly m_font8x8 As New Dictionary(Of Integer, Integer()) _
       From {{&H0, {&H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0}},
@@ -795,48 +792,17 @@ Namespace Global.QB
             {&HFE, {&H0, &H0, &H0, &H0, &H3E, &H3E, &H3E, &H3E, &H3E, &H3E, &H3E, &H0, &H0, &H0, &H0, &H0}},
             {&HFF, {&H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0}}}
 
-    Private Declare Function GetAsyncKeyState Lib "user32" (vkey As Integer) As Short
+#End Region
 
-    Private Shared m_pge As PixelGameEngine
-    Private Shared m_display As Sprite
-    'Private Shared m_rectangle As New Rectangle
-    'Private Shared m_context As BufferedGraphicsContext
-    'Private Shared m_buffer As BufferedGraphics
-
-    'Private Shared m_parent As System.Windows.Forms.Form
-    'Private Shared m_pictureBox As System.Windows.Forms.PictureBox
-
-    Private Shared ReadOnly m_manualMode As Boolean = False
+    Public Shared Property Screen0 As UShort()
+    Public Shared Property Buffer As Integer()
 
     Private Sub New()
     End Sub
 
-#Region "Interop"
-
-    '<DllImport("user32.dll")>
-    'Private Shared Function GetDC(hwnd As IntPtr) As IntPtr
-    'End Function
-
-    '<DllImport("user32.dll")>
-    'Private Shared Function ReleaseDC(hwnd As IntPtr, hdc As IntPtr) As Int32
-    'End Function
-
-    <DllImport("gdi32.dll")>
-    Private Shared Function GetPixel(hdc As IntPtr, nXPos As Integer, nYPos As Integer) As UInteger
-    End Function
-
-    Public Shared Function GetColor(x%, y%) As Pixel
-      Return m_display.GetPixel(x, y)
-    End Function
-
-#End Region
-
-    Public Shared Sub Init(pge As PixelGameEngine) 'parent As System.Windows.Forms.Form, pic As System.Windows.Forms.PictureBox, Optional manualMode As Boolean = False)
-      m_pge = pge
-      'AddHandler parent.KeyDown, AddressOf Me_KeyDown
-      'AddHandler parent.Resize, AddressOf Me_Resize
-      GraphicsInit(640, 480)
-      Me_Resize(Nothing, EventArgs.Empty)
+    Public Shared Sub Init()
+      ReDim Screen0(1999)
+      ReDim Buffer(0)
     End Sub
 
     Private Shared Sub Me_KeyDown(sender As Object, e As EventArgs) 'System.Windows.Forms.KeyEventArgs)
@@ -865,14 +831,14 @@ Namespace Global.QB
     End Sub
 
     Private Shared Sub GraphicsInit(width%, height%)
-      m_display = New Sprite(width%, height%)
+      'm_display = New Sprite(width%, height%)
     End Sub
 
-    Private Shared m_cursorRow As Integer
-    Private Shared m_cursorCol As Integer
-    Private Shared m_textH As Integer = 16
-    Private Shared m_textW As Integer = 8
-    Private Shared ReadOnly m_palette() As Pixel = {Presets.Black,
+    Friend Shared m_cursorRow As Integer
+    Friend Shared m_cursorCol As Integer
+    Friend Shared m_textH As Integer = 16
+    Friend Shared m_textW As Integer = 8
+    Friend Shared ReadOnly m_palette() As Pixel = {Presets.Black,
                                                     Presets.DarkBlue,
                                                     Presets.DarkGreen,
                                                     Presets.DarkCyan,
@@ -889,40 +855,6 @@ Namespace Global.QB
                                                     Presets.Yellow,
                                                     Presets.White}
 
-    'Private Shared ReadOnly m_brush() As SolidBrush = {New SolidBrush(System.Drawing.Color.Black),
-    '                                          New SolidBrush(System.Drawing.Color.DarkBlue),
-    '                                          New SolidBrush(System.Drawing.Color.DarkGreen),
-    '                                          New SolidBrush(System.Drawing.Color.DarkCyan),
-    '                                          New SolidBrush(System.Drawing.Color.DarkRed),
-    '                                          New SolidBrush(System.Drawing.Color.DarkMagenta),
-    '                                          New SolidBrush(System.Drawing.Color.Brown),
-    '                                          New SolidBrush(System.Drawing.Color.LightGray),
-    '                                          New SolidBrush(System.Drawing.Color.Gray),
-    '                                          New SolidBrush(System.Drawing.Color.Blue),
-    '                                          New SolidBrush(System.Drawing.Color.LightGreen),
-    '                                          New SolidBrush(System.Drawing.Color.Cyan),
-    '                                          New SolidBrush(System.Drawing.Color.Red),
-    '                                          New SolidBrush(System.Drawing.Color.Magenta),
-    '                                          New SolidBrush(System.Drawing.Color.Yellow),
-    '                                          New SolidBrush(System.Drawing.Color.White)}
-
-    'Private Shared ReadOnly m_pen() As Pen = {New Pen(System.Drawing.Color.Black),
-    '                                 New Pen(System.Drawing.Color.DarkBlue),
-    '                                 New Pen(System.Drawing.Color.DarkGreen),
-    '                                 New Pen(System.Drawing.Color.DarkCyan),
-    '                                 New Pen(System.Drawing.Color.DarkRed),
-    '                                 New Pen(System.Drawing.Color.DarkMagenta),
-    '                                 New Pen(System.Drawing.Color.Brown),
-    '                                 New Pen(System.Drawing.Color.LightGray),
-    '                                 New Pen(System.Drawing.Color.Gray),
-    '                                 New Pen(System.Drawing.Color.Blue),
-    '                                 New Pen(System.Drawing.Color.LightGreen),
-    '                                 New Pen(System.Drawing.Color.Cyan),
-    '                                 New Pen(System.Drawing.Color.Red),
-    '                                 New Pen(System.Drawing.Color.Magenta),
-    '                                 New Pen(System.Drawing.Color.Yellow),
-    '                                 New Pen(System.Drawing.Color.White)}
-
     Public Shared Sub PRINT()
       m_cursorRow += 1
       m_cursorCol = 1
@@ -936,27 +868,9 @@ Namespace Global.QB
       '      could be called after other formatting (USING) takes
       '      place.  So should determine the total output and then
       '      adjust for TAB(s).
-      'If False Then
-      '  Using g = Graphics.FromImage(m_display)
-      '    Dim x = (m_cursorCol - 1) * m_textW
-      '    Dim y = (m_cursorRow - 1) * m_textH
-      '    'Using b = New SolidBrush(m_palette(m_bgColor))
-      '    g.FillRectangle(m_brush(m_bgColor), x, y, m_textW * text$.Length, m_textH)
-      '    'End Using
-      '    Using f = New Font("Consolas", 9, FontStyle.Regular)
-      '      'Using b = New SolidBrush(m_palette(m_fgColor))
-      '      g.DrawString(text$, f, m_brush(m_fgColor), x, y)
-      '      'End Using
-      '    End Using
-      '  End Using
-      'Else
-      Dim suspended = m_suspend
-      m_suspend = True
       For Each c In text
         WriteCharacter(CByte(AscW(c)))
       Next
-      m_suspend = suspended
-      'End If
       If noCr Then
         m_cursorCol += If(text?.Length, 0)
       Else
@@ -969,405 +883,390 @@ Namespace Global.QB
     Public Shared Sub LOCATE(Optional row% = -1, Optional column% = -1, Optional a% = -1, Optional b% = -1, Optional c% = -1)
       If a <> 0 OrElse b <> 0 OrElse c <> 0 Then
       End If
-      If row% = -1 AndAlso column% > 0 Then
-        m_cursorCol = column%
-      ElseIf column% = -1 AndAlso row% > 0 Then
-        System.Console.CursorTop = row% - 1
-        m_cursorRow = row%
-      ElseIf row% > 0 AndAlso column% > 0 Then
-        m_cursorCol = column%
-        m_cursorRow = row%
-      End If
+      If row% > 0 AndAlso row% < 26 Then m_cursorRow = row%
+      If column% > 0 AndAlso column% < 81 Then m_cursorCol = column%
     End Sub
 
-    Public Shared Sub PSET(x%, y%, color%)
-      m_display.SetPixel(x, y, m_palette(color))
-      Invalidate()
-    End Sub
+    '    Public Shared Sub PSET(x%, y%, color%)
+    '      m_display.SetPixel(x, y, m_palette(color))
+    '      Invalidate()
+    '    End Sub
 
-    Public Shared Sub CIRCLE(x%, y%, radius#)
-      CIRCLE(x, y, radius, m_fgColor)
-    End Sub
+    '    Public Shared Sub CIRCLE(x%, y%, radius#)
+    '      CIRCLE(x, y, radius, m_fgColor)
+    '    End Sub
 
-    Public Shared Sub CIRCLE(x%, y%, radius#, attribute%)
-      Dim start = 0
-      Dim [end] = Math.PI * 2
-      CIRCLE(x, y, radius, attribute, start, [end])
-    End Sub
+    '    Public Shared Sub CIRCLE(x%, y%, radius#, attribute%)
+    '      Dim start = 0
+    '      Dim [end] = Math.PI * 2
+    '      CIRCLE(x, y, radius, attribute, start, [end])
+    '    End Sub
 
-    Public Shared Sub CIRCLE(x%, y%, radius#, attribute%, start#, end#)
-      Dim aspect As Double '= 1.0
-      Select Case m_mode
-        Case 9 : aspect = 4.0 * (350.0 / 640.0) / 3.0
-        Case Else
-          Throw New NotImplementedException
-      End Select
-      CIRCLE(x, y, radius, attribute, start, [end], aspect)
-    End Sub
+    '    Public Shared Sub CIRCLE(x%, y%, radius#, attribute%, start#, end#)
+    '      Dim aspect As Double '= 1.0
+    '      Select Case m_mode
+    '        Case 9 : aspect = 4.0 * (350.0 / 640.0) / 3.0
+    '        Case Else
+    '          Throw New NotImplementedException
+    '      End Select
+    '      CIRCLE(x, y, radius, attribute, start, [end], aspect)
+    '    End Sub
 
-    Public Shared Sub CIRCLE(xcenter%, ycenter%, radius As Double, attribute%, startValue As Double?, endValue As Double?, aspect As Double)
+    '    Public Shared Sub CIRCLE(xcenter%, ycenter%, radius As Double, attribute%, startValue As Double?, endValue As Double?, aspect As Double)
 
-      Dim start As Double = If(startValue, 0.0)
-      Dim [end] As Double = If(endValue, Math.PI * 2)
+    '      Dim start As Double = If(startValue, 0.0)
+    '      Dim [end] As Double = If(endValue, Math.PI * 2)
 
-      Select Case m_mode
-        Case 0
-          Throw New InvalidOperationException
-        Case 1
-          If Not attribute.Between(0, 3) Then attribute = 3
-        Case 2
-          If Not attribute.Between(0, 1) Then attribute = 1
-        Case 7
-          If Not attribute.Between(0, 15) Then attribute = 15
-        Case 8
-          If Not attribute.Between(0, 15) Then attribute = 15
-        Case 9
-          If Not attribute.Between(0, 15) Then attribute = 15
-        Case 10
-          If Not attribute.Between(0, 3) Then attribute = 3
-        Case Else
-          Stop
-      End Select
+    '      Select Case m_mode
+    '        Case 0
+    '          Throw New InvalidOperationException
+    '        Case 1
+    '          If Not attribute.Between(0, 3) Then attribute = 3
+    '        Case 2
+    '          If Not attribute.Between(0, 1) Then attribute = 1
+    '        Case 7
+    '          If Not attribute.Between(0, 15) Then attribute = 15
+    '        Case 8
+    '          If Not attribute.Between(0, 15) Then attribute = 15
+    '        Case 9
+    '          If Not attribute.Between(0, 15) Then attribute = 15
+    '        Case 10
+    '          If Not attribute.Between(0, 3) Then attribute = 3
+    '        Case Else
+    '          Stop
+    '      End Select
 
-      Static pi As Double = 3.1415926535897931
-      Static pi2 As Double = 6.2831853071795862
-      Static line_to_start, line_from_end As Integer
-      Static ix, iy As Integer ' integer screen co-ordinates of circle's centre
-      Static xspan, yspan As Double
-      Static c As Double ' circumference
-      Static px, py As Double
-      Static sinb, cosb As Double ' second angle used in double-angle-formula
-      Static pixels As Integer
-      Static tmp As Double
-      Static tmpi As Integer
-      Static i As Integer
-      Static exclusive As Integer
-      Static arc1, arc2, arc3, arc4, arcinc As Double
-      Static px2 As Double ', py2 As Double
-      Static x2, y2 As Integer
-      Static lastplotted_x2, lastplotted_y2 As Integer
-      Static lastchecked_x2, lastchecked_y2 As Integer
+    '      Static pi As Double = 3.1415926535897931
+    '      Static pi2 As Double = 6.2831853071795862
+    '      Static line_to_start, line_from_end As Integer
+    '      Static ix, iy As Integer ' integer screen co-ordinates of circle's centre
+    '      Static xspan, yspan As Double
+    '      Static c As Double ' circumference
+    '      Static px, py As Double
+    '      Static sinb, cosb As Double ' second angle used in double-angle-formula
+    '      Static pixels As Integer
+    '      Static tmp As Double
+    '      Static tmpi As Integer
+    '      Static i As Integer
+    '      Static exclusive As Integer
+    '      Static arc1, arc2, arc3, arc4, arcinc As Double
+    '      Static px2 As Double ', py2 As Double
+    '      Static x2, y2 As Integer
+    '      Static lastplotted_x2, lastplotted_y2 As Integer
+    '      Static lastchecked_x2, lastchecked_y2 As Integer
 
-      'If m_writePage.Text Then Throw New InvalidOperationException
+    '      'If m_writePage.Text Then Throw New InvalidOperationException
 
-      ' lines to & from centre
-      'If (Not ((passed And 4) = 4)) Then start = 0
-      'If (Not ((passed And 8) = 8)) Then [end] = pi2
-      line_to_start = 0 : If (start < 0) Then line_to_start = 1 : start = -start
-      line_from_end = 0 : If ([end] < 0) Then line_from_end = 1 : [end] = -[end]
+    '      ' lines to & from centre
+    '      'If (Not ((passed And 4) = 4)) Then start = 0
+    '      'If (Not ((passed And 8) = 8)) Then [end] = pi2
+    '      line_to_start = 0 : If (start < 0) Then line_to_start = 1 : start = -start
+    '      line_from_end = 0 : If ([end] < 0) Then line_from_end = 1 : [end] = -[end]
 
-      ' error checking
-      If (start > pi2) Then Throw New InvalidOperationException
-      If ([end] > pi2) Then Throw New InvalidOperationException
+    '      ' error checking
+    '      If (start > pi2) Then Throw New InvalidOperationException
+    '      If ([end] > pi2) Then Throw New InvalidOperationException
 
-      ' when end<start, the arc of the circle that wouldn't have been drawn if start & end 
-      ' were swapped is drawn
-      exclusive = 0
-      If [end] < start Then
-        tmp = start : start = [end] : [end] = tmp
-        tmpi = line_to_start : line_to_start = line_from_end : line_from_end = tmpi
-        exclusive = 1
-      End If
+    '      ' when end<start, the arc of the circle that wouldn't have been drawn if start & end 
+    '      ' were swapped is drawn
+    '      exclusive = 0
+    '      If [end] < start Then
+    '        tmp = start : start = [end] : [end] = tmp
+    '        tmpi = line_to_start : line_to_start = line_from_end : line_from_end = tmpi
+    '        exclusive = 1
+    '      End If
 
-      ' calc. centre
-      'If (passed And 1) = 1 Then x = m_writePage.X + x : y = m_writePage.Y + y
-      'm_writePage.X = x : m_writePage.Y = y ' set graphics cursor position to circle's centre
+    '      ' calc. centre
+    '      'If (passed And 1) = 1 Then x = m_writePage.X + x : y = m_writePage.Y + y
+    '      'm_writePage.X = x : m_writePage.Y = y ' set graphics cursor position to circle's centre
 
-      Dim r As Double = radius
-      Dim x As Integer = xcenter
-      Dim y As Integer = ycenter
+    '      Dim r As Double = radius
+    '      Dim x As Integer = xcenter
+    '      Dim y As Integer = ycenter
 
-      r = x + r ' the differece between x & x+r in pixels will be the radius in pixels
-      ' resolve coordinates (but keep as floats)
-      'If m_writePage.ClippingOrScaling <> 0 Then
-      '  If m_writePage.ClippingOrScaling = 2 Then
-      '    x = x * m_writePage.ScalingX + m_writePage.ScalingOffsetX + m_writePage.ViewOffsetX
-      '    y = y * m_writePage.ScalingY + m_writePage.ScalingOffsetY + m_writePage.ViewOffsetY
-      '    r = r * m_writePage.ScalingX + m_writePage.ScalingOffsetX + m_writePage.ViewOffsetX
-      '  Else
-      '    x = x + m_writePage.ViewOffsetX
-      '    y = y + m_writePage.ViewOffsetY
-      '    r = r + m_writePage.ViewOffsetX
-      '  End If
-      'End If
-      'If x < 0 Then ix = CInt(x - 0.05) Else ix = CInt(x + 0.5)
-      'If y < 0 Then iy = CInt(y - 0.05) Else iy = CInt(y + 0.05)
-      If x < 0 Then ix = CInt(x) Else ix = CInt(x)
-      If y < 0 Then iy = CInt(y) Else iy = CInt(y)
-      r = Math.Abs(r - x) ' r is now a radius in pixels
+    '      r = x + r ' the differece between x & x+r in pixels will be the radius in pixels
+    '      ' resolve coordinates (but keep as floats)
+    '      'If m_writePage.ClippingOrScaling <> 0 Then
+    '      '  If m_writePage.ClippingOrScaling = 2 Then
+    '      '    x = x * m_writePage.ScalingX + m_writePage.ScalingOffsetX + m_writePage.ViewOffsetX
+    '      '    y = y * m_writePage.ScalingY + m_writePage.ScalingOffsetY + m_writePage.ViewOffsetY
+    '      '    r = r * m_writePage.ScalingX + m_writePage.ScalingOffsetX + m_writePage.ViewOffsetX
+    '      '  Else
+    '      '    x = x + m_writePage.ViewOffsetX
+    '      '    y = y + m_writePage.ViewOffsetY
+    '      '    r = r + m_writePage.ViewOffsetX
+    '      '  End If
+    '      'End If
+    '      'If x < 0 Then ix = CInt(x - 0.05) Else ix = CInt(x + 0.5)
+    '      'If y < 0 Then iy = CInt(y - 0.05) Else iy = CInt(y + 0.05)
+    '      If x < 0 Then ix = CInt(x) Else ix = CInt(x)
+    '      If y < 0 Then iy = CInt(y) Else iy = CInt(y)
+    '      r = Math.Abs(r - x) ' r is now a radius in pixels
 
-      ' adjust vertical and horizontal span of the circle based on aspect ratio
-      xspan = r : yspan = r
-      'If Not ((passed And 16) = 16) Then
-      '  aspect = 1 ' Note: default aspect ratio is 1:1 for QB64 specific modes (256/32)
-      '  If (m_writePage.CompatibleMode = 1) Then aspect = 4.0 * (200.0 / 320.0) / 3.0
-      '  If (m_writePage.CompatibleMode = 2) Then aspect = 4.0 * (200.0 / 640.0) / 3.0
-      '  If (m_writePage.CompatibleMode = 7) Then aspect = 4.0 * (200.0 / 320.0) / 3.0
-      '  If (m_writePage.CompatibleMode = 8) Then aspect = 4.0 * (200.0 / 640.0) / 3.0
-      '  If (m_writePage.CompatibleMode = 9) Then aspect = 4.0 * (350.0 / 640.0) / 3.0
-      '  If (m_writePage.CompatibleMode = 10) Then aspect = 4.0 * (350.0 / 640.0) / 3.0
-      '  If (m_writePage.CompatibleMode = 11) Then aspect = 4.0 * (480.0 / 640.0) / 3.0
-      '  If (m_writePage.CompatibleMode = 12) Then aspect = 4.0 * (480.0 / 640.0) / 3.0
-      '  If (m_writePage.CompatibleMode = 13) Then aspect = 4.0 * (200.0 / 320.0) / 3.0
-      '  ' Old method: aspect = 4.0 * (m_writePage.Height / m_writePage.width) / 3.0
-      'End If
-      If aspect >= 0 Then
-        If aspect < 1 Then
-          ' aspect: 0 to 1
-          yspan *= aspect
-        End If
-        If aspect > 1 Then
-          ' aspect: 1 to infinity
-          xspan /= aspect
-        End If
-      Else
-        If (aspect > -1) Then
-          ' aspect: -1 to 0
-          yspan *= (1 + aspect)
-        End If
-        ' if aspect<-1 no change is required
-      End If
+    '      ' adjust vertical and horizontal span of the circle based on aspect ratio
+    '      xspan = r : yspan = r
+    '      'If Not ((passed And 16) = 16) Then
+    '      '  aspect = 1 ' Note: default aspect ratio is 1:1 for QB64 specific modes (256/32)
+    '      '  If (m_writePage.CompatibleMode = 1) Then aspect = 4.0 * (200.0 / 320.0) / 3.0
+    '      '  If (m_writePage.CompatibleMode = 2) Then aspect = 4.0 * (200.0 / 640.0) / 3.0
+    '      '  If (m_writePage.CompatibleMode = 7) Then aspect = 4.0 * (200.0 / 320.0) / 3.0
+    '      '  If (m_writePage.CompatibleMode = 8) Then aspect = 4.0 * (200.0 / 640.0) / 3.0
+    '      '  If (m_writePage.CompatibleMode = 9) Then aspect = 4.0 * (350.0 / 640.0) / 3.0
+    '      '  If (m_writePage.CompatibleMode = 10) Then aspect = 4.0 * (350.0 / 640.0) / 3.0
+    '      '  If (m_writePage.CompatibleMode = 11) Then aspect = 4.0 * (480.0 / 640.0) / 3.0
+    '      '  If (m_writePage.CompatibleMode = 12) Then aspect = 4.0 * (480.0 / 640.0) / 3.0
+    '      '  If (m_writePage.CompatibleMode = 13) Then aspect = 4.0 * (200.0 / 320.0) / 3.0
+    '      '  ' Old method: aspect = 4.0 * (m_writePage.Height / m_writePage.width) / 3.0
+    '      'End If
+    '      If aspect >= 0 Then
+    '        If aspect < 1 Then
+    '          ' aspect: 0 to 1
+    '          yspan *= aspect
+    '        End If
+    '        If aspect > 1 Then
+    '          ' aspect: 1 to infinity
+    '          xspan /= aspect
+    '        End If
+    '      Else
+    '        If (aspect > -1) Then
+    '          ' aspect: -1 to 0
+    '          yspan *= (1 + aspect)
+    '        End If
+    '        ' if aspect<-1 no change is required
+    '      End If
 
-      ' skip everything if none of the circle is inside current viwport
-      'If ((x + xspan + 0.5) < m_writePage.ViewX1) Then Return
-      'If ((y + yspan + 0.5) < m_writePage.ViewY1) Then Return
-      'If ((x - xspan - 0.5) > m_writePage.ViewX2) Then Return
-      'If ((y - yspan - 0.5) > m_writePage.ViewY2) Then Return
+    '      ' skip everything if none of the circle is inside current viwport
+    '      'If ((x + xspan + 0.5) < m_writePage.ViewX1) Then Return
+    '      'If ((y + yspan + 0.5) < m_writePage.ViewY1) Then Return
+    '      'If ((x - xspan - 0.5) > m_writePage.ViewX2) Then Return
+    '      'If ((y - yspan - 0.5) > m_writePage.ViewY2) Then Return
 
-      'If Not ((passed And 2) = 2) Then col = m_writePage.Color
-      'm_writePage.DrawColor = col
+    '      'If Not ((passed And 2) = 2) Then col = m_writePage.Color
+    '      'm_writePage.DrawColor = col
 
-      ' pre-set/pre-calcualate values
-      c = pi2 * r
-      pixels = CInt(c / 4.0) ' + 0.5)
-      arc1 = 0
-      arc2 = pi
-      arc3 = pi
-      arc4 = pi2
-      arcinc = (pi / 2) / CDbl(pixels)
-      sinb = Math.Sin(arcinc)
-      cosb = Math.Cos(arcinc)
-      lastplotted_x2 = -1
-      lastchecked_x2 = -1
-      i = 0
+    '      ' pre-set/pre-calcualate values
+    '      c = pi2 * r
+    '      pixels = CInt(c / 4.0) ' + 0.5)
+    '      arc1 = 0
+    '      arc2 = pi
+    '      arc3 = pi
+    '      arc4 = pi2
+    '      arcinc = (pi / 2) / CDbl(pixels)
+    '      sinb = Math.Sin(arcinc)
+    '      cosb = Math.Cos(arcinc)
+    '      lastplotted_x2 = -1
+    '      lastchecked_x2 = -1
+    '      i = 0
 
-      If CBool(line_to_start) Then
-        px = Math.Cos(start) : py = Math.Sin(start)
-        x2 = CInt(px * xspan + 0.5) : y2 = CInt(py * yspan - 0.5)
-        'FastLine(ix, iy, ix + x2, iy - y2, col)
-        LINE(ix, iy, ix + x2, iy - y2, attribute)
-      End If
+    '      If CBool(line_to_start) Then
+    '        px = Math.Cos(start) : py = Math.Sin(start)
+    '        x2 = CInt(px * xspan + 0.5) : y2 = CInt(py * yspan - 0.5)
+    '        'FastLine(ix, iy, ix + x2, iy - y2, col)
+    '        LINE(ix, iy, ix + x2, iy - y2, attribute)
+    '      End If
 
-      px = 1
-      py = 0
+    '      px = 1
+    '      py = 0
 
-drawcircle:
-      x2 = CInt(px * xspan) ' + 0.5)
-      y2 = CInt(py * yspan) ' - 0.5)
+    'drawcircle:
+    '      x2 = CInt(px * xspan) ' + 0.5)
+    '      y2 = CInt(py * yspan) ' - 0.5)
 
-      If (i = 0) Then lastchecked_x2 = x2 : lastchecked_y2 = y2 : GoTo plot
+    '      If (i = 0) Then lastchecked_x2 = x2 : lastchecked_y2 = y2 : GoTo plot
 
-      If ((Math.Abs(x2 - lastplotted_x2) >= 2) OrElse (Math.Abs(y2 - lastplotted_y2) >= 2)) Then
-plot:
-        If CBool(exclusive) Then
-          If ((arc1 <= start) OrElse (arc1 >= [end])) Then PSET(ix + lastchecked_x2, iy + lastchecked_y2, attribute)
-          If ((arc2 <= start) OrElse (arc2 >= [end])) Then PSET(ix - lastchecked_x2, iy + lastchecked_y2, attribute)
-          If ((arc3 <= start) OrElse (arc3 >= [end])) Then PSET(ix - lastchecked_x2, iy - lastchecked_y2, attribute)
-          If ((arc4 <= start) OrElse (arc4 >= [end])) Then PSET(ix + lastchecked_x2, iy - lastchecked_y2, attribute)
-        Else ' inclusive
-          If ((arc1 >= start) AndAlso (arc1 <= [end])) Then PSET(ix + lastchecked_x2, iy + lastchecked_y2, attribute)
-          If ((arc2 >= start) AndAlso (arc2 <= [end])) Then PSET(ix - lastchecked_x2, iy + lastchecked_y2, attribute)
-          If ((arc3 >= start) AndAlso (arc3 <= [end])) Then PSET(ix - lastchecked_x2, iy - lastchecked_y2, attribute)
-          If ((arc4 >= start) AndAlso (arc4 <= [end])) Then PSET(ix + lastchecked_x2, iy - lastchecked_y2, attribute)
-        End If
-        If (i > pixels) Then GoTo allplotted
-        lastplotted_x2 = lastchecked_x2 : lastplotted_y2 = lastchecked_y2
-      End If
-      lastchecked_x2 = x2 : lastchecked_y2 = y2
+    '      If ((Math.Abs(x2 - lastplotted_x2) >= 2) OrElse (Math.Abs(y2 - lastplotted_y2) >= 2)) Then
+    'plot:
+    '        If CBool(exclusive) Then
+    '          If ((arc1 <= start) OrElse (arc1 >= [end])) Then PSET(ix + lastchecked_x2, iy + lastchecked_y2, attribute)
+    '          If ((arc2 <= start) OrElse (arc2 >= [end])) Then PSET(ix - lastchecked_x2, iy + lastchecked_y2, attribute)
+    '          If ((arc3 <= start) OrElse (arc3 >= [end])) Then PSET(ix - lastchecked_x2, iy - lastchecked_y2, attribute)
+    '          If ((arc4 <= start) OrElse (arc4 >= [end])) Then PSET(ix + lastchecked_x2, iy - lastchecked_y2, attribute)
+    '        Else ' inclusive
+    '          If ((arc1 >= start) AndAlso (arc1 <= [end])) Then PSET(ix + lastchecked_x2, iy + lastchecked_y2, attribute)
+    '          If ((arc2 >= start) AndAlso (arc2 <= [end])) Then PSET(ix - lastchecked_x2, iy + lastchecked_y2, attribute)
+    '          If ((arc3 >= start) AndAlso (arc3 <= [end])) Then PSET(ix - lastchecked_x2, iy - lastchecked_y2, attribute)
+    '          If ((arc4 >= start) AndAlso (arc4 <= [end])) Then PSET(ix + lastchecked_x2, iy - lastchecked_y2, attribute)
+    '        End If
+    '        If (i > pixels) Then GoTo allplotted
+    '        lastplotted_x2 = lastchecked_x2 : lastplotted_y2 = lastchecked_y2
+    '      End If
+    '      lastchecked_x2 = x2 : lastchecked_y2 = y2
 
-      If (i <= pixels) Then
-        i += 1
-        If (i > pixels) Then GoTo plot
-        px2 = px * cosb + py * sinb
-        py = py * cosb - px * sinb
-        px = px2
-        If CBool(i) Then arc1 += arcinc : arc2 -= arcinc : arc3 += arcinc : arc4 -= arcinc
-        GoTo drawcircle
-      End If
+    '      If (i <= pixels) Then
+    '        i += 1
+    '        If (i > pixels) Then GoTo plot
+    '        px2 = px * cosb + py * sinb
+    '        py = py * cosb - px * sinb
+    '        px = px2
+    '        If CBool(i) Then arc1 += arcinc : arc2 -= arcinc : arc3 += arcinc : arc4 -= arcinc
+    '        GoTo drawcircle
+    '      End If
 
-allplotted:
+    'allplotted:
 
-      If CBool(line_from_end) Then
-        px = Math.Cos([end]) : py = Math.Sin([end])
-        x2 = CInt(px * xspan + 0.5) : y2 = CInt(py * yspan - 0.5)
-        'FastLine(ix, iy, ix + x2, iy - y2, col)
-        LINE(ix, iy, ix + x2, iy - y2, attribute)
-      End If
+    '      If CBool(line_from_end) Then
+    '        px = Math.Cos([end]) : py = Math.Sin([end])
+    '        x2 = CInt(px * xspan + 0.5) : y2 = CInt(py * yspan - 0.5)
+    '        'FastLine(ix, iy, ix + x2, iy - y2, col)
+    '        LINE(ix, iy, ix + x2, iy - y2, attribute)
+    '      End If
 
-      Invalidate()
+    '      Invalidate()
 
-    End Sub
+    '    End Sub
 
-    Public Shared Sub PAINT(x%, y%)
-      PAINT(False, x, y, m_fgColor, m_fgColor, Nothing)
-    End Sub
+    '    Public Shared Sub PAINT(x%, y%)
+    '      PAINT(False, x, y, m_fgColor, m_fgColor, Nothing)
+    '    End Sub
 
-    Public Shared Sub PAINT(x%, y%, color%)
-      PAINT(False, x, y, color, color, Nothing)
-    End Sub
+    '    Public Shared Sub PAINT(x%, y%, color%)
+    '      PAINT(False, x, y, color, color, Nothing)
+    '    End Sub
 
-    Public Shared Sub PAINT(x%, y%, color%, border%)
-      PAINT(False, x, y, color, border, Nothing)
-    End Sub
+    '    Public Shared Sub PAINT(x%, y%, color%, border%)
+    '      PAINT(False, x, y, color, border, Nothing)
+    '    End Sub
 
-    Public Shared Sub PAINT(x%, y%, color%, border%, background$)
-      PAINT(False, x, y, color, border, background)
-    End Sub
+    '    Public Shared Sub PAINT(x%, y%, color%, border%, background$)
+    '      PAINT(False, x, y, color, border, background)
+    '    End Sub
 
-    Public Shared Sub PAINT([step] As Boolean, x%, y%)
-      PAINT([step], x, y, m_fgColor, m_fgColor, Nothing)
-    End Sub
+    '    Public Shared Sub PAINT([step] As Boolean, x%, y%)
+    '      PAINT([step], x, y, m_fgColor, m_fgColor, Nothing)
+    '    End Sub
 
-    Public Shared Sub PAINT([step] As Boolean, x%, y%, color%)
-      PAINT([step], x, y, color, color, Nothing)
-    End Sub
+    '    Public Shared Sub PAINT([step] As Boolean, x%, y%, color%)
+    '      PAINT([step], x, y, color, color, Nothing)
+    '    End Sub
 
-    Public Shared Sub PAINT([step] As Boolean, x%, y%, color%, border%)
-      PAINT([step], x, y, color, border, Nothing)
-    End Sub
+    '    Public Shared Sub PAINT([step] As Boolean, x%, y%, color%, border%)
+    '      PAINT([step], x, y, color, border, Nothing)
+    '    End Sub
 
-    Public Shared Sub PAINT([step] As Boolean, x%, y%, color%, border%, background$)
-      If [step] AndAlso border <> 0 AndAlso background$ <> "" Then
-      End If
-      '#If oldway Then
-      Dim p = New Drawing.Point(x, y)
-      Dim stk As New Stack()
-      stk.Push(p)
-      Dim replacementColor = GetColor(p.X, p.Y)
-      Do While stk.Count <> 0
-        p = CType(stk.Pop(), Point)
-        Dim testColor = GetColor(p.X, p.Y)
-        If SameColor(testColor, replacementColor) AndAlso Not SameColor(testColor, m_palette(color)) Then
-          m_display.SetPixel(p.X, p.Y, replacementColor)
-          If p.X - 1 > -1 Then stk.Push(New Point(p.X - 1, p.Y))
-          If p.X + 1 < m_display.Width Then stk.Push(New Point(p.X + 1, p.Y))
-          If p.Y - 1 > -1 Then stk.Push(New Point(p.X, p.Y - 1))
-          If p.Y + 1 < m_display.Height Then stk.Push(New Point(p.X, p.Y + 1))
-        End If
-      Loop
+    '    Public Shared Sub PAINT([step] As Boolean, x%, y%, color%, border%, background$)
+    '      If [step] AndAlso border <> 0 AndAlso background$ <> "" Then
+    '      End If
+    '      '#If oldway Then
+    '      Dim p = New Drawing.Point(x, y)
+    '      Dim stk As New Stack()
+    '      stk.Push(p)
+    '      Dim replacementColor = GetColor(p.X, p.Y)
+    '      Do While stk.Count <> 0
+    '        p = CType(stk.Pop(), Point)
+    '        Dim testColor = GetColor(p.X, p.Y)
+    '        If SameColor(testColor, replacementColor) AndAlso Not SameColor(testColor, m_palette(color)) Then
+    '          m_display.SetPixel(p.X, p.Y, replacementColor)
+    '          If p.X - 1 > -1 Then stk.Push(New Point(p.X - 1, p.Y))
+    '          If p.X + 1 < m_display.Width Then stk.Push(New Point(p.X + 1, p.Y))
+    '          If p.Y - 1 > -1 Then stk.Push(New Point(p.X, p.Y - 1))
+    '          If p.Y + 1 < m_display.Height Then stk.Push(New Point(p.X, p.Y + 1))
+    '        End If
+    '      Loop
 
-      Invalidate()
+    '      Invalidate()
 
-    End Sub
+    '    End Sub
 
-    Private Shared Function SameColor(c1 As Pixel, c2 As Pixel) As Boolean
-      Return ((c1.A = c2.A) AndAlso (c1.B = c2.B) AndAlso (c1.G = c2.G) AndAlso (c1.R = c2.R))
-    End Function
+    'Private Shared Function SameColor(c1 As Pixel, c2 As Pixel) As Boolean
+    '  Return ((c1.A = c2.A) AndAlso (c1.B = c2.B) AndAlso (c1.G = c2.G) AndAlso (c1.R = c2.R))
+    'End Function
 
-    Public Shared Sub LINE(x1!, y1!, x2!, y2!, attr%, Optional lo As LineOption = LineOption.None)
+    'Public Shared Sub LINE(x1!, y1!, x2!, y2!, attr%, Optional lo As LineOption = LineOption.None)
 
-      If x2 < x1 Then SWAP(x1, x2)
-      If y2 < y1 Then SWAP(y1, y2)
+    '  If x2 < x1 Then SWAP(x1, x2)
+    '  If y2 < y1 Then SWAP(y1, y2)
 
-      Select Case lo
-        Case LineOption.None
-          m_pge.DrawLine(x1, y1, x2, y2, m_palette(attr))
-        Case LineOption.B
-          m_pge.DrawRect(CInt(Fix(x1)), CInt(Fix(y1)), CInt(Fix((x2 - x1))) + 1, CInt(Fix(y2 - y1)) + 1, m_palette(attr))
-        Case LineOption.BF
-          m_pge.FillRect(CInt(Fix(x1)), CInt(Fix(y1)), CInt(Fix((x2 - x1))) + 1, CInt(Fix(y2 - y1)) + 1, m_palette(attr))
-        Case Else
-      End Select
-      Invalidate()
-    End Sub
+    '  Select Case lo
+    '    Case LineOption.None
+    '      m_pge.DrawLine(x1, y1, x2, y2, m_palette(attr))
+    '    Case LineOption.B
+    '      m_pge.DrawRect(CInt(Fix(x1)), CInt(Fix(y1)), CInt(Fix((x2 - x1))) + 1, CInt(Fix(y2 - y1)) + 1, m_palette(attr))
+    '    Case LineOption.BF
+    '      m_pge.FillRect(CInt(Fix(x1)), CInt(Fix(y1)), CInt(Fix((x2 - x1))) + 1, CInt(Fix(y2 - y1)) + 1, m_palette(attr))
+    '    Case Else
+    '  End Select
+    '  Invalidate()
+    'End Sub
 
-    Private Shared m_suspend As Boolean
+    'Friend Shared m_suspend As Boolean
 
-    Public Shared Sub SuspendOutput()
-      m_suspend = True
-    End Sub
+    'Public Shared Sub SuspendOutput()
+    '  m_suspend = True
+    'End Sub
 
-    Public Shared Sub ResumeOutput()
-      m_suspend = False
-      Invalidate()
-    End Sub
+    'Public Shared Sub ResumeOutput()
+    '  m_suspend = False
+    '  Invalidate()
+    'End Sub
 
-    Private Shared m_invalidated As Boolean
+    Friend Shared m_invalidated As Boolean
 
     Private Shared Sub Invalidate()
       m_invalidated = True
-      If Not m_manualMode Then
-        Render()
-      End If
     End Sub
 
-    Public Shared Sub Render()
-      If m_suspend Then Return
-      If m_invalidated Then
-        m_pge.DrawSprite(0, 0, m_display, 1)
-        m_invalidated = False
-      End If
-    End Sub
+    'Public Shared Sub PUT(x%, y%, img As System.Drawing.Image, po As PutOption)
+    '  If po <> PutOption.PUT_PSET Then
+    '  End If
+    '  Dim src = New Rectangle(0, 0, img.Width, img.Height)
+    '  Dim dest = New Rectangle(x, y, img.Width, img.Height)
+    '  'g.DrawImage(img, dest, src, System.Drawing.GraphicsUnit.Pixel)
+    '  Invalidate()
+    'End Sub
 
-    Public Shared Sub PUT(x%, y%, img As System.Drawing.Image, po As PutOption)
-      If po <> PutOption.PUT_PSET Then
-      End If
-      Dim src = New Rectangle(0, 0, img.Width, img.Height)
-      Dim dest = New Rectangle(x, y, img.Width, img.Height)
-      'g.DrawImage(img, dest, src, System.Drawing.GraphicsUnit.Pixel)
-      Invalidate()
-    End Sub
+    ''Private Shared ReadOnly m_address As New List(Of System.Drawing.Image)
 
-    'Private Shared ReadOnly m_address As New List(Of System.Drawing.Image)
+    'Public Shared Sub [GET](x1%, y1%, x2%, y2%, ByRef img As System.Drawing.Image)
+    '  img = New Bitmap(x2 - x1, y2 - y1)
+    '  Using g = Graphics.FromImage(img)
+    '    Dim src = New Rectangle(x1, y1, x2 - x1, y2 - y1)
+    '    Dim dest = New Rectangle(0, 0, x2 - x1, y2 - y1)
+    '    'g.DrawImage(m_display, dest, src, System.Drawing.GraphicsUnit.Pixel)
+    '  End Using
+    'End Sub
 
-    Public Shared Sub [GET](x1%, y1%, x2%, y2%, ByRef img As System.Drawing.Image)
-      img = New Bitmap(x2 - x1, y2 - y1)
-      Using g = Graphics.FromImage(img)
-        Dim src = New Rectangle(x1, y1, x2 - x1, y2 - y1)
-        Dim dest = New Rectangle(0, 0, x2 - x1, y2 - y1)
-        'g.DrawImage(m_display, dest, src, System.Drawing.GraphicsUnit.Pixel)
-      End Using
-    End Sub
+    'Public Shared Async Function LineInputAsync(prompt$) As Task(Of String)
+    '  PRINT(prompt$)
+    '  Dim result$ = ""
+    '  Do
+    '    Await Task.Delay(1)
+    '    Dim a$ = INKEY()
+    '    If a$?.Length > 0 Then
+    '      If a$ = Chr(13) Then
+    '        Return result$
+    '      Else
+    '        result$ &= a$
+    '        PRINT(a$, True)
+    '      End If
+    '    End If
+    '  Loop
+    'End Function
 
-    Public Shared Async Function LineInputAsync(prompt$) As Task(Of String)
-      PRINT(prompt$)
-      Dim result$ = ""
-      Do
-        Await Task.Delay(1)
-        Dim a$ = INKEY()
-        If a$?.Length > 0 Then
-          If a$ = Chr(13) Then
-            Return result$
-          Else
-            result$ &= a$
-            PRINT(a$, True)
-          End If
-        End If
-      Loop
-    End Function
-
-    'Private Shared m_bgBrush As Brush = Brushes.Black
-    'Private Shared m_fgBrush As Brush = Brushes.White
-
-    Private Shared m_bgColor As Integer = 0
-    Private Shared m_fgColor As Integer = 7
+    Friend Shared m_bgColor As Integer = 0
+    Friend Shared m_fgColor As Integer = 7
 
     Public Shared Sub COLOR(fg%)
-      'If fg% > 15 Then fg% -= 16
-      'Throw New NotImplementedException
       m_fgColor = fg
     End Sub
 
-    Public Shared Sub COLOR(fg%, bg%)
-      'Throw New NotImplementedException
+    Public Shared Sub COLOR(fg As Integer, bg As Integer)
       m_fgColor = fg
       m_bgColor = bg
     End Sub
 
+    'Private Shared Function OneColor(fg As Integer, bg As Integer) As Integer
+    '  Return CByte((fg << 4) Or bg)
+    'End Function
+
+    Friend Shared Sub SplitColor(colr As Integer, ByRef fg As Integer, ByRef bg As Integer)
+      fg = colr >> 4
+      bg = colr And &HF
+    End Sub
+
     Public Shared Sub CLS()
-      m_pge.SetDrawTarget(m_display)
-      m_pge.FillRect(0, 0, m_display.Width, m_display.Height, m_palette(m_bgColor))
-      m_pge.SetDrawTarget(Nothing)
+      For index = 0 To Screen0.Length - 1
+        Screen0(index) = CUShort((((m_fgColor << 4) Or m_bgColor) * 256) + 32)
+      Next
       m_cursorCol = 1
       m_cursorRow = 1
       Invalidate()
@@ -1401,34 +1300,19 @@ allplotted:
 
 #Region "SCREEN (Function)"
 
-    'Public Shared Function SCREEN(r%, c%) As Integer
-    '  Return 0
-    'End Function
-
     Public Shared Function SCREEN%(row%, column%, Optional colr% = 0)
-      If row <> 0 OrElse column <> 0 OrElse colr <> 0 Then
-      End If
-      Throw New NotImplementedException
+      Dim index = (((row - 1) * 80) + column) - 1
+      Dim ch = CByte(Screen0(index) And &HFF)
+      Dim clr = ((Screen0(index) And &HFF00) \ 256) And &HFF
       If colr% = 0 Then
-        'Dim ch = ConsoleEx.ReadChar(column - 1, row - 1)
-        'If ch IsNot Nothing Then
-        '  Select Case CStr(ch)
-        '    Case "█" : Return 219
-        '    Case "▄" : Return 220
-        '    Case "▌" : Return 221
-        '    Case "▐" : Return 222
-        '    Case "▀" : Return 223
-        '      'Case "√" : Return 251
-        '    Case Else
-        '      Return QBAsc(CChar(ch))
-        '  End Select
-        'Else
-        '  Return 0
-        'End If
+        Return ch
       Else
-        Return 0
+        If m_mode = 0 Then
+          Return clr
+        Else
+          Return 0
+        End If
       End If
-      Return 0
     End Function
 
 #End Region
@@ -1444,10 +1328,6 @@ allplotted:
     End Sub
 
     Public Shared Sub SCREEN(mode%)
-      'If m_pictureBox IsNot Nothing AndAlso
-      '   m_pictureBox.Image IsNot Nothing Then
-      '  m_pictureBox.Image = Nothing
-      'End If
       Select Case mode
         Case 0 ' Text Mode
           m_mode = mode
@@ -1666,18 +1546,18 @@ allplotted:
 
 #End Region
 
-    Public Shared Function POINT%(x%, y%)
-      'Render()
-      Dim c = GetColor(x, y)
-      For entry = 0 To m_palette.Length - 1
-        If c.R = m_palette(entry).R AndAlso
-           c.G = m_palette(entry).G AndAlso
-           c.B = m_palette(entry).B Then
-          Return entry
-        End If
-      Next
-      Return 0
-    End Function
+    'Public Shared Function POINT%(x%, y%)
+    '  'Render()
+    '  Dim c = GetColor(x, y)
+    '  For entry = 0 To m_palette.Length - 1
+    '    If c.R = m_palette(entry).R AndAlso
+    '       c.G = m_palette(entry).G AndAlso
+    '       c.B = m_palette(entry).B Then
+    '      Return entry
+    '    End If
+    '  Next
+    '  Return 0
+    'End Function
 
     Public Shared Function TAB(column%) As String
       If column% <= 32767 Then
@@ -1699,7 +1579,7 @@ allplotted:
       End If
     End Function
 
-    Private Shared Function CharMap(charHeight%, ascii As Byte) As Integer()
+    Friend Shared Function CharMap(charHeight%, ascii As Byte) As Integer()
       Select Case charHeight
         Case 8 : Return m_font8x8(ascii)
         Case 14 : Return m_font8x14(ascii)
@@ -1712,32 +1592,18 @@ allplotted:
 
     Private Shared Sub WriteCharacter(ascii As Byte)
 
-      Dim map = CharMap(m_textH, ascii)
-
-      Dim r = m_cursorRow
-      Dim c = m_cursorCol
-
-      Dim x = (c - 1) * m_textW
-      Dim y = (r - 1) * m_textH
-
-      For dy = 0 To m_textH - 1
-        PSET(x + 0, dy + y, If((map(dy) And 1) > 0, m_fgColor, m_bgColor))
-        PSET(x + 1, dy + y, If((map(dy) And 2) > 0, m_fgColor, m_bgColor))
-        PSET(x + 2, dy + y, If((map(dy) And 4) > 0, m_fgColor, m_bgColor))
-        PSET(x + 3, dy + y, If((map(dy) And 8) > 0, m_fgColor, m_bgColor))
-        PSET(x + 4, dy + y, If((map(dy) And 16) > 0, m_fgColor, m_bgColor))
-        PSET(x + 5, dy + y, If((map(dy) And 32) > 0, m_fgColor, m_bgColor))
-        PSET(x + 6, dy + y, If((map(dy) And 64) > 0, m_fgColor, m_bgColor))
-        PSET(x + 7, dy + y, If((map(dy) And 128) > 0, m_fgColor, m_bgColor))
-      Next
+      Dim index = (((m_cursorRow - 1) * 80) + m_cursorCol) - 1
+      Screen0(index) = CUShort((((m_fgColor << 4) Or m_bgColor) * 256) + ascii)
 
       m_cursorCol += 1
+
       If m_cursorCol > 80 Then
-        m_cursorCol = 1
-        m_cursorRow += 1
-        If m_cursorRow > 25 Then
-          m_cursorRow = 1
-        End If
+
+        m_cursorRow += 1 : m_cursorCol = 1
+
+        'TODO: Scroll screen up?
+        If m_cursorRow > 25 Then m_cursorRow = 1
+
       End If
 
     End Sub

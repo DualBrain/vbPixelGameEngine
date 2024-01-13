@@ -1,8 +1,4 @@
-﻿Option Explicit On
-Option Strict On
-Option Infer On
-
-Imports System.Runtime.CompilerServices
+﻿Imports System.Runtime.CompilerServices
 
 Namespace Global.QB
 
