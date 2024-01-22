@@ -49,6 +49,7 @@ Public MustInherit Class PixelGameEngine
   Private Const VK_SHIFT As Integer = &H10
   Private Const VK_CONTROL As Integer = &H11
   Private Const VK_SPACE As Integer = &H20
+  Private Const VK_MENU As Integer = &H12
 
   Private Const VK_NUMPAD0 As Integer = &H60
   Private Const VK_NUMPAD1 As Integer = &H61
@@ -96,12 +97,16 @@ Public MustInherit Class PixelGameEngine
   Private Const WM_LBUTTONDOWN As Integer = &H201
   Private Const WM_KEYUP As Integer = &H101
   Private Const WM_KEYDOWN As Integer = &H100
+  Private Const WM_SYSKEYDOWN As Integer = &H104
+  Private Const WM_SYSKEYUP As Integer = &H105
   Private Const WM_KILLFOCUS As Integer = &H8
   Private Const WM_SETFOCUS As Integer = &H7
   Private Const WM_MOUSELEAVE As Integer = &H2A3
   Private Const WM_MOUSEWHEEL As Integer = &H20A
   Private Const WM_SIZE As Integer = &H5
   Private Const WM_CREATE As Integer = &H1
+  Private Const WM_SYSCOMMAND = &H112
+  Private Const SC_KEYMENU = &HF100
 
   'Private Const WS_OVERLAPPEDWINDOW As UInteger = &HCF0000
   Private Const WS_VISIBLE As UInteger = &H10000000
@@ -1746,6 +1751,7 @@ Public MustInherit Class PixelGameEngine
     OEM_8
     CAPS_LOCK
     ENUM_END
+    ALT
   End Enum
 
   Private m_fontSprite As Sprite
@@ -3122,6 +3128,7 @@ next4:
     Singleton.MapKeys(VK_END) = Key.END : Singleton.MapKeys(VK_PRIOR) = Key.PGUP : Singleton.MapKeys(VK_NEXT) = Key.PGDN : Singleton.MapKeys(VK_INSERT) = Key.INS
     Singleton.MapKeys(VK_SHIFT) = Key.SHIFT : Singleton.MapKeys(VK_CONTROL) = Key.CTRL
     Singleton.MapKeys(VK_SPACE) = Key.SPACE
+    Singleton.MapKeys(VK_MENU) = Key.ALT
 
     Singleton.MapKeys(&H30) = Key.K0 : Singleton.MapKeys(&H31) = Key.K1 : Singleton.MapKeys(&H32) = Key.K2 : Singleton.MapKeys(&H33) = Key.K3 : Singleton.MapKeys(&H34) = Key.K4
     Singleton.MapKeys(&H35) = Key.K5 : Singleton.MapKeys(&H36) = Key.K6 : Singleton.MapKeys(&H37) = Key.K7 : Singleton.MapKeys(&H38) = Key.K8 : Singleton.MapKeys(&H39) = Key.K9
@@ -3219,6 +3226,22 @@ next4:
         Return IntPtr.Zero
       Case WM_KILLFOCUS
         Singleton.Pge.m_hasInputFocus = False
+        Return IntPtr.Zero
+      Case WM_SYSCOMMAND
+        If (wParam.ToInt32 And &HFFF0) = SC_KEYMENU Then
+          Return IntPtr.Zero
+        End If
+      Case WM_SYSKEYDOWN
+        Dim value As Integer
+        If MapKeys.TryGetValue(wParam.ToInt32(), value) Then
+          Pge.m_keyNewState(value) = True
+        End If
+        Return IntPtr.Zero
+      Case WM_SYSKEYUP
+        Dim value As Integer
+        If MapKeys.TryGetValue(wParam.ToInt32(), value) Then
+          Pge.m_keyNewState(value) = False
+        End If
         Return IntPtr.Zero
       Case WM_KEYDOWN
         Dim value As Integer
