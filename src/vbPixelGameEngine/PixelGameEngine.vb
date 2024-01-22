@@ -403,6 +403,8 @@ Public MustInherit Class PixelGameEngine
   Private Const XK_Shift_R As Integer = &HFFE2
   Private Const XK_Control_L As Integer = &HFFE3
   Private Const XK_Control_R As Integer = &HFFE4
+  Private Const XK_Alt_L As Integer = &HFFE9
+  Private Const XK_Alt_R As Integer = &HFFEA
   Private Const XK_space As Integer = &H20
 
   Private Const XK_0 As Integer = &H30
@@ -427,11 +429,11 @@ Public MustInherit Class PixelGameEngine
   Private Const XK_KP_8 As Integer = &HFFB8
   Private Const XK_KP_9 As Integer = &HFFB9
 
-  Private Const XK_KP_Multiply As Integer = &H1008FFAA
-  Private Const XK_KP_Add As Integer = &H1008FFAB
-  Private Const XK_KP_Divide As Integer = &H1008FFAF
-  Private Const XK_KP_Subtract As Integer = &H1008FFAD
-  Private Const XK_KP_Decimal As Integer = &H1008FFAE
+  Private Const XK_KP_Multiply As Integer = &HFFAA '&H1008FFAA
+  Private Const XK_KP_Add As Integer = &HFFAB '&H1008FFAB
+  Private Const XK_KP_Divide As Integer = &HFFAF '&H1008FFAF
+  Private Const XK_KP_Subtract As Integer = &HFFAD '&H1008FFAD
+  Private Const XK_KP_Decimal As Integer = &HFFAE '&H1008FFAE
 
   Private Const GLX_RGBA As Integer = 4
   Private Const GLX_DEPTH_SIZE As Integer = 12
@@ -3367,6 +3369,7 @@ next4:
     Singleton.MapKeys(XK_Scroll_Lock) = Key.SCROLL : Singleton.MapKeys(XK_Tab) = Key.TAB : Singleton.MapKeys(XK_Delete) = Key.DEL : Singleton.MapKeys(XK_Home) = Key.HOME
     Singleton.MapKeys(XK_End) = Key.END : Singleton.MapKeys(XK_Page_Up) = Key.PGUP : Singleton.MapKeys(XK_Page_Down) = Key.PGDN : Singleton.MapKeys(XK_Insert) = Key.INS
     Singleton.MapKeys(XK_Shift_L) = Key.SHIFT : Singleton.MapKeys(XK_Shift_R) = Key.SHIFT : Singleton.MapKeys(XK_Control_L) = Key.CTRL : Singleton.MapKeys(XK_Control_R) = Key.CTRL
+    Singleton.MapKeys(XK_Alt_L) = Key.ALT : Singleton.MapKeys(XK_Alt_R) = Key.ALT
     Singleton.MapKeys(XK_space) = Key.SPACE
 
     Singleton.MapKeys(XK_0) = Key.K0 : Singleton.MapKeys(XK_1) = Key.K1 : Singleton.MapKeys(XK_2) = Key.K2 : Singleton.MapKeys(XK_3) = Key.K3 : Singleton.MapKeys(XK_4) = Key.K4
