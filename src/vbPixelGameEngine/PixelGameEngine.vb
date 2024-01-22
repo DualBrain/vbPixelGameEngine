@@ -3100,8 +3100,8 @@ next4:
 
     'Singleton.Pge = Me
     m_hWnd = Win32.CreateWindowEx(dwExStyle, atom, "", dwStyle,
-                          nCosmeticOffset, nCosmeticOffset, width, height, Nothing, Nothing,
-                          Win32.GetModuleHandle(Nothing), IntPtr.Zero)
+                                  nCosmeticOffset, nCosmeticOffset, width, height, Nothing, Nothing,
+                                  Win32.GetModuleHandle(Nothing), IntPtr.Zero)
 
     'Dim tme = New TRACKMOUSEEVENTSTRUCT
     'tme.cbSize = Marshal.SizeOf(GetType(TRACKMOUSEEVENTSTRUCT))
