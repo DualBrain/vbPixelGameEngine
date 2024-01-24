@@ -2653,6 +2653,9 @@ next4:
     m_mouseWheelDeltaCache += delta
   End Sub
 
+  Public Property ShowEngineName As Boolean = True
+  Public Property ShowFPS As Boolean = True
+
   Private Sub Pge_UpdateMouse(x As Integer, y As Integer)
 
     ' Mouse coords come in screen space
@@ -2984,7 +2987,9 @@ next4:
             Dim avg = m_totalFrameCount \ m_totalFrames
 
             m_frameTimer -= 1.0F
-            Dim title = $"vbPixelGameEngine v0.0.1 - {AppName} - FPS: {m_frameCount} ({avg})"
+            Dim title As String
+            If Not ShowEngineName Then title = If(ShowFPS, $"{AppName} - FPS: {m_frameCount} ({avg})", AppName)
+            If ShowEngineName Then title = If(ShowFPS, $"vbPixelGameEngine v0.0.1 - {AppName} - FPS: {m_frameCount} ({avg})", $"vbPixelGameEngine v0.0.1 - {AppName}")
             m_frameCount = 0
 
             If IsOSPlatform(Windows) Then
