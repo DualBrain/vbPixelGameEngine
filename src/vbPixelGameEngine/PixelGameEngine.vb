@@ -3411,6 +3411,18 @@ next4:
     Singleton.MapKeys(XK_KP_5) = Key.NP5 : Singleton.MapKeys(XK_KP_6) = Key.NP6 : Singleton.MapKeys(XK_KP_7) = Key.NP7 : Singleton.MapKeys(XK_KP_8) = Key.NP8 : Singleton.MapKeys(XK_KP_9) = Key.NP9
     Singleton.MapKeys(XK_KP_Multiply) = Key.NP_MUL : Singleton.MapKeys(XK_KP_Add) = Key.NP_ADD : Singleton.MapKeys(XK_KP_Divide) = Key.NP_DIV : Singleton.MapKeys(XK_KP_Subtract) = Key.NP_SUB : Singleton.MapKeys(XK_KP_Decimal) = Key.NP_DECIMAL
 
+    Singleton.MapKeys(X11.XKeySym.XK_semicolon) = Key.OEM_1
+    Singleton.MapKeys(X11.XKeySym.XK_equal) = Key.EQUALS
+    Singleton.MapKeys(X11.XKeySym.XK_comma) = Key.COMMA
+    Singleton.MapKeys(X11.XKeySym.XK_minus) = Key.MINUS
+    Singleton.MapKeys(X11.XKeySym.XK_period) = Key.PERIOD
+    Singleton.MapKeys(X11.XKeySym.XK_slash) = Key.OEM_2
+    Singleton.MapKeys(X11.XKeySym.XK_grave) = Key.OEM_3
+    Singleton.MapKeys(X11.XKeySym.XK_bracketleft) = Key.OEM_4
+    Singleton.MapKeys(X11.XKeySym.XK_backslash) = Key.OEM_5
+    Singleton.MapKeys(X11.XKeySym.XK_bracketright) = Key.OEM_6
+    Singleton.MapKeys(X11.XKeySym.XK_apostrophe) = Key.OEM_7
+
     Return pge_Display
 
   End Function
