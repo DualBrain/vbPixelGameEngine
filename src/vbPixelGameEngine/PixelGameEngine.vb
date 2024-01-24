@@ -17,6 +17,21 @@ Public MustInherit Class PixelGameEngine
 
 #Region "Win32 - Const"
 
+  Private Const VK_CAPITAL = &H14
+  Private Const VK_NUMLOCK = &H90
+
+  Private Const VK_OEM_1 = &HBA ' ;:
+  Private Const VK_OEM_PLUS = &HBB ' -_
+  Private Const VK_OEM_COMMA = &HBC ' ,<
+  Private Const VK_OEM_MINUS = &HBD ' =+
+  Private Const VK_OEM_PERIOD = 190 ' .>
+  Private Const VK_OEM_2 = &HBF ' /?
+  Private Const VK_OEM_3 = &HC0 ' `~
+  Private Const VK_OEM_4 = &HDB ' [{
+  Private Const VK_OEM_5 = &HDC ' \|
+  Private Const VK_OEM_6 = &HDD ' ]}
+  Private Const VK_OEM_7 = &HDE ' '"
+
   Private Const VK_F1 As Integer = &H70
   Private Const VK_F2 As Integer = &H71
   Private Const VK_F3 As Integer = &H72
@@ -262,13 +277,9 @@ Public MustInherit Class PixelGameEngine
     Friend Shared Function WglGetProcAddress(lpProcName As String) As IntPtr
     End Function
 
-    <DllImport("user32.dll", CharSet:=CharSet.Ansi, EntryPoint:="CreateWindowA")>
-    Friend Shared Function CreateWindow(lpClassName As String, lpWindowName As String, dwStyle As Integer, x As Integer, y As Integer, nWidth As Integer, nHeight As Integer, hWndParent As IntPtr, hMenu As IntPtr, hInstance As IntPtr, lpParam As IntPtr) As IntPtr
-    End Function
-
-    <DllImport("user32.dll", CharSet:=CharSet.Ansi, EntryPoint:="SetWindowTextA")>
-    Friend Shared Function SetWindowText(hwnd As IntPtr, lpString As String) As Boolean
-    End Function
+    '<DllImport("user32.dll", CharSet:=CharSet.Ansi, EntryPoint:="CreateWindowA")>
+    'Friend Shared Function CreateWindow(lpClassName As String, lpWindowName As String, dwStyle As Integer, x As Integer, y As Integer, nWidth As Integer, nHeight As Integer, hWndParent As IntPtr, hMenu As IntPtr, hInstance As IntPtr, lpParam As IntPtr) As IntPtr
+    'End Function
 
 #Enable Warning CA2101 ' Specify marshaling for P/Invoke string arguments
 
@@ -287,10 +298,6 @@ Public MustInherit Class PixelGameEngine
                                           lpParam As IntPtr) As IntPtr
     End Function
 
-    <DllImport("user32.dll", CharSet:=CharSet.Unicode)>
-    Friend Shared Function FindWindow(lpClassName As String, lpWindowName As String) As IntPtr
-    End Function
-
     Friend Declare Function wglCreateContext Lib "opengl32" (hdc As IntPtr) As IntPtr
     Friend Declare Function wglMakeCurrent Lib "opengl32" (hdc As IntPtr, hglrc As IntPtr) As Integer
     Friend Declare Sub glViewport Lib "opengl32" (x As Integer, y As Integer, width As Integer, height As Integer)
@@ -307,46 +314,36 @@ Public MustInherit Class PixelGameEngine
     Friend Declare Sub glVertex3f Lib "opengl32.dll" (x As Single, y As Single, z As Single)
     Friend Declare Function wglDeleteContext Lib "opengl32.dll" (hglrc As IntPtr) As Boolean
     Friend Declare Sub glClear Lib "opengl32.dll" (mask As UInteger)
-    'Declare Function SwapBuffers Lib "opengl32.dll" (hdc As IntPtr) As Boolean
 
-    Friend Declare Function UpdateWindow Lib "user32.dll" (hWnd As IntPtr) As Boolean
-    Friend Declare Function ShowWindow Lib "user32.dll" (hWnd As IntPtr, cmdShow As Integer) As <MarshalAs(UnmanagedType.Bool)> Boolean
-    Friend Declare Function DestroyWindow Lib "user32.dll" (hWnd As IntPtr) As Boolean
-    'Private Declare Function RegisterClassEx Lib "user32.dll" Alias "RegisterClassExA" (<[In]> ByRef wndClass As WNDCLASSEX) As UShort
-    'Private Declare Function CreateWindowEx Lib "user32.dll" Alias "CreateWindowExA" (exStyle As Integer,
-    '                                                                                  atom As UShort, 'string lpClassName,
-    '                                                                                  windowName As String,
-    '                                                                                  style As UInteger,
-    '                                                                                  x As Integer,
-    '                                                                                  y As Integer,
-    '                                                                                  width As Integer,
-    '                                                                                  height As Integer,
-    '                                                                                  hWndParent As IntPtr,
-    '                                                                                  hMenu As IntPtr,
-    '                                                                                  hInstance As IntPtr,
-    '                                                                                  lpParam As IntPtr) As IntPtr
-    Friend Declare Function DefWindowProc Lib "user32.dll" Alias "DefWindowProcA" (hWnd As IntPtr, msg As UInteger, wParam As IntPtr, lParam As IntPtr) As IntPtr
-    Friend Declare Sub PostQuitMessage Lib "user32.dll" (exitCode As Integer)
-    Friend Declare Function LoadCursor Lib "user32.dll" Alias "LoadCursorA" (hInstance As IntPtr, cursorName As Integer) As IntPtr
-    Friend Declare Function GetMessage Lib "user32.dll" Alias "GetMessageA" (ByRef lpMsg As MSG, hWnd As IntPtr, wMsgFilterMin As UInteger, wMsgFilterMax As UInteger) As Integer
-    Friend Declare Function TranslateMessage Lib "user32.dll" (ByRef lpMsg As MSG) As Boolean
-    Friend Declare Function DispatchMessage Lib "user32.dll" Alias "DispatchMessageA" (ByRef lpMsg As MSG) As Integer
-    Friend Declare Function LoadIcon Lib "user32.dll" Alias "LoadIconA" (hInstance As IntPtr, lpIconName As Integer) As IntPtr
-    Friend Declare Function RegisterClass Lib "user32.dll" Alias "RegisterClassA" (ByRef lpWndClass As WNDCLASS) As UShort
-    Friend Declare Function MonitorFromWindow Lib "user32.dll" (hwnd As IntPtr, dwFlags As UInteger) As IntPtr
-    Friend Declare Function GetMonitorInfo Lib "user32.dll" Alias "GetMonitorInfoA" (hMonitor As IntPtr, ByRef lpmi As MONITORINFO) As Boolean
     Friend Declare Function AdjustWindowRectEx Lib "user32.dll" (ByRef lpRect As RECT, dwStyle As UInteger, bMenu As Boolean, dwExStyle As UInteger) As Boolean
-    Friend Declare Function TrackMouseEvent Lib "user32.dll" (ByRef tme As TRACKMOUSEEVENTSTRUCT) As Boolean
+    Friend Declare Function DefWindowProc Lib "user32.dll" Alias "DefWindowProcA" (hWnd As IntPtr, msg As UInteger, wParam As IntPtr, lParam As IntPtr) As IntPtr
+    Friend Declare Function DestroyWindow Lib "user32.dll" (hWnd As IntPtr) As Boolean
+    Friend Declare Function DispatchMessage Lib "user32.dll" Alias "DispatchMessageA" (ByRef lpMsg As MSG) As Integer
+    <DllImport("user32.dll", CharSet:=CharSet.Unicode)>
+    Friend Shared Function FindWindow(lpClassName As String, lpWindowName As String) As IntPtr
+    End Function
     Friend Declare Function GetDC Lib "user32" (hWnd As IntPtr) As IntPtr
+    Friend Declare Function GetKeyState Lib "user32.dll" (virtKey As Integer) As Short
+    Friend Declare Function GetMessage Lib "user32.dll" Alias "GetMessageA" (ByRef lpMsg As MSG, hWnd As IntPtr, wMsgFilterMin As UInteger, wMsgFilterMax As UInteger) As Integer
+    Friend Declare Function GetMonitorInfo Lib "user32.dll" Alias "GetMonitorInfoA" (hMonitor As IntPtr, ByRef lpmi As MONITORINFO) As Boolean
+    Friend Declare Function LoadCursor Lib "user32.dll" Alias "LoadCursorA" (hInstance As IntPtr, cursorName As Integer) As IntPtr
+    Friend Declare Function LoadIcon Lib "user32.dll" Alias "LoadIconA" (hInstance As IntPtr, lpIconName As Integer) As IntPtr
+    Friend Declare Function MonitorFromWindow Lib "user32.dll" (hwnd As IntPtr, dwFlags As UInteger) As IntPtr
+    Friend Declare Sub PostQuitMessage Lib "user32.dll" (exitCode As Integer)
     Friend Declare Function PostMessage Lib "user32.dll" Alias "PostMessageA" (hwnd As IntPtr, wMsg As UInteger, wParam As IntPtr, lParam As IntPtr) As Boolean
-    'Private Declare Function FindWindow Lib "user32.dll" Alias "FindWindowA" (lpClassName As String, lpWindowName As String) As IntPtr
-    'Private Declare Function ShowWindow Lib "user32.dll" (hWnd As IntPtr, nCmdShow As Integer) As Boolean
-    'Private Declare Function SwapBuffers Lib "user32.dll" (hdc As IntPtr) As Boolean
+    Friend Declare Function RegisterClass Lib "user32.dll" Alias "RegisterClassA" (ByRef lpWndClass As WNDCLASS) As UShort
+    <DllImport("user32.dll", CharSet:=CharSet.Unicode, EntryPoint:="SetWindowTextW")>
+    Friend Shared Function SetWindowText(hwnd As IntPtr, lpString As String) As Boolean
+    End Function
+    Friend Declare Function ShowWindow Lib "user32.dll" (hWnd As IntPtr, cmdShow As Integer) As <MarshalAs(UnmanagedType.Bool)> Boolean
+    Friend Declare Function TrackMouseEvent Lib "user32.dll" (ByRef tme As TRACKMOUSEEVENTSTRUCT) As Boolean
+    Friend Declare Function TranslateMessage Lib "user32.dll" (ByRef lpMsg As MSG) As Boolean
+    Friend Declare Function UpdateWindow Lib "user32.dll" (hWnd As IntPtr) As Boolean
 
-    Friend Declare Function GetLastError Lib "kernel32.dll" () As UInteger
-    Friend Declare Function GetModuleHandle Lib "kernel32.dll" Alias "GetModuleHandleA" (lpModuleName As IntPtr) As IntPtr
     Friend Declare Function FreeConsole Lib "kernel32.dll" () As Boolean
     Friend Declare Function GetConsoleWindow Lib "kernel32.dll" () As IntPtr
+    Friend Declare Function GetLastError Lib "kernel32.dll" () As UInteger
+    Friend Declare Function GetModuleHandle Lib "kernel32.dll" Alias "GetModuleHandleA" (lpModuleName As IntPtr) As IntPtr
 
     Friend Declare Function ChoosePixelFormat Lib "gdi32" (hdc As IntPtr, ByRef pfd As PIXELFORMATDESCRIPTOR) As Integer
     Friend Declare Function SetPixelFormat Lib "gdi32" (hdc As IntPtr, iPixelFormat As Integer, ByRef pfd As PIXELFORMATDESCRIPTOR) As Integer
@@ -1537,22 +1534,22 @@ Public MustInherit Class PixelGameEngine
 
     Friend Declare Sub XCloseDisplay Lib "libX11.so.6" (display As IntPtr)
     Friend Declare Function XCreateColormap Lib "libX11.so.6" (display As IntPtr,
-                                                            window As IntPtr,
-                                                            visual As IntPtr,
-                                                            alloc As Integer) As IntPtr
+                                                               window As IntPtr,
+                                                               visual As IntPtr,
+                                                               alloc As Integer) As IntPtr
     Friend Declare Function XCreateWindow Lib "libX11.so.6" (display As IntPtr, ' Display*
-                                                          parent As IntPtr, ' Window
-                                                          x As Integer, ' int
-                                                          y As Integer, ' int
-                                                          width As Integer, ' unsigned int
-                                                          height As Integer, ' unsigned int
-                                                          borderWidth As Integer, ' unsigned int
-                                                          depth As Integer, ' int
-                                                          [class] As Integer, ' unsigned int
-                                                          visual As IntPtr, ' Visual*
-                                                          valueMask As XWindowAttributeFlags, ' unsigned long
-                                                          ByRef attributes As XSetWindowAttributes ' XSetWindowAttributes*
-                                                          ) As IntPtr ' Window
+                                                             parent As IntPtr, ' Window
+                                                             x As Integer, ' int
+                                                             y As Integer, ' int
+                                                             width As Integer, ' unsigned int
+                                                             height As Integer, ' unsigned int
+                                                             borderWidth As Integer, ' unsigned int
+                                                             depth As Integer, ' int
+                                                             [class] As Integer, ' unsigned int
+                                                             visual As IntPtr, ' Visual*
+                                                             valueMask As XWindowAttributeFlags, ' unsigned long
+                                                             ByRef attributes As XSetWindowAttributes ' XSetWindowAttributes*
+                                                             ) As IntPtr ' Window
     Friend Declare Function XDefaultRootWindow Lib "libX11.so.6" (display As IntPtr) As IntPtr
     Friend Declare Function XDestroyWindow Lib "libX11.so.6" (display As IntPtr, window As IntPtr) As Integer
     Friend Declare Function XFlush Lib "libX11.so.6" (display As IntPtr) As Integer
@@ -1563,13 +1560,13 @@ Public MustInherit Class PixelGameEngine
     Friend Declare Function XNextEvent Lib "libX11.so.6" (display As IntPtr, handle As IntPtr) As Integer
     Friend Declare Function XPending Lib "libX11.so.6" (display As IntPtr) As Integer
     Friend Declare Function XSendEvent Lib "libX11.so.6" (display As IntPtr, ' Display *
-                                                       window As IntPtr, ' Window
-                                                       propagate As Boolean, ' Bool
-                                                       eventMask As Long, ' long
-                                                       eventSend As IntPtr ' XEvent *
-                                                       ) As Integer ' Status
+                                                          window As IntPtr, ' Window
+                                                          propagate As Boolean, ' Bool
+                                                          eventMask As Long, ' long
+                                                          eventSend As IntPtr ' XEvent *
+                                                          ) As Integer ' Status
     Friend Declare Sub XSetWMProtocols Lib "libX11.so.6" (display As IntPtr, window As IntPtr,
-                                                       protocols As Integer(), count As Integer)
+                                                          protocols As Integer(), count As Integer)
 
 #End Region
 
@@ -1762,6 +1759,29 @@ Public MustInherit Class PixelGameEngine
     AppName = "Undefined"
     Singleton.Pge = Me
   End Sub
+
+  Public Function CapsLock() As Boolean
+    If IsOSPlatform(Windows) Then
+      Return (Win32.GetKeyState(VK_CAPITAL) And 1) <> 0
+    Else
+      If pge_Display <> IntPtr.Zero Then
+        ' Tried XkbGetIndicatorState (along with XkbQueryExtension), XGetModifierMapping and XQueryKeymap
+        ' with no success; not sure what the right approach is supposed to be here.
+      End If
+      Return False
+    End If
+  End Function
+
+  Public Function NumLock() As Boolean
+    If IsOSPlatform(Windows) Then
+      Return (Win32.GetKeyState(VK_NUMLOCK) And 1) <> 0
+    Else
+      If pge_Display <> IntPtr.Zero Then
+        ' See CapsLock for more details.
+      End If
+      Return False
+    End If
+  End Function
 
   Public Function Construct(screenW As Integer, screenH As Integer, pixelW As Integer, pixelH As Integer, Optional fullScreen As Boolean = False, Optional vsync As Boolean = False) As Boolean 'RCode
 
@@ -3112,7 +3132,7 @@ next4:
     ' Create Keyboard Mapping
     Singleton.MapKeys(&H0) = Key.NONE
     Singleton.MapKeys(&H41) = Key.A : Singleton.MapKeys(&H42) = Key.B : Singleton.MapKeys(&H43) = Key.C : Singleton.MapKeys(&H44) = Key.D : Singleton.MapKeys(&H45) = Key.E
-    Singleton.MapKeys(&H46) = Key.F : Singleton.MapKeys(&H47) = Key.G : Singleton.MapKeys(&H48) = Key.H : Singleton.MapKeys(&H49) = Key.I : Singleton.MapKeys(&H50) = Key.J
+    Singleton.MapKeys(&H46) = Key.F : Singleton.MapKeys(&H47) = Key.G : Singleton.MapKeys(&H48) = Key.H : Singleton.MapKeys(&H49) = Key.I : Singleton.MapKeys(&H4A) = Key.J
     Singleton.MapKeys(&H4B) = Key.K : Singleton.MapKeys(&H4C) = Key.L : Singleton.MapKeys(&H4D) = Key.M : Singleton.MapKeys(&H4E) = Key.N : Singleton.MapKeys(&H4F) = Key.O
     Singleton.MapKeys(&H50) = Key.P : Singleton.MapKeys(&H51) = Key.Q : Singleton.MapKeys(&H52) = Key.R : Singleton.MapKeys(&H53) = Key.S : Singleton.MapKeys(&H54) = Key.T
     Singleton.MapKeys(&H55) = Key.U : Singleton.MapKeys(&H56) = Key.V : Singleton.MapKeys(&H57) = Key.W : Singleton.MapKeys(&H58) = Key.X : Singleton.MapKeys(&H59) = Key.Y
@@ -3138,6 +3158,18 @@ next4:
     Singleton.MapKeys(VK_NUMPAD0) = Key.NP0 : Singleton.MapKeys(VK_NUMPAD1) = Key.NP1 : Singleton.MapKeys(VK_NUMPAD2) = Key.NP2 : Singleton.MapKeys(VK_NUMPAD3) = Key.NP3 : Singleton.MapKeys(VK_NUMPAD4) = Key.NP4
     Singleton.MapKeys(VK_NUMPAD5) = Key.NP5 : Singleton.MapKeys(VK_NUMPAD6) = Key.NP6 : Singleton.MapKeys(VK_NUMPAD7) = Key.NP7 : Singleton.MapKeys(VK_NUMPAD8) = Key.NP8 : Singleton.MapKeys(VK_NUMPAD9) = Key.NP9
     Singleton.MapKeys(VK_MULTIPLY) = Key.NP_MUL : Singleton.MapKeys(VK_ADD) = Key.NP_ADD : Singleton.MapKeys(VK_DIVIDE) = Key.NP_DIV : Singleton.MapKeys(VK_SUBTRACT) = Key.NP_SUB : Singleton.MapKeys(VK_DECIMAL) = Key.NP_DECIMAL
+
+    Singleton.MapKeys(VK_OEM_1) = Key.OEM_1
+    Singleton.MapKeys(VK_OEM_COMMA) = Key.COMMA
+    Singleton.MapKeys(VK_OEM_MINUS) = Key.MINUS
+    Singleton.MapKeys(VK_OEM_PLUS) = Key.EQUALS
+    Singleton.MapKeys(VK_OEM_PERIOD) = Key.PERIOD
+    Singleton.MapKeys(VK_OEM_2) = Key.OEM_2
+    Singleton.MapKeys(VK_OEM_3) = Key.OEM_3
+    Singleton.MapKeys(VK_OEM_4) = Key.OEM_4
+    Singleton.MapKeys(VK_OEM_5) = Key.OEM_5
+    Singleton.MapKeys(VK_OEM_6) = Key.OEM_6
+    Singleton.MapKeys(VK_OEM_7) = Key.OEM_7
 
     Return m_hWnd
 
