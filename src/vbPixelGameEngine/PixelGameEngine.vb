@@ -1588,7 +1588,7 @@ Public MustInherit Class PixelGameEngine
 
   Protected Property AppName As String
 
-  Private m_hWnd As IntPtr
+  Protected m_hWnd As IntPtr
   Private m_glBuffer As UInteger
 
   Private m_pixelMode As Pixel.Mode
