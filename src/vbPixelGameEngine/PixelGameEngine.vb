@@ -271,34 +271,10 @@ Public MustInherit Class PixelGameEngine
 
 #Region "Win32 - P/Invoke"
 
-#Disable Warning CA2101 ' Specify marshaling for P/Invoke string arguments
-
-    <DllImport("opengl32", CharSet:=CharSet.Ansi, EntryPoint:="wglGetProcAddress")>
-    Friend Shared Function WglGetProcAddress(lpProcName As String) As IntPtr
-    End Function
-
-    '<DllImport("user32.dll", CharSet:=CharSet.Ansi, EntryPoint:="CreateWindowA")>
-    'Friend Shared Function CreateWindow(lpClassName As String, lpWindowName As String, dwStyle As Integer, x As Integer, y As Integer, nWidth As Integer, nHeight As Integer, hWndParent As IntPtr, hMenu As IntPtr, hInstance As IntPtr, lpParam As IntPtr) As IntPtr
-    'End Function
-
-#Enable Warning CA2101 ' Specify marshaling for P/Invoke string arguments
-
-    <DllImport("user32.dll", CharSet:=CharSet.Unicode, EntryPoint:="CreateWindowExW")>
-    Friend Shared Function CreateWindowEx(exStyle As UInteger,
-                                          atom As UShort, 'className As String,
-                                          windowName As String,
-                                          style As UInteger,
-                                          x As Integer,
-                                          y As Integer,
-                                          width As Integer,
-                                          height As Integer,
-                                          wndParent As IntPtr,
-                                          menu As IntPtr,
-                                          hInstance As IntPtr,
-                                          lpParam As IntPtr) As IntPtr
-    End Function
-
     Friend Declare Function wglCreateContext Lib "opengl32" (hdc As IntPtr) As IntPtr
+#Disable Warning CA2101 ' Specify marshaling for P/Invoke string arguments
+    Friend Declare Function wglGetProcAddress Lib "opengl32" Alias "wglGetProcAddress" (<MarshalAs(UnmanagedType.LPStr)> lpProcName As String) As IntPtr
+#Enable Warning CA2101 ' Specify marshaling for P/Invoke string arguments
     Friend Declare Function wglMakeCurrent Lib "opengl32" (hdc As IntPtr, hglrc As IntPtr) As Integer
     Friend Declare Sub glViewport Lib "opengl32" (x As Integer, y As Integer, width As Integer, height As Integer)
     Friend Declare Sub glEnable Lib "opengl32.dll" (cap As UInteger)
@@ -316,12 +292,23 @@ Public MustInherit Class PixelGameEngine
     Friend Declare Sub glClear Lib "opengl32.dll" (mask As UInteger)
 
     Friend Declare Function AdjustWindowRectEx Lib "user32.dll" (ByRef lpRect As RECT, dwStyle As UInteger, bMenu As Boolean, dwExStyle As UInteger) As Boolean
+    Friend Declare Function CreateWindowEx Lib "user32.dll" Alias "CreateWindowExW" (exStyle As UInteger,
+                                                                                     atom As UShort,
+                                                                                     <MarshalAs(UnmanagedType.LPWStr)> windowName As String,
+                                                                                     style As UInteger,
+                                                                                     x As Integer,
+                                                                                     y As Integer,
+                                                                                     width As Integer,
+                                                                                     height As Integer,
+                                                                                     wndParent As IntPtr,
+                                                                                     menu As IntPtr,
+                                                                                     hInstance As IntPtr,
+                                                                                     lpParam As IntPtr) As IntPtr
     Friend Declare Function DefWindowProc Lib "user32.dll" Alias "DefWindowProcA" (hWnd As IntPtr, msg As UInteger, wParam As IntPtr, lParam As IntPtr) As IntPtr
     Friend Declare Function DestroyWindow Lib "user32.dll" (hWnd As IntPtr) As Boolean
     Friend Declare Function DispatchMessage Lib "user32.dll" Alias "DispatchMessageA" (ByRef lpMsg As MSG) As Integer
-    <DllImport("user32.dll", CharSet:=CharSet.Unicode)>
-    Friend Shared Function FindWindow(lpClassName As String, lpWindowName As String) As IntPtr
-    End Function
+    Friend Declare Function FindWindow Lib "user32.dll" (<MarshalAs(UnmanagedType.LPWStr)> lpClassName As String,
+                                                         <MarshalAs(UnmanagedType.LPWStr)> lpWindowName As String) As Boolean
     Friend Declare Function GetDC Lib "user32" (hWnd As IntPtr) As IntPtr
     Friend Declare Function GetKeyState Lib "user32.dll" (virtKey As Integer) As Short
     Friend Declare Function GetMessage Lib "user32.dll" Alias "GetMessageA" (ByRef lpMsg As MSG, hWnd As IntPtr, wMsgFilterMin As UInteger, wMsgFilterMax As UInteger) As Integer
@@ -332,9 +319,7 @@ Public MustInherit Class PixelGameEngine
     Friend Declare Sub PostQuitMessage Lib "user32.dll" (exitCode As Integer)
     Friend Declare Function PostMessage Lib "user32.dll" Alias "PostMessageA" (hwnd As IntPtr, wMsg As UInteger, wParam As IntPtr, lParam As IntPtr) As Boolean
     Friend Declare Function RegisterClass Lib "user32.dll" Alias "RegisterClassA" (ByRef lpWndClass As WNDCLASS) As UShort
-    <DllImport("user32.dll", CharSet:=CharSet.Unicode, EntryPoint:="SetWindowTextW")>
-    Friend Shared Function SetWindowText(hwnd As IntPtr, lpString As String) As Boolean
-    End Function
+    Friend Declare Function SetWindowText Lib "user32.dll" Alias "SetWindowTextW" (hwnd As IntPtr, <MarshalAs(UnmanagedType.LPWStr)> lpString As String) As Boolean
     Friend Declare Function ShowWindow Lib "user32.dll" (hWnd As IntPtr, cmdShow As Integer) As <MarshalAs(UnmanagedType.Bool)> Boolean
     Friend Declare Function TrackMouseEvent Lib "user32.dll" (ByRef tme As TRACKMOUSEEVENTSTRUCT) As Boolean
     Friend Declare Function TranslateMessage Lib "user32.dll" (ByRef lpMsg As MSG) As Boolean
@@ -1482,18 +1467,13 @@ Public MustInherit Class PixelGameEngine
 
 #Region "OpenGL"
 
-#Disable Warning CA2101 ' Specify marshaling for P/Invoke string arguments
-
-    <DllImport("libGL.so.1", CharSet:=CharSet.Ansi)>
-    Friend Shared Function glXGetProcAddress(procname As String) As IntPtr
-    End Function
-
-#Enable Warning CA2101 ' Specify marshaling for P/Invoke string arguments
-
     Friend Declare Function glXChooseVisual Lib "libGL.so.1" (display As IntPtr,
                                                              screen As Integer,
                                                              ByRef attribList() As Integer) As IntPtr
     Friend Declare Function glXCreateContext Lib "libGL.so.1" (display As IntPtr, vi As IntPtr, shareList As IntPtr, direct As Boolean) As IntPtr
+#Disable Warning CA2101 ' Specify marshaling for P/Invoke string arguments
+    Friend Declare Function glXGetProcAddress Lib "libGL.so.1" (<MarshalAs(UnmanagedType.LPStr)> procname As String) As IntPtr
+#Enable Warning CA2101 ' Specify marshaling for P/Invoke string arguments
     Friend Declare Function glXMakeCurrent Lib "libGL.so.1" (display As IntPtr, draw As IntPtr, context As IntPtr) As Integer
     Friend Declare Sub glViewport Lib "libGL.so.1" (x As Integer, y As Integer, width As Integer, height As Integer)
 
@@ -1515,22 +1495,6 @@ Public MustInherit Class PixelGameEngine
 #End Region
 
 #Region "Linux P/Invoke - X11"
-
-#Disable Warning CA2101 ' Specify marshaling for P/Invoke string arguments
-
-    <DllImport("libX11.so.6", CharSet:=CharSet.Ansi)>
-    Friend Shared Function XInternAtom(display As IntPtr, atomName As String, onlyIfExists As Boolean) As Integer
-    End Function
-
-    <DllImport("libX11.so.6", CharSet:=CharSet.Ansi)>
-    Friend Shared Function XOpenDisplay(display As String) As IntPtr
-    End Function
-
-    <DllImport("libX11.so.6", CharSet:=CharSet.Ansi)>
-    Friend Shared Sub XStoreName(display As IntPtr, window As IntPtr, title As String)
-    End Sub
-
-#Enable Warning CA2101 ' Specify marshaling for P/Invoke string arguments
 
     Friend Declare Sub XCloseDisplay Lib "libX11.so.6" (display As IntPtr)
     Friend Declare Function XCreateColormap Lib "libX11.so.6" (display As IntPtr,
@@ -1555,9 +1519,15 @@ Public MustInherit Class PixelGameEngine
     Friend Declare Function XFlush Lib "libX11.so.6" (display As IntPtr) As Integer
     Friend Declare Function XGetWindowAttributes Lib "libX11.so.6" (display As IntPtr, w As IntPtr, <Out> ByRef windowAttributesReturn As XWindowAttributes) As Integer
     Friend Declare Function XInitThreads Lib "libX11.so.6" () As Integer
-    Friend Declare Sub XMapWindow Lib "libX11.so.6" (display As IntPtr, window As IntPtr)
+#Disable Warning CA2101 ' Specify marshaling for P/Invoke string arguments
+    Friend Declare Function XInternAtom Lib "libX11.so.6" (display As IntPtr, <MarshalAs(UnmanagedType.LPStr)> atomName As String, onlyIfExists As Boolean) As Integer
+#Enable Warning CA2101 ' Specify marshaling for P/Invoke string arguments
     Friend Declare Function XLookupKeysym Lib "libX11.so.6" (ByRef keyEvent As XKeyEvent, index As Integer) As XKeySym
+    Friend Declare Sub XMapWindow Lib "libX11.so.6" (display As IntPtr, window As IntPtr)
     Friend Declare Function XNextEvent Lib "libX11.so.6" (display As IntPtr, handle As IntPtr) As Integer
+#Disable Warning CA2101 ' Specify marshaling for P/Invoke string arguments
+    Friend Declare Function XOpenDisplay Lib "libX11.so.6" (<MarshalAs(UnmanagedType.LPStr)> display As String) As IntPtr
+#Enable Warning CA2101 ' Specify marshaling for P/Invoke string arguments
     Friend Declare Function XPending Lib "libX11.so.6" (display As IntPtr) As Integer
     Friend Declare Function XSendEvent Lib "libX11.so.6" (display As IntPtr, ' Display *
                                                           window As IntPtr, ' Window
@@ -1567,6 +1537,9 @@ Public MustInherit Class PixelGameEngine
                                                           ) As Integer ' Status
     Friend Declare Sub XSetWMProtocols Lib "libX11.so.6" (display As IntPtr, window As IntPtr,
                                                           protocols As Integer(), count As Integer)
+#Disable Warning CA2101 ' Specify marshaling for P/Invoke string arguments
+    Friend Declare Sub XStoreName Lib "libX11.so.6" (display As IntPtr, window As IntPtr, <MarshalAs(UnmanagedType.LPStr)> title As String)
+#Enable Warning CA2101 ' Specify marshaling for P/Invoke string arguments
 
 #End Region
 
