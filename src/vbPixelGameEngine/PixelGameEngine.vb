@@ -1643,6 +1643,7 @@ Public MustInherit Class PixelGameEngine
     Public Pressed As Boolean ' Set once during the frame the event occurs
     Public Released As Boolean ' Set once during the frame the event occurs
     Public Held As Boolean ' Set true for all frames between pressed and released events
+    Public ElapsedTime As Single
   End Structure
 
   Public Enum RCode
@@ -2848,6 +2849,20 @@ next4:
               End If
             End If
             m_keyOldState(i) = m_keyNewState(i)
+            ' Handle Keyboard Repeat (Rate)
+            ' Setting to approximately 2-3 10th's of a second
+            ' delay (for the initial delay) with a little less
+            ' than 10th of a second for continued repeats...
+            If m_keyboardState(i).Pressed OrElse m_keyboardState(i).Held Then
+              m_keyboardState(i).ElapsedTime += elapsedTime
+              If m_keyboardState(i).Held AndAlso
+                 m_keyboardState(i).ElapsedTime > 0.275 Then
+                m_keyboardState(i).ElapsedTime -= 0.075!
+                m_keyboardState(i).Pressed = True
+              End If
+            Else
+              m_keyboardState(i).ElapsedTime = 0
+            End If
           Next
 
           ' Handle User Input - Mouse
@@ -2987,7 +3002,7 @@ next4:
             Dim avg = m_totalFrameCount \ m_totalFrames
 
             m_frameTimer -= 1.0F
-            Dim title As String
+            Dim title As String = Nothing
             If Not ShowEngineName Then title = If(ShowFPS, $"{AppName} - FPS: {m_frameCount} ({avg})", AppName)
             If ShowEngineName Then title = If(ShowFPS, $"vbPixelGameEngine v0.0.1 - {AppName} - FPS: {m_frameCount} ({avg})", $"vbPixelGameEngine v0.0.1 - {AppName}")
             m_frameCount = 0
