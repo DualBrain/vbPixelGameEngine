@@ -121,9 +121,14 @@ Public MustInherit Class PixelGameEngine
   Private Const WM_SIZE As Integer = &H5
   Private Const WM_CREATE As Integer = &H1
   Private Const WM_SYSCOMMAND = &H112
+  Private Const WM_GETICON As Integer = &H7F
+  Private Const WM_SETICON As Integer = &H80
   Private Const SC_KEYMENU = &HF100
 
-  'Private Const WS_OVERLAPPEDWINDOW As UInteger = &HCF0000
+  Private Const SW_SHOWMAXIMIZED As Integer = 3
+  Private Const SW_SHOWNORMAL As Integer = 1
+
+  Private Const WS_OVERLAPPEDWINDOW As UInteger = &HCF0000
   Private Const WS_VISIBLE As UInteger = &H10000000
   Private Const WS_EX_APPWINDOW As UInteger = &H40000UI
   Private Const WS_EX_WINDOWEDGE As UInteger = &H100
@@ -131,6 +136,19 @@ Public MustInherit Class PixelGameEngine
   Private Const WS_SYSMENU As UInteger = &H80000
   Private Const WS_THICKFRAME As UInteger = &H40000
   Private Const WS_POPUP As UInteger = &H80000000UI
+  Private Const WS_MINIMIZEBOX = &H20000UI
+  Private Const WS_MAXIMIZEBOX = &H10000UI
+
+  ' Window size and position flags
+  Private Const SWP_NOSIZE As Integer = &H1
+  Private Const SWP_NOMOVE As Integer = &H2
+  Private Const SWP_FRAMECHANGED As Integer = &H20
+  Private Const SWP_NOZORDER As Integer = &H4
+  Private Const SWP_NOOWNERZORDER As UInteger = &H200
+
+  Private Const GWL_STYLE As Integer = -16
+
+  Private Const ICON_BIG As Integer = 1
 
   Private Const MONITOR_DEFAULTTONEAREST As Integer = &H2
 
@@ -162,6 +180,17 @@ Public MustInherit Class PixelGameEngine
     Delegate Function WndProc(hWnd As IntPtr, msg As UInteger, wParam As IntPtr, lParam As IntPtr) As IntPtr
 
 #Region "Win32 - Structure"
+
+    <StructLayout(LayoutKind.Sequential)>
+    Friend Structure WINDOWPLACEMENT
+      Public Length As UInteger
+      Public Flags As UInteger
+      Public ShowCmd As UInteger
+      Public MinPosition As Point
+      Public MaxPosition As Point
+      Public NormalPosition As RECT
+      'Public Device As RECT ' only on Mac?
+    End Structure
 
     <StructLayout(LayoutKind.Sequential)>
     Friend Class CREATESTRUCT
@@ -310,15 +339,22 @@ Public MustInherit Class PixelGameEngine
     Friend Declare Function FindWindow Lib "user32.dll" (<MarshalAs(UnmanagedType.LPWStr)> lpClassName As String,
                                                          <MarshalAs(UnmanagedType.LPWStr)> lpWindowName As String) As Boolean
     Friend Declare Function GetDC Lib "user32" (hWnd As IntPtr) As IntPtr
+    Friend Declare Function GetDesktopWindow Lib "user32.dll" () As IntPtr
     Friend Declare Function GetKeyState Lib "user32.dll" (virtKey As Integer) As Short
     Friend Declare Function GetMessage Lib "user32.dll" Alias "GetMessageA" (ByRef lpMsg As MSG, hWnd As IntPtr, wMsgFilterMin As UInteger, wMsgFilterMax As UInteger) As Integer
     Friend Declare Function GetMonitorInfo Lib "user32.dll" Alias "GetMonitorInfoA" (hMonitor As IntPtr, ByRef lpmi As MONITORINFO) As Boolean
+    Friend Declare Function GetWindowLong Lib "user32.dll" Alias "GetWindowLongA" (hWnd As IntPtr, index As Integer) As Long
+    Friend Declare Function GetWindowPlacement Lib "user32.dll" (hWnd As IntPtr, ByRef lpwndpl As WINDOWPLACEMENT) As Boolean
     Friend Declare Function LoadCursor Lib "user32.dll" Alias "LoadCursorA" (hInstance As IntPtr, cursorName As Integer) As IntPtr
     Friend Declare Function LoadIcon Lib "user32.dll" Alias "LoadIconA" (hInstance As IntPtr, lpIconName As Integer) As IntPtr
     Friend Declare Function MonitorFromWindow Lib "user32.dll" (hwnd As IntPtr, dwFlags As UInteger) As IntPtr
     Friend Declare Sub PostQuitMessage Lib "user32.dll" (exitCode As Integer)
     Friend Declare Function PostMessage Lib "user32.dll" Alias "PostMessageA" (hwnd As IntPtr, wMsg As UInteger, wParam As IntPtr, lParam As IntPtr) As Boolean
     Friend Declare Function RegisterClass Lib "user32.dll" Alias "RegisterClassA" (ByRef lpWndClass As WNDCLASS) As UShort
+    Friend Declare Function SendMessage Lib "user32.dll" Alias "SendMessageA" (hWnd As IntPtr, msg As UInteger, wParam As IntPtr, lParam As IntPtr) As IntPtr
+    Friend Declare Function SetWindowLong Lib "user32.dll" Alias "SetWindowLongA" (hWnd As IntPtr, index As Integer, newLong As Long) As Long
+    Friend Declare Function SetWindowPlacement Lib "user32.dll" (hWnd As IntPtr, ByRef lpwndpl As WINDOWPLACEMENT) As Boolean
+    Friend Declare Function SetWindowPos Lib "user32.dll" (hWnd As IntPtr, hWndInsertAfter As IntPtr, x As Integer, y As Integer, cx As Integer, cy As Integer, flags As UInteger) As Boolean
     Friend Declare Function SetWindowText Lib "user32.dll" Alias "SetWindowTextW" (hwnd As IntPtr, <MarshalAs(UnmanagedType.LPWStr)> lpString As String) As Boolean
     Friend Declare Function ShowWindow Lib "user32.dll" (hWnd As IntPtr, cmdShow As Integer) As <MarshalAs(UnmanagedType.Bool)> Boolean
     Friend Declare Function TrackMouseEvent Lib "user32.dll" (ByRef tme As TRACKMOUSEEVENTSTRUCT) As Boolean
@@ -1734,6 +1770,110 @@ Public MustInherit Class PixelGameEngine
     Singleton.Pge = Me
   End Sub
 
+  Private m_wpPrev As Win32.WINDOWPLACEMENT
+
+  Public ReadOnly Property IsFullScreen As Boolean
+    Get
+      If IsOSPlatform(Windows) Then
+        Dim currentStyle = Win32.GetWindowLong(m_hWnd, GWL_STYLE)
+        Return Not ((currentStyle And WS_OVERLAPPEDWINDOW) = WS_OVERLAPPEDWINDOW)
+      Else
+        'TODO: Linux?
+      End If
+      Return False
+    End Get
+  End Property
+
+  Public Sub ToggleFullScreen()
+
+    If IsOSPlatform(Windows) Then
+
+      ' Get the current window style
+      Dim currentStyle = Win32.GetWindowLong(m_hWnd, GWL_STYLE)
+
+      ' Check if the window is currently in full screen mode
+      'Dim isFullScreen = (currentStyle And WS_POPUP) = WS_POPUP
+      Dim isFullScreen = Not ((currentStyle And WS_OVERLAPPEDWINDOW) = WS_OVERLAPPEDWINDOW)
+
+      If isFullScreen Then
+        ' Restore to normal window
+        'Win32.SetWindowLong(m_hWnd, GWL_STYLE, currentStyle And Not WS_POPUP)
+        'Win32.SetWindowPos(m_hWnd, IntPtr.Zero, 100, 100, 800, 600, SWP_NOZORDER Or SWP_NOMOVE Or SWP_NOSIZE Or SWP_FRAMECHANGED)
+        'Win32.ShowWindow(m_hWnd, SW_SHOWNORMAL)
+
+        Win32.SetWindowLong(m_hWnd, GWL_STYLE, currentStyle Or WS_OVERLAPPEDWINDOW)
+        Win32.SetWindowPlacement(m_hWnd, m_wpPrev)
+        'Win32.SetWindowPos(m_hWnd, IntPtr.Zero, 0, 0, 0, 0, SWP_NOOWNERZORDER Or SWP_FRAMECHANGED)
+
+        'm_iconHandle = Win32.SendMessage(m_hWnd, WM_GETICON, CType(ICON_BIG, IntPtr), IntPtr.Zero)
+        'If m_iconHandle <> IntPtr.Zero Then
+        '  Win32.SendMessage(m_hWnd, WM_SETICON, CType(ICON_BIG, IntPtr), m_iconHandle)
+        'End If
+
+      Else
+        'Win32.SetWindowLong(m_hWnd, GWL_STYLE, currentStyle Or WS_POPUP)
+        'Win32.SetWindowPos(m_hWnd, Win32.GetDesktopWindow(), 0, 0, 0, 0, SWP_NOZORDER Or SWP_NOMOVE Or SWP_NOSIZE Or SWP_FRAMECHANGED)
+        'Win32.ShowWindow(m_hWnd, SW_SHOWMAXIMIZED)
+
+        'm_iconHandle = Win32.SendMessage(m_hWnd, WM_GETICON, CType(ICON_BIG, IntPtr), IntPtr.Zero)
+        m_wpPrev = New Win32.WINDOWPLACEMENT With {.Length = CUInt(Marshal.SizeOf(GetType(Win32.WINDOWPLACEMENT)))}
+        Dim mi = New Win32.MONITORINFO With {.cbSize = Marshal.SizeOf(GetType(Win32.MONITORINFO))}
+
+        If Win32.GetWindowPlacement(m_hWnd, m_wpPrev) AndAlso
+           Win32.GetMonitorInfo(Win32.MonitorFromWindow(m_hWnd, 0), mi) Then
+          Win32.SetWindowLong(m_hWnd, GWL_STYLE, currentStyle And (Not WS_OVERLAPPEDWINDOW))
+          Win32.SetWindowPos(m_hWnd, IntPtr.Zero,
+                             mi.rcMonitor.Left, mi.rcMonitor.Top,
+                             mi.rcMonitor.Right - mi.rcMonitor.Left,
+                             mi.rcMonitor.Bottom - mi.rcMonitor.Top,
+                             SWP_NOOWNERZORDER Or SWP_FRAMECHANGED)
+        End If
+
+      End If
+    Else
+      'TODO: Linux?
+    End If
+  End Sub
+
+  Public Sub DecreasePixelSize()
+    If m_pixelWidth > 1 AndAlso m_pixelHeight > 1 Then
+      If IsOSPlatform(Windows) Then
+        m_pixelWidth -= 1
+        m_pixelHeight -= 1
+        m_windowWidth = m_screenWidth * m_pixelWidth
+        m_windowHeight = m_screenHeight * m_pixelHeight
+        Dim dwExStyle = WS_EX_APPWINDOW Or WS_EX_WINDOWEDGE
+        Dim dwStyle = WS_CAPTION Or WS_SYSMENU Or WS_VISIBLE Or WS_THICKFRAME Or WS_MINIMIZEBOX Or WS_MAXIMIZEBOX
+        Dim rWndRect = New Win32.RECT With {.Left = 0, .Top = 0, .Right = m_windowWidth, .Bottom = m_windowHeight}
+        Win32.AdjustWindowRectEx(rWndRect, dwStyle, False, dwExStyle)
+        Dim width = rWndRect.Right - rWndRect.Left
+        Dim height = rWndRect.Bottom - rWndRect.Top
+        Win32.SetWindowPos(m_hWnd, IntPtr.Zero, 0, 0, width, height, SWP_NOOWNERZORDER Or SWP_NOMOVE Or SWP_NOZORDER Or SWP_FRAMECHANGED)
+      Else
+        'TODO: Linux?
+      End If
+    End If
+  End Sub
+
+  Public Sub IncreasePixelSize()
+    'TODO: Possibly limit to a maximum?
+    If IsOSPlatform(Windows) Then
+      m_pixelWidth += 1
+      m_pixelHeight += 1
+      m_windowWidth = m_screenWidth * m_pixelWidth
+      m_windowHeight = m_screenHeight * m_pixelHeight
+      Dim dwExStyle = WS_EX_APPWINDOW Or WS_EX_WINDOWEDGE
+      Dim dwStyle = WS_CAPTION Or WS_SYSMENU Or WS_VISIBLE Or WS_THICKFRAME Or WS_MINIMIZEBOX Or WS_MAXIMIZEBOX
+      Dim rWndRect = New Win32.RECT With {.Left = 0, .Top = 0, .Right = m_windowWidth, .Bottom = m_windowHeight}
+      Win32.AdjustWindowRectEx(rWndRect, dwStyle, False, dwExStyle)
+      Dim width = rWndRect.Right - rWndRect.Left
+      Dim height = rWndRect.Bottom - rWndRect.Top
+      Win32.SetWindowPos(m_hWnd, IntPtr.Zero, 0, 0, width, height, SWP_NOOWNERZORDER Or SWP_NOMOVE Or SWP_NOZORDER Or SWP_FRAMECHANGED)
+    Else
+      'TODO: Linux?
+    End If
+  End Sub
+
   Public Function CapsLock() As Boolean
     If IsOSPlatform(Windows) Then
       Return (Win32.GetKeyState(VK_CAPITAL) And 1) <> 0
@@ -3085,7 +3225,7 @@ next4:
 
     ' Define window furniture
     Dim dwExStyle = WS_EX_APPWINDOW Or WS_EX_WINDOWEDGE
-    Dim dwStyle = WS_CAPTION Or WS_SYSMENU Or WS_VISIBLE Or WS_THICKFRAME
+    Dim dwStyle = WS_CAPTION Or WS_SYSMENU Or WS_VISIBLE Or WS_THICKFRAME Or WS_MINIMIZEBOX Or WS_MAXIMIZEBOX
 
     Dim nCosmeticOffset = 30
     m_viewW = m_windowWidth
