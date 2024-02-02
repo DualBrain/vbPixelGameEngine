@@ -2134,7 +2134,11 @@ Public MustInherit Class PixelGameEngine
     DrawLine(x1, y1, x2, y2, Presets.White, &HFFFFFFFFUI)
   End Sub
 
-  Public Sub DrawLine(x1 As Single, y1 As Single, x2 As Single, y2 As Single, p As Pixel)
+  'Public Sub DrawLine(x1 As Single, y1 As Single, x2 As Single, y2 As Single, p As Pixel)
+  '  DrawLine(CInt(Fix(x1)), CInt(Fix(y1)), CInt(Fix(x2)), CInt(Fix(y2)), p, &HFFFFFFFFUI)
+  'End Sub
+
+  Public Sub DrawLine(x1 As Double, y1 As Double, x2 As Double, y2 As Double, p As Pixel)
     DrawLine(CInt(Fix(x1)), CInt(Fix(y1)), CInt(Fix(x2)), CInt(Fix(y2)), p, &HFFFFFFFFUI)
   End Sub
 
