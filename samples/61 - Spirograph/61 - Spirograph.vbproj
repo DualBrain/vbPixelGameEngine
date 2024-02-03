@@ -4,6 +4,7 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>Spirograph</RootNamespace>
     <TargetFramework>net8.0</TargetFramework>
+    <OptionStrict>On</OptionStrict>
   </PropertyGroup>
 
   <ItemGroup>

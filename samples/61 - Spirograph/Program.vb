@@ -45,7 +45,7 @@ Friend Class Spirograph
   Inherits PixelGameEngine
 
   Friend Sub New()
-    AppName = "Empty"
+    AppName = "Spirograph"
   End Sub
 
   Protected Overrides Function OnUserCreate() As Boolean
