@@ -3116,12 +3116,14 @@ next4:
               m_totalFrames += 1
             End If
 
-            Dim avg = m_totalFrameCount \ m_totalFrames
+            'Dim avg = m_totalFrameCount \ m_totalFrames
 
             m_frameTimer -= 1.0F
             Dim title As String = Nothing
-            If Not ShowEngineName Then title = If(ShowFPS, $"{AppName} - FPS: {m_frameCount} ({avg})", AppName)
-            If ShowEngineName Then title = If(ShowFPS, $"vbPixelGameEngine v0.0.1 - {AppName} - FPS: {m_frameCount} ({avg})", $"vbPixelGameEngine v0.0.1 - {AppName}")
+            'If Not ShowEngineName Then title = If(ShowFPS, $"{AppName} - FPS: {m_frameCount} ({avg})", AppName)
+            'If ShowEngineName Then title = If(ShowFPS, $"vbPixelGameEngine v0.0.1 - {AppName} - FPS: {m_frameCount} ({avg})", $"vbPixelGameEngine v0.0.1 - {AppName}")
+            If Not ShowEngineName Then title = If(ShowFPS, $"{AppName} - FPS: {m_frameCount}", AppName)
+            If ShowEngineName Then title = If(ShowFPS, $"vbPixelGameEngine v0.0.1 - {AppName} - FPS: {m_frameCount}", $"vbPixelGameEngine v0.0.1 - {AppName}")
             m_frameCount = 0
 
             If IsOSPlatform(Windows) Then
