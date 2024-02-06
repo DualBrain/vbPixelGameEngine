@@ -36,6 +36,7 @@ End Enum
 <StructLayout(LayoutKind.Explicit)>
 Public Structure Pixel
   <FieldOffset(0)> Public N As UInteger
+  <FieldOffset(0)> Public I As Integer
   <FieldOffset(0)> Public R As Byte
   <FieldOffset(1)> Public G As Byte
   <FieldOffset(2)> Public B As Byte
