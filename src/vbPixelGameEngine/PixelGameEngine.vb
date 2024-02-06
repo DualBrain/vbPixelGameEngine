@@ -1772,6 +1772,20 @@ Public MustInherit Class PixelGameEngine
 
   Private m_wpPrev As Win32.WINDOWPLACEMENT
 
+  Public Function GetScreenSize() As (w As Integer, h As Integer)
+
+    If IsOSPlatform(Windows) Then
+      Dim mi = New Win32.MONITORINFO With {.cbSize = Marshal.SizeOf(GetType(Win32.MONITORINFO))}
+      If Win32.GetMonitorInfo(Win32.MonitorFromWindow(m_hWnd, 0), mi) Then
+        Return (mi.rcMonitor.Right - mi.rcMonitor.Left, mi.rcMonitor.Bottom - mi.rcMonitor.Top)
+      End If
+    Else
+      'Throw New NotImplementedException()
+      Return (1920, 1080)
+    End If
+
+  End Function
+
   Public ReadOnly Property IsFullScreen As Boolean
     Get
       If IsOSPlatform(Windows) Then
