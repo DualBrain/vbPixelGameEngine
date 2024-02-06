@@ -121,12 +121,12 @@ Public MustInherit Class PixelGameEngine
   Private Const WM_SIZE As Integer = &H5
   Private Const WM_CREATE As Integer = &H1
   Private Const WM_SYSCOMMAND = &H112
-  Private Const WM_GETICON As Integer = &H7F
-  Private Const WM_SETICON As Integer = &H80
+  'Private Const WM_GETICON As Integer = &H7F
+  'Private Const WM_SETICON As Integer = &H80
   Private Const SC_KEYMENU = &HF100
 
-  Private Const SW_SHOWMAXIMIZED As Integer = 3
-  Private Const SW_SHOWNORMAL As Integer = 1
+  'Private Const SW_SHOWMAXIMIZED As Integer = 3
+  'Private Const SW_SHOWNORMAL As Integer = 1
 
   Private Const WS_OVERLAPPEDWINDOW As UInteger = &HCF0000
   Private Const WS_VISIBLE As UInteger = &H10000000
@@ -140,7 +140,7 @@ Public MustInherit Class PixelGameEngine
   Private Const WS_MAXIMIZEBOX = &H10000UI
 
   ' Window size and position flags
-  Private Const SWP_NOSIZE As Integer = &H1
+  'Private Const SWP_NOSIZE As Integer = &H1
   Private Const SWP_NOMOVE As Integer = &H2
   Private Const SWP_FRAMECHANGED As Integer = &H20
   Private Const SWP_NOZORDER As Integer = &H4
@@ -148,7 +148,7 @@ Public MustInherit Class PixelGameEngine
 
   Private Const GWL_STYLE As Integer = -16
 
-  Private Const ICON_BIG As Integer = 1
+  'Private Const ICON_BIG As Integer = 1
 
   Private Const MONITOR_DEFAULTTONEAREST As Integer = &H2
 
@@ -1622,7 +1622,7 @@ Public MustInherit Class PixelGameEngine
   Private m_frameTimer As Single = 1.0F
   Private m_frameCount As Integer
   Private m_totalFrameCount As Integer
-  Private m_totalFrames As Integer
+  'Private m_totalFrames As Integer
 
   Private ReadOnly m_keyNewState(255) As Boolean
   Private ReadOnly m_keyOldState(255) As Boolean
@@ -1778,7 +1778,7 @@ Public MustInherit Class PixelGameEngine
         Dim currentStyle = Win32.GetWindowLong(m_hWnd, GWL_STYLE)
         Return Not ((currentStyle And WS_OVERLAPPEDWINDOW) = WS_OVERLAPPEDWINDOW)
       Else
-        'TODO: Linux?
+        'Throw New NotImplementedException()
       End If
       Return False
     End Get
@@ -3110,10 +3110,10 @@ next4:
 
             If m_totalFrameCount + m_frameCount > Integer.MaxValue Then
               m_totalFrameCount = m_frameCount
-              m_totalFrames = 1
+              'm_totalFrames = 1
             Else
               m_totalFrameCount += m_frameCount
-              m_totalFrames += 1
+              'm_totalFrames += 1
             End If
 
             'Dim avg = m_totalFrameCount \ m_totalFrames
