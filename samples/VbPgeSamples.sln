@@ -69,6 +69,8 @@ Project("{778DAE3C-4631-46EA-AA77-85C1314464D9}") = "61 - Spirograph", "61 - Spi
 EndProject
 Project("{778DAE3C-4631-46EA-AA77-85C1314464D9}") = "62 - BoingBall", "62 - BoingBall\62 - BoingBall.vbproj", "{ABD9C5ED-5C3B-41AA-A618-C1297FA639D6}"
 EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "63 - Boxes", "63 - Boxes\63 - Boxes.vbproj", "{BA34CC49-3EA3-4803-8469-2C3334F7471A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -207,6 +209,10 @@ Global
 		{ABD9C5ED-5C3B-41AA-A618-C1297FA639D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{ABD9C5ED-5C3B-41AA-A618-C1297FA639D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{ABD9C5ED-5C3B-41AA-A618-C1297FA639D6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BA34CC49-3EA3-4803-8469-2C3334F7471A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BA34CC49-3EA3-4803-8469-2C3334F7471A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BA34CC49-3EA3-4803-8469-2C3334F7471A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BA34CC49-3EA3-4803-8469-2C3334F7471A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
