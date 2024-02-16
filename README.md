@@ -29,7 +29,7 @@ I stumbled across [OneLoneCoder](https://github.com/OneLoneCoder) and I couldn't
 
 Now that I've completed the *olcConsoleGameEngine*-related videos and having had a tremendous amount of fun abusing the Command Prompt (as well as essentially completing the process of porting *olcConsoleGameEngine* [for use with VB](https://github.com/DualBrain/vbConsoleGameEngine)), I've found that the API design by of the [OneLoneCoder](https://github.com/OneLoneCoder) to be very straight forward and, well, BASIC *(although in C/C++)*.
 
-Right now the main focus is on the [olcPixelGameEngine](https://github.com/OneLoneCoder/olcPixelGameEngine) v1.x ("PGE1") which has since been retired and replaced with [olcPixelGameEngine](https://github.com/OneLoneCoder/olcPixelGameEngine) v2.x ("PGE2"). As I continue to work through his videos (in reverse chronological order), I'll continue to update this project as I progress.
+Right now the main focus is on the [olcPixelGameEngine](https://github.com/OneLoneCoder/olcPixelGameEngine) v1.x ("PGE1") which has since been retired and replaced with [olcPixelGameEngine](https://github.com/OneLoneCoder/olcPixelGameEngine) v2.x ("PGE2"). As I continue to work through his videos (in chronological order), I'll continue to update this project as I progress.
 
 ## Discord
 
