@@ -4,7 +4,7 @@ Friend Module Program
 
   Sub Main()
     Dim demo As New BoingBall
-    If demo.Construct(640, 480, 1, 1, False, True) Then
+    If demo.Construct(640, 480, 1, 1) Then
       demo.Start()
     End If
   End Sub
@@ -45,7 +45,17 @@ Friend Class BoingBall
     Return True
   End Function
 
+  Private m_t As Single
+
   Protected Overrides Function OnUserUpdate(elapsedTime As Single) As Boolean
+
+    If GetKey(Key.F11).Pressed Then
+      ToggleFullScreen()
+    End If
+
+    m_t += elapsedTime
+    If m_t < 1 / 60 Then Return True
+    m_t -= 1 / 60
 
     Clear(Presets.Gray)
 
