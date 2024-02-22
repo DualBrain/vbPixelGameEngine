@@ -22,20 +22,21 @@ Friend Class BoingBall
     End Sub
   End Class
 
-  Private BLACK As Pixel = New Pixel(0, 0, 0)
-  Private GRAY As Pixel = New Pixel(102, 102, 102)
-  Private LIGHTGRAY As Pixel = New Pixel(170, 170, 170)
-  Private WHITE As Pixel = New Pixel(255, 255, 255)
-  Private RED As Pixel = New Pixel(255, 26, 1)
-  Private PURPLE As Pixel = New Pixel(183, 45, 168)
+  Private BLACK As New Pixel(0, 0, 0)
+  Private GRAY As New Pixel(102, 102, 102)
+  'Private LIGHTGRAY As New Pixel(170, 170, 170)
+  Private WHITE As New Pixel(255, 255, 255)
+  Private RED As New Pixel(255, 26, 1)
+  Private PURPLE As New Pixel(183, 45, 168)
 
-  Private done As Boolean = False
-  Private phase As Double = 0.0
-  Private dp As Double = 2.5
-  Private x As Double = 320
-  Private dx As Double = 2.1
-  Private right As Boolean = True
-  Private yAng As Double = 0.0
+  Private m_phase As Double = 0.0
+  Private ReadOnly m_dp As Double = 2.5
+  Private m_x As Double = 320
+  Private ReadOnly m_dx As Double = 2.1
+  Private m_right As Boolean = True
+  Private m_yAng As Double = 0.0
+
+  Private m_t As Single
 
   Friend Sub New()
     AppName = "Boing"
@@ -45,33 +46,29 @@ Friend Class BoingBall
     Return True
   End Function
 
-  Private m_t As Single
-
   Protected Overrides Function OnUserUpdate(elapsedTime As Single) As Boolean
 
     If GetKey(Key.F11).Pressed Then
       ToggleFullScreen()
     End If
 
-    m_t += elapsedTime
-    If m_t < 1 / 60 Then Return True
-    m_t -= 1 / 60
+    m_t += elapsedTime : If m_t < 1 / 60 Then Return True Else m_t -= 1 / 60
 
     Clear(Presets.Gray)
 
-    phase = (phase + If(right, 45.0 - dp, dp)) Mod 45.0
-    x += If(right, dx, -dx)
+    m_phase = (m_phase + If(m_right, 45.0 - m_dp, m_dp)) Mod 45.0
+    m_x += If(m_right, m_dx, -m_dx)
 
-    If x >= 505 Then
-      right = False
-    ElseIf x <= 135 Then
-      right = True
+    If m_x >= 505 Then
+      m_right = False
+    ElseIf m_x <= 135 Then
+      m_right = True
     End If
 
-    yAng = (yAng + 1.5) Mod 360.0
-    Dim yValue = 350.0 - 200.0 * Math.Abs(Math.Cos(yAng * Math.PI / 180.0))
+    m_yAng = (m_yAng + 1.5) Mod 360.0
+    Dim yValue = 350.0 - 200.0 * Math.Abs(Math.Cos(m_yAng * Math.PI / 180.0))
 
-    CalcAndDraw(phase, 120.0, x, yValue)
+    CalcAndDraw(m_phase, 120.0, m_x, yValue)
 
     Return True
 

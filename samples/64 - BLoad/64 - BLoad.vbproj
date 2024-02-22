@@ -1,0 +1,56 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>BLoad</RootNamespace>
+    <TargetFramework>net8.0</TargetFramework>
+    <OptionStrict>On</OptionStrict>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="content\CWE4.DAT" />
+    <None Remove="content\TECHNIC.FNT" />
+    <None Remove="content\TSBED1.DAT" />
+    <None Remove="content\TSCPANL.TDP" />
+    <None Remove="content\TSDEMO1.IMG" />
+    <None Remove="content\TSEM2.DAT" />
+    <None Remove="content\TSSCENE1.TDP" />
+    <None Remove="content\TSTITLE1.DAT" />
+    <None Remove="content\TURINGD.TDP" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\vbPixelGameEngine\vbPixelGameEngine.vbproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="content\CWE4.DAT">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="content\TECHNIC.FNT">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="content\TSBED1.DAT">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="content\TSCPANL.TDP">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="content\TSDEMO1.IMG">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="content\TSEM2.DAT">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="content\TSSCENE1.TDP">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="content\TSTITLE1.DAT">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="content\TURINGD.TDP">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+</Project>
