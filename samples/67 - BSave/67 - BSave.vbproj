@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>BSave</RootNamespace>
+    <TargetFramework>net8.0</TargetFramework>
+    <OptionStrict>On</OptionStrict>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="SCR13.PAL" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\vbPixelGameEngine\vbPixelGameEngine.vbproj" />
+  </ItemGroup>
+
+</Project>
