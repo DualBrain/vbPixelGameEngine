@@ -30,16 +30,19 @@ Friend Class Empty
 
   Protected Overrides Function OnUserUpdate(elapsedTime As Single) As Boolean
 
+    Dim bg = New Pixel(7, 36, 18)
+    Dim fg = New Pixel(0, 239, 130)
+
     m_t += elapsedTime : If m_t < m_delay Then Return True Else m_t -= m_delay
 
-    Clear()
+    Clear(bg)
 
     For c = 1 To 2000
       Dim h = c + m_inc
       Dim x = Math.Sin(6 * h / Math.PI) + Math.Sin(3 * h)
       h = c + m_inc * 2
       Dim y = Math.Cos(6 * h / Math.PI) + Math.Cos(3 * h)
-      FillCircle(CInt(Fix(m_size * (20 * x + 50))), CInt(Fix(m_size * (20 * y + 50))), 2, New Pixel(255, 255, 255))
+      FillCircle(CInt(Fix(m_size * (20 * x + 50))), CInt(Fix(m_size * (20 * y + 50))), 2, fg)
     Next
     m_inc += 0.001!
 
