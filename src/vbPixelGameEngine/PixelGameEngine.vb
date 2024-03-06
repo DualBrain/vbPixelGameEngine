@@ -3020,6 +3020,11 @@ next4:
           m_mouseWheelDelta = m_mouseWheelDeltaCache
           m_mouseWheelDeltaCache = 0
 
+          ' Handle F11 key
+          If GetKey(Key.F11).Pressed Then
+            ToggleFullScreen()
+          End If
+
           ' Handle Frame Update
           If Not OnUserUpdate(elapsedTime) Then
             Singleton.AtomActive = False

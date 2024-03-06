@@ -48,10 +48,6 @@ Friend Class BoingBall
 
   Protected Overrides Function OnUserUpdate(elapsedTime As Single) As Boolean
 
-    If GetKey(Key.F11).Pressed Then
-      ToggleFullScreen()
-    End If
-
     m_t += elapsedTime : If m_t < 1 / 60 Then Return True Else m_t -= 1 / 60
 
     Clear(Presets.Gray)

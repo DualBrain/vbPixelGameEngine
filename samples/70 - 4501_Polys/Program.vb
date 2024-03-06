@@ -14,8 +14,6 @@ End Module
 Friend Class Polys
   Inherits PixelGameEngine
 
-  Dim c As Single
-
   Friend Sub New()
     AppName = "1401 Polys"
   End Sub
@@ -23,15 +21,7 @@ Friend Class Polys
   Protected Overrides Function OnUserCreate() As Boolean
 
     'ORIGIN 0, 0 To 250, 150
-    c = 180 / MathF.PI
-
-    Clear()
-
-    Return True
-
-  End Function
-
-  Protected Overrides Function OnUserUpdate(elapsedTime As Single) As Boolean
+    Dim c = 180 / MathF.PI
 
     Dim bg = New Pixel(7, 36, 18)
     Dim fg = New Pixel(0, 239, 130)
@@ -40,8 +30,6 @@ Friend Class Polys
 
     For n = 3 To 19
       Dim a1 = (150 + 40 * n) / c
-      'Dim x1 = 135 + 4 * n * MathF.Cos(a1)
-      'Dim y1 = 65 + 4 * n * MathF.Sin(a1)
       Dim x1 = 150 + 4 * n * MathF.Cos(a1)
       Dim y1 = 85 + 4 * n * MathF.Sin(a1)
       For i = 0 To n - 1
@@ -50,16 +38,20 @@ Friend Class Polys
           Dim a = CSng(i * (360 / n) / c)
           Dim x = CInt(Fix(x1 + r * MathF.Cos(a)))
           Dim y = CInt(Fix(y1 + r * MathF.Sin(a)))
-          'plot x, y
           a = CSng(j * (360 / n) / c)
           Dim xx = CInt(Fix(x1 + r * MathF.Cos(a)))
           Dim yy = CInt(Fix(y1 + r * MathF.Sin(a)))
-          'Draw to xx, yy
           DrawLine(x * 3, y * 3, xx * 3, yy * 3, fg)
         Next j
       Next i
 
     Next n
+
+    Return True
+
+  End Function
+
+  Protected Overrides Function OnUserUpdate(elapsedTime As Single) As Boolean
 
     Return True
 
