@@ -20,9 +20,6 @@ Friend Class Hat
     AppName = "Commodore PET Hat"
   End Sub
 
-  Private m_t As Single
-  Private ReadOnly m_delay As Single = 1 / 60.0!
-
   Protected Overrides Function OnUserCreate() As Boolean
 
     Dim green = New Pixel(0, 255, 0)
@@ -75,7 +72,8 @@ Friend Class Hat
 
   Protected Overrides Function OnUserUpdate(elapsedTime As Single) As Boolean
 
-    m_t += elapsedTime : If m_t < m_delay Then Return True Else m_t -= m_delay
+    Static t As Single : Const DELAY As Single = 1 / 60.0!
+    t += elapsedTime : If t < DELAY Then Return True Else t -= DELAY
 
     Return True
 

@@ -4,6 +4,7 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>PathFinding_AStar</RootNamespace>
     <TargetFramework>net8.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>

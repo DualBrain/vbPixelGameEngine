@@ -3,7 +3,7 @@ Imports VbPixelGameEngine
 Friend Module Program
 
   Sub Main()
-    Dim game As New Hat
+    Dim game As New Screen
     If game.Construct(640, 400, 2, 2) Then
       game.Start()
     End If
@@ -11,15 +11,12 @@ Friend Module Program
 
 End Module
 
-Friend Class Hat
+Friend Class Screen
   Inherits PixelGameEngine
 
   Friend Sub New()
     AppName = "SCREEN 2 (QBasic) Demo"
   End Sub
-
-  Private m_t As Single
-  Private ReadOnly m_delay As Single = 1 / 60.0!
 
   Protected Overrides Function OnUserCreate() As Boolean
     m_row = 1
@@ -32,18 +29,19 @@ Friend Class Hat
   Private m_row As Integer, m_col As Integer
   Private m_fg As Pixel, m_bg As Pixel
 
-  Private m_option As Integer
-  Private m_generated As Integer
-  Private m_found As Integer
-  Private m_searched As Integer
-
   Protected Overrides Function OnUserUpdate(elapsedTime As Single) As Boolean
+
+    Static t As Single : Const DELAY As Single = 1 / 60.0!
+    t += elapsedTime : If t < DELAY Then Return True Else t -= DELAY
+
+    Static m_option As Integer
+    Static m_generated As Integer
+    Static m_found As Integer
+    Static m_searched As Integer
 
     If GetKey(Key.SPACE).Pressed Then
       m_option += 1 : If m_option > 2 Then m_option = 0
     End If
-
-    m_t += elapsedTime : If m_t < m_delay Then Return True Else m_t -= m_delay
 
     m_generated += 1
     If m_generated Mod 1000 = 0 Then m_found += 1
@@ -94,14 +92,5 @@ Friend Class Hat
     Next
     m_row += 1
   End Sub
-
-  Private Sub Print()
-    m_row += 1
-  End Sub
-
-  Private Function Center(text As String) As Integer
-    Dim l = text.Length
-    Return (80 - l) \ 2
-  End Function
 
 End Class

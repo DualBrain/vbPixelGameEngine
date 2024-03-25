@@ -8,7 +8,7 @@ Imports VbPixelGameEngine
 Friend Module Program
 
   Sub Main()
-    Dim game As New Hat
+    Dim game As New Laxity
     If game.Construct(512, 512, 2, 2) Then
       game.Start()
     End If
@@ -16,41 +16,34 @@ Friend Module Program
 
 End Module
 
-Friend Class Hat
+Friend Class Laxity
   Inherits PixelGameEngine
 
   Friend Sub New()
     AppName = "Amiga Demo by Laxity"
   End Sub
 
-  Private m_t As Single
-  Private ReadOnly m_delay As Single = 1 / 60.0!
-
-  Private sw, sh As Integer
-  Private sws As Single
-
-  Private ReadOnly x(697) As Integer, y(697) As Integer
-
-  Private j As Single = 4
-  Private k As Single = 2
-  Private z As Single = 0
-
-  Private c1 As New Pixel(255, 160, 0)
-  Private c2 As New Pixel(0, 255, 255)
-
   Protected Overrides Function OnUserCreate() As Boolean
-
-    sw = ScreenWidth \ 2
-    sh = ScreenHeight \ 2
-    sws = sh * 0.9!
-
     Return True
-
   End Function
 
   Protected Overrides Function OnUserUpdate(elapsedTime As Single) As Boolean
 
-    m_t += elapsedTime : If m_t < m_delay Then Return True Else m_t -= m_delay
+    Static t As Single : Const DELAY As Single = 1 / 60.0!
+    t += elapsedTime : If t < DELAY Then Return True Else t -= DELAY
+
+    Static sw As Integer = ScreenWidth \ 2
+    Static sh As Integer = ScreenHeight \ 2
+    Static sws As Single = sh * 0.9!
+
+    Static c1 As New Pixel(255, 160, 0)
+    Static c2 As New Pixel(0, 255, 255)
+
+    Static x(697) As Integer, y(697) As Integer
+
+    Static j As Single = 4
+    Static k As Single = 2
+    Static z As Single = 0
 
     Dim a = 0!
 

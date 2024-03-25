@@ -5,6 +5,7 @@
     <RootNamespace>Polymorphism</RootNamespace>
     <TargetFramework>net8.0</TargetFramework>
     <OptionStrict>On</OptionStrict>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
