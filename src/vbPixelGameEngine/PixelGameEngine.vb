@@ -2786,7 +2786,7 @@ next4:
   End Sub
 
   Public Property ShowEngineName As Boolean = True
-  Public Property ShowFPS As Boolean = True
+  Public Property ShowIPS As Boolean = True
 
   Private Sub Pge_UpdateMouse(x As Integer, y As Integer)
 
@@ -3139,10 +3139,10 @@ next4:
 
             m_frameTimer -= 1.0F
             Dim title As String = Nothing
-            'If Not ShowEngineName Then title = If(ShowFPS, $"{AppName} - FPS: {m_frameCount} ({avg})", AppName)
-            'If ShowEngineName Then title = If(ShowFPS, $"vbPixelGameEngine v0.0.1 - {AppName} - FPS: {m_frameCount} ({avg})", $"vbPixelGameEngine v0.0.1 - {AppName}")
-            If Not ShowEngineName Then title = If(ShowFPS, $"{AppName} - FPS: {m_frameCount}", AppName)
-            If ShowEngineName Then title = If(ShowFPS, $"vbPixelGameEngine v0.0.1 - {AppName} - FPS: {m_frameCount}", $"vbPixelGameEngine v0.0.1 - {AppName}")
+            'If Not ShowEngineName Then title = If(ShowIPS, $"{AppName} - IPS: {m_frameCount} ({avg})", AppName)
+            'If ShowEngineName Then title = If(ShowIPS, $"vbPixelGameEngine v0.0.1 - {AppName} - IPS: {m_frameCount} ({avg})", $"vbPixelGameEngine v0.0.1 - {AppName}")
+            If Not ShowEngineName Then title = If(ShowIPS, $"{AppName} - IPS: {m_frameCount}", AppName)
+            If ShowEngineName Then title = If(ShowIPS, $"vbPixelGameEngine v0.0.1 - {AppName} - IPS: {m_frameCount}", $"vbPixelGameEngine v0.0.1 - {AppName}")
             m_frameCount = 0
 
             If IsOSPlatform(Windows) Then

@@ -4,8 +4,7 @@ Friend Module Program
 
   Sub Main()
     Dim game As New ShadowOfTheBeast
-    ' Note that the game loop is designed to work with vsync enabled.
-    If game.Construct(320, 180, 4, 4, False, True) Then
+    If game.Construct(320, 180, 4, 4) Then
       game.Start()
     End If
   End Sub
@@ -115,6 +114,9 @@ Friend Class ShadowOfTheBeast
   End Function
 
   Protected Overrides Function OnUserUpdate(elapsedTime As Single) As Boolean
+
+    Static t As Single : Const DELAY = 1.0! / 60.0!
+    t += elapsedTime : If t < DELAY Then Return True Else t -= DELAY
 
     ' Clear the screen (same color as the sky)
     Clear(New Pixel(102, 119, 136))

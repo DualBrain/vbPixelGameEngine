@@ -14,31 +14,26 @@ End Module
 Friend Class HelloWorld
   Inherits PixelGameEngine
 
-  Private m_state As Integer = 0
-
-  Private m_playerX As Single
-  Private m_playerY As Single
-
   Friend Sub New()
     AppName = "Hello World"
   End Sub
 
   Protected Overrides Function OnUserCreate() As Boolean
-
-    m_playerX = 10
-    m_playerY = 10
-
     Return True
-
   End Function
 
   Protected Overrides Function OnUserUpdate(elapsedTime As Single) As Boolean
 
-    If GetKey(Key.SPACE).Pressed Then
-      m_state += 1
-    End If
+    Static state As Integer = 0
+    Static playerX As Single = 10
+    Static playerY As Single = 10
 
-    Select Case m_state
+    If GetKey(Key.SPACE).Pressed Then state += 1
+
+    Static t As Single : Const DELAY = 1.0! / 60.0!
+    t += elapsedTime : If t < DELAY Then Return True Else t -= DELAY
+
+    Select Case state
 
       Case 0
 
@@ -75,14 +70,14 @@ Friend Class HelloWorld
         ' Simple character movement
         ' ------
 
-        If GetKey(Key.LEFT).Held Then m_playerX -= 15 * elapsedTime
-        If GetKey(Key.RIGHT).Held Then m_playerX += 15 * elapsedTime
-        If GetKey(Key.UP).Held Then m_playerY -= 15 * elapsedTime
-        If GetKey(Key.DOWN).Held Then m_playerY += 15 * elapsedTime
+        If GetKey(Key.LEFT).Held Then playerX -= 15 * elapsedTime
+        If GetKey(Key.RIGHT).Held Then playerX += 15 * elapsedTime
+        If GetKey(Key.UP).Held Then playerY -= 15 * elapsedTime
+        If GetKey(Key.DOWN).Held Then playerY += 15 * elapsedTime
 
         Clear()
 
-        FillRect(CInt(Fix(m_playerX)), CInt(Fix(m_playerY)), 5, 5)
+        FillRect(CInt(Fix(playerX)), CInt(Fix(playerY)), 5, 5)
 
       Case 3
 
@@ -103,7 +98,7 @@ Friend Class HelloWorld
         End If
 
       Case Else
-        m_state = 0
+        state = 0
     End Select
 
     Return True

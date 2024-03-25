@@ -53,6 +53,10 @@ Friend Class SpriteTest
   End Function
 
   Protected Overrides Function OnUserUpdate(elapsedTime As Single) As Boolean
+
+    Static t As Single : Const DELAY = 1.0! / 60.0!
+    t += elapsedTime : If t < DELAY Then Return True Else t -= DELAY
+
     ' Draw the background...
     DrawSprite(0, 0, m_background, 1)
     ' Update positions and determine direction for next pass.
@@ -67,7 +71,9 @@ Friend Class SpriteTest
       DrawSprite(entry.X, entry.y, m_sprite2, 1)
     Next
     SetPixelMode(Pixel.Mode.Normal)
+
     Return True
+
   End Function
 
 End Class
