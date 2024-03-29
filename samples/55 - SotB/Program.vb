@@ -1,5 +1,7 @@
 Imports VbPixelGameEngine
 
+'NOTE: Currently doesn't work on Linux due to missing PNG file support.
+
 Friend Module Program
 
   Sub Main()
