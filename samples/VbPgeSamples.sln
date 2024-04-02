@@ -95,9 +95,33 @@ Project("{778DAE3C-4631-46EA-AA77-85C1314464D9}") = "74 - AmigaDemoLaxity", "74 
 EndProject
 Project("{778DAE3C-4631-46EA-AA77-85C1314464D9}") = "75 - Screen2", "75 - Screen2\75 - Screen2.vbproj", "{75CE9628-A827-4FF9-9CC4-69541F24BF86}"
 EndProject
-Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "76 - Balls3", "76 - Balls3\76 - Balls3.vbproj", "{D27C331A-51F6-4DFC-AB91-6148EE7F0445}"
+Project("{778DAE3C-4631-46EA-AA77-85C1314464D9}") = "76 - Balls3", "76 - Balls3\76 - Balls3.vbproj", "{D27C331A-51F6-4DFC-AB91-6148EE7F0445}"
 EndProject
-Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "77 - KimmieFish", "77 - KimmieFish\77 - KimmieFish.vbproj", "{CB60D6FB-ACEB-4B3F-B1F3-EB8E4A07F7AE}"
+Project("{778DAE3C-4631-46EA-AA77-85C1314464D9}") = "77 - KimmieFish", "77 - KimmieFish\77 - KimmieFish.vbproj", "{CB60D6FB-ACEB-4B3F-B1F3-EB8E4A07F7AE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3d", "3d", "{FEB83FE8-BA67-4880-949C-7FBA9F7ED3F1}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "automata", "automata", "{C1BE1174-5C8F-42E1-93D1-812BEDCFC992}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "color", "color", "{4B75CBF4-E4A7-41C3-BC6C-EF99415AB37A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "fractals", "fractals", "{F2639C99-696D-4F16-9CAD-195EF7A5DB4B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "games", "games", "{5432F8C8-922F-4BD1-9350-022808AA2809}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "olc", "olc", "{E0C410DB-BA5F-4A63-ACD6-F1C3E148CC98}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "graphics", "graphics", "{8A1D85BF-53EA-4091-A682-52F123836428}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "misc", "misc", "{DC2B9FA7-EF10-471A-90DA-12579CC3CC10}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "sound", "sound", "{A4616BB5-1464-4298-B691-8AD85C637613}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "text", "text", "{A56D6180-F14C-4CB2-A74C-7E3AA14EF007}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "toys", "toys", "{7C6F52DB-454D-4E36-BFEA-288E6804F4E2}"
+EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "RaytracingTex", "3d\RaytracingTex\RaytracingTex.vbproj", "{EBA3DBE2-B5A5-4C32-A34E-06CC4DB7F1C9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -297,9 +321,16 @@ Global
 		{CB60D6FB-ACEB-4B3F-B1F3-EB8E4A07F7AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CB60D6FB-ACEB-4B3F-B1F3-EB8E4A07F7AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CB60D6FB-ACEB-4B3F-B1F3-EB8E4A07F7AE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EBA3DBE2-B5A5-4C32-A34E-06CC4DB7F1C9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EBA3DBE2-B5A5-4C32-A34E-06CC4DB7F1C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EBA3DBE2-B5A5-4C32-A34E-06CC4DB7F1C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EBA3DBE2-B5A5-4C32-A34E-06CC4DB7F1C9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{EBA3DBE2-B5A5-4C32-A34E-06CC4DB7F1C9} = {FEB83FE8-BA67-4880-949C-7FBA9F7ED3F1}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {0A734DAD-9F0E-4DF0-A944-FEDFAD6EE10C}
