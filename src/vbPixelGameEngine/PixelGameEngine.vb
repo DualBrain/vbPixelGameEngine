@@ -300,6 +300,8 @@ Public MustInherit Class PixelGameEngine
 
 #Region "Win32 - P/Invoke"
 
+    Friend Declare Function ShowCursor Lib "user32" (show As Integer) As Integer
+
     Friend Declare Function wglCreateContext Lib "opengl32" (hdc As IntPtr) As IntPtr
 #Disable Warning CA2101 ' Specify marshaling for P/Invoke string arguments
     Friend Declare Function wglGetProcAddress Lib "opengl32" Alias "wglGetProcAddress" (<MarshalAs(UnmanagedType.LPStr)> lpProcName As String) As IntPtr
@@ -3280,6 +3282,13 @@ next4:
     m_hWnd = Win32.CreateWindowEx(dwExStyle, atom, "", dwStyle,
                                   nCosmeticOffset, nCosmeticOffset, width, height, Nothing, Nothing,
                                   Win32.GetModuleHandle(Nothing), IntPtr.Zero)
+
+    'NOTE: The following does cause the mouse
+    '      cursor to be hidden; but it is too
+    '      aggressive in that it is also hidden
+    '      at the Windows chrome level which is
+    '      not desired.
+    'Dim vc = Win32.ShowCursor(0)
 
     'Dim tme = New TRACKMOUSEEVENTSTRUCT
     'tme.cbSize = Marshal.SizeOf(GetType(TRACKMOUSEEVENTSTRUCT))
