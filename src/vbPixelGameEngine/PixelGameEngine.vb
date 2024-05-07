@@ -1913,7 +1913,11 @@ Public MustInherit Class PixelGameEngine
     End If
   End Function
 
-  Public Function Construct(screenW As Integer, screenH As Integer, pixelW As Integer, pixelH As Integer, Optional fullScreen As Boolean = False, Optional vsync As Boolean = False) As Boolean 'RCode
+  Public Overloads Function Construct(screenW As Integer, screenH As Integer, Optional fullScreen As Boolean = False, Optional vsync As Boolean = False) As Boolean 'RCode
+    Return Construct(screenW, screenH, 1, 1, fullScreen, vsync)
+  End Function
+
+  Public Overloads Function Construct(screenW As Integer, screenH As Integer, pixelW As Integer, pixelH As Integer, Optional fullScreen As Boolean = False, Optional vsync As Boolean = False) As Boolean 'RCode
 
     m_screenWidth = screenW
     m_screenHeight = screenH
@@ -2095,8 +2099,16 @@ Public MustInherit Class PixelGameEngine
     Return Draw(pos.x, pos.y, p)
   End Function
 
+  Protected Overridable Function Draw(x As Double, y As Double) As Boolean
+    Return Draw(x, y, Presets.White)
+  End Function
+
   Protected Overridable Function Draw(x As Integer, y As Integer) As Boolean
     Return Draw(x, y, Presets.White)
+  End Function
+
+  Public Function Draw(x As Double, y As Double, p As Pixel) As Boolean
+    Return Draw(CInt(x), CInt(y), p)
   End Function
 
   Public Function Draw(x As Integer, y As Integer, p As Pixel) As Boolean
@@ -2146,16 +2158,16 @@ Public MustInherit Class PixelGameEngine
     DrawLine(pos1.x, pos1.y, pos2.x, pos2.y, p, pattern)
   End Sub
 
+  Protected Sub DrawLine(x1 As Double, y1 As Double, x2 As Double, y2 As Double)
+    DrawLine(x1, y1, x2, y2, Presets.White, &HFFFFFFFFUI)
+  End Sub
+
   Protected Sub DrawLine(x1 As Integer, y1 As Integer, x2 As Integer, y2 As Integer)
     DrawLine(x1, y1, x2, y2, Presets.White, &HFFFFFFFFUI)
   End Sub
 
-  'Public Sub DrawLine(x1 As Single, y1 As Single, x2 As Single, y2 As Single, p As Pixel)
-  '  DrawLine(CInt(Fix(x1)), CInt(Fix(y1)), CInt(Fix(x2)), CInt(Fix(y2)), p, &HFFFFFFFFUI)
-  'End Sub
-
-  Public Sub DrawLine(x1 As Double, y1 As Double, x2 As Double, y2 As Double, p As Pixel)
-    DrawLine(CInt(Fix(x1)), CInt(Fix(y1)), CInt(Fix(x2)), CInt(Fix(y2)), p, &HFFFFFFFFUI)
+  Public Sub DrawLine(x1 As Double, y1 As Double, x2 As Double, y2 As Double, p As Pixel, Optional pattern As UInteger = &HFFFFFFFFUI)
+    DrawLine(CInt(x1), CInt(y1), CInt(x2), CInt(y2), p, pattern)
   End Sub
 
   Public Sub DrawLine(x1 As Integer, y1 As Integer, x2 As Integer, y2 As Integer, p As Pixel, Optional pattern As UInteger = &HFFFFFFFFUI)
@@ -2255,8 +2267,16 @@ Public MustInherit Class PixelGameEngine
     DrawCircle(pos.x, pos.y, radius, p, mask)
   End Sub
 
+  Protected Sub DrawCircle(x As Double, y As Double, radius As Double)
+    DrawCircle(x, y, radius, Presets.White, &HFF)
+  End Sub
+
   Protected Sub DrawCircle(x As Integer, y As Integer, radius As Integer)
     DrawCircle(x, y, radius, Presets.White, &HFF)
+  End Sub
+
+  Public Sub DrawCircle(x As Double, y As Double, radius As Double, p As Pixel, Optional mask As Byte = &HFF)
+    DrawCircle(CInt(x), CInt(y), CInt(radius), p, mask)
   End Sub
 
   Public Sub DrawCircle(x As Integer, y As Integer, radius As Integer, p As Pixel, Optional mask As Byte = &HFF)
@@ -2292,8 +2312,12 @@ Public MustInherit Class PixelGameEngine
     FillCircle(pos.x, pos.y, radius, p)
   End Sub
 
-  Public Sub FillCircle(x As Single, y As Single, radius As Single, p As Pixel)
-    FillCircle(CInt(Fix(x)), CInt(Fix(y)), CInt(Fix(radius)), p)
+  Public Sub FillCircle(x As Double, y As Double, radius As Double)
+    FillCircle(x, y, radius, Presets.White)
+  End Sub
+
+  Public Sub FillCircle(x As Double, y As Double, radius As Double, p As Pixel)
+    FillCircle(CInt(x), CInt(y), CInt(radius), p)
   End Sub
 
   Public Sub FillCircle(x As Integer, y As Integer, radius As Integer, p As Pixel)
@@ -2331,8 +2355,16 @@ Public MustInherit Class PixelGameEngine
     DrawRect(pos.x, pos.y, size.x, size.y, p)
   End Sub
 
+  Protected Sub DrawRect(x As Double, y As Double, w As Double, h As Double)
+    DrawRect(x, y, w, h, Presets.White)
+  End Sub
+
   Protected Sub DrawRect(x As Integer, y As Integer, w As Integer, h As Integer)
     DrawRect(x, y, w, h, Presets.White)
+  End Sub
+
+  Public Sub DrawRect(x As Double, y As Double, w As Double, h As Double, p As Pixel)
+    DrawRect(CInt(x), CInt(y), CInt(w), CInt(h), p)
   End Sub
 
   Public Sub DrawRect(x As Integer, y As Integer, w As Integer, h As Integer, p As Pixel)
@@ -2341,6 +2373,29 @@ Public MustInherit Class PixelGameEngine
     DrawLine(x + w, y + h, x, y + h, p)
     DrawLine(x, y + h, x, y, p)
   End Sub
+
+  Protected Shared Function QBColor(index As Integer) As Pixel
+    Select Case index Mod 16
+      Case 0 : Return Presets.Black
+      Case 1 : Return Presets.DarkBlue
+      Case 2 : Return Presets.DarkGreen
+      Case 3 : Return Presets.DarkCyan
+      Case 4 : Return Presets.DarkRed
+      Case 5 : Return Presets.DarkMagenta
+      Case 6 : Return Presets.Brown
+      Case 7 : Return Presets.DarkGrey
+      Case 8 : Return Presets.Gray
+      Case 9 : Return Presets.Blue
+      Case 10 : Return Presets.Green
+      Case 11 : Return Presets.Cyan
+      Case 12 : Return Presets.Red
+      Case 13 : Return Presets.Magenta
+      Case 14 : Return Presets.Yellow
+      Case 15 : Return Presets.White
+      Case Else
+        Return Presets.Black
+    End Select
+  End Function
 
   Protected Sub Clear()
     Clear(Presets.Black)
@@ -2365,8 +2420,16 @@ Public MustInherit Class PixelGameEngine
     FillRect(pos.x, pos.y, size.x, size.y, p)
   End Sub
 
+  Protected Sub FillRect(x As Double, y As Double, w As Double, h As Double)
+    FillRect(x, y, w, h, Presets.White)
+  End Sub
+
   Protected Sub FillRect(x As Integer, y As Integer, w As Integer, h As Integer)
     FillRect(x, y, w, h, Presets.White)
+  End Sub
+
+  Public Sub FillRect(x As Double, y As Double, w As Double, h As Double, p As Pixel)
+    FillRect(CInt(x), CInt(y), CInt(w), CInt(h), p)
   End Sub
 
   Public Sub FillRect(x As Integer, y As Integer, w As Integer, h As Integer, p As Pixel)
@@ -2400,12 +2463,16 @@ Public MustInherit Class PixelGameEngine
     DrawTriangle(pos1.x, pos1.y, pos2.x, pos2.y, pos3.x, pos3.y, p)
   End Sub
 
+  Protected Sub DrawTriangle(x1 As Double, y1 As Double, x2 As Double, y2 As Double, x3 As Double, y3 As Double)
+    DrawTriangle(x1, y1, x2, y2, x3, y3, Presets.White)
+  End Sub
+
   Protected Sub DrawTriangle(x1 As Integer, y1 As Integer, x2 As Integer, y2 As Integer, x3 As Integer, y3 As Integer)
     DrawTriangle(x1, y1, x2, y2, x3, y3, Presets.White)
   End Sub
 
-  Public Sub DrawTriangle(x1 As Single, y1 As Single, x2 As Single, y2 As Single, x3 As Single, y3 As Single, p As Pixel)
-    DrawTriangle(CInt(Fix(x1)), CInt(Fix(y1)), CInt(Fix(x2)), CInt(Fix(y2)), CInt(Fix(x3)), CInt(Fix(y3)), p)
+  Public Sub DrawTriangle(x1 As Double, y1 As Double, x2 As Double, y2 As Double, x3 As Double, y3 As Double, p As Pixel)
+    DrawTriangle(CInt(x1), CInt(y1), CInt(x2), CInt(y2), CInt(x3), CInt(y3), p)
   End Sub
 
   Public Sub DrawTriangle(x1 As Integer, y1 As Integer, x2 As Integer, y2 As Integer, x3 As Integer, y3 As Integer, p As Pixel)
@@ -2422,12 +2489,16 @@ Public MustInherit Class PixelGameEngine
     FillTriangle(pos1.x, pos1.y, pos2.x, pos2.y, pos3.x, pos3.y, p)
   End Sub
 
+  Protected Sub FillTriangle(x1 As Double, y1 As Double, x2 As Double, y2 As Double, x3 As Double, y3 As Double)
+    FillTriangle(x1, y1, x2, y2, x3, y3, Presets.White)
+  End Sub
+
   Protected Sub FillTriangle(x1 As Integer, y1 As Integer, x2 As Integer, y2 As Integer, x3 As Integer, y3 As Integer)
     FillTriangle(x1, y1, x2, y2, x3, y3, Presets.White)
   End Sub
 
-  Public Sub FillTriangle(x1 As Single, y1 As Single, x2 As Single, y2 As Single, x3 As Single, y3 As Single, p As Pixel)
-    FillTriangle(CInt(Fix(x1)), CInt(Fix(y1)), CInt(Fix(x2)), CInt(Fix(y2)), CInt(Fix(x3)), CInt(Fix(y3)), p)
+  Public Sub FillTriangle(x1 As Double, y1 As Double, x2 As Double, y2 As Double, x3 As Double, y3 As Double, p As Pixel)
+    FillTriangle(CInt(x1), CInt(y1), CInt(x2), CInt(y2), CInt(x3), CInt(y3), p)
   End Sub
 
   Public Sub FillTriangle(x1 As Integer, y1 As Integer, x2 As Integer, y2 As Integer, x3 As Integer, y3 As Integer, p As Pixel)
@@ -2607,6 +2678,10 @@ next4:
     DrawSprite(pos.x, pos.y, sprite, scale)
   End Sub
 
+  Public Sub DrawSprite(x As Double, y As Double, sprite As Sprite, Optional scale As Integer = 1)
+    DrawSprite(CInt(x), CInt(y), sprite, scale)
+  End Sub
+
   Public Sub DrawSprite(x As Integer, y As Integer, sprite As Sprite, Optional scale As Integer = 1)
 
     If sprite Is Nothing Then Return
@@ -2638,6 +2713,10 @@ next4:
 
   Protected Sub DrawPartialSprite(pos As Vi2d, sprite As Sprite, sourcepos As Vi2d, size As Vi2d, Optional scale As Integer = 1)
     DrawPartialSprite(pos.x, pos.y, sprite, sourcepos.x, sourcepos.y, size.x, size.y, scale)
+  End Sub
+
+  Protected Sub DrawPartialSprite(x As Double, y As Double, sprite As Sprite, ox As Double, oy As Double, w As Double, h As Double, Optional scale As Integer = 1)
+    DrawPartialSprite(CInt(x), CInt(y), sprite, CInt(ox), CInt(oy), CInt(w), CInt(h), scale)
   End Sub
 
   Protected Sub DrawPartialSprite(x As Integer, y As Integer, sprite As Sprite, ox As Integer, oy As Integer, w As Integer, h As Integer, Optional scale As Integer = 1)
@@ -2674,8 +2753,16 @@ next4:
     DrawString(pos.x, pos.y, sText, col, scale)
   End Sub
 
+  Protected Sub DrawString(x As Double, y As Double, sText As String)
+    DrawString(x, y, sText, Presets.White, 1)
+  End Sub
+
   Protected Sub DrawString(x As Integer, y As Integer, sText As String)
     DrawString(x, y, sText, Presets.White, 1)
+  End Sub
+
+  Protected Sub DrawString(x As Double, y As Double, sText As String, col As Pixel, Optional scale As Integer = 1)
+    DrawString(CInt(x), CInt(y), sText, col, scale)
   End Sub
 
   Protected Sub DrawString(x As Integer, y As Integer, sText As String, col As Pixel, Optional scale As Integer = 1)
@@ -3659,6 +3746,12 @@ next4:
 
   Private ReadOnly m_random As New Random
   Protected Const RAND_MAX As Integer = 2147483647
+
+  Protected ReadOnly Property Coin As Integer
+    Get
+      Return If(Rnd >= 0.5, 1, 0)
+    End Get
+  End Property
 
   Protected ReadOnly Property Rnd As Double
     Get
