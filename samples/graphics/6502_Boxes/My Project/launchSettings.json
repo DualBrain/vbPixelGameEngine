@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "6502_Boxes": {
+      "commandName": "Project"
+    },
+    "WSL": {
+      "commandName": "WSL2",
+      "distributionName": ""
+    }
+  }
+}

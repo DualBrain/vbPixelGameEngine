@@ -18,7 +18,7 @@ Friend Class Boxes
   Private a As Single = 0!
 
   Friend Sub New()
-    AppName = "Boxes"
+    AppName = "6052 Boxes"
   End Sub
 
   Protected Overrides Function OnUserCreate() As Boolean
@@ -28,20 +28,22 @@ Friend Class Boxes
 
   Protected Overrides Function OnUserUpdate(elapsedTime As Single) As Boolean
 
+    If GetKey(Key.ESCAPE).Pressed Then Return False
+
     Dim w = ScreenHeight
 
     SetPixelMode(Function(x As Integer, y As Integer, desired As Pixel, current As Pixel) As Pixel
-                   Dim r = CInt(current.R) - CInt(desired.R)
-                   Dim g = CInt(desired.G)
-                   Dim b = CInt(desired.B)
-                   If r < 0 Then r = 255 + r
-                   If r > 255 Then r -= 255
-                   Return New Pixel(r, g, b)
+                   Dim c = -1
+                   For i = SpecPalette.Count - 1 To 0 Step -1
+                     If SpecPalette(i) = current Then c = i : Exit For
+                   Next
+                   c -= 1 : If c < 0 Then c = 255
+                   Return SpecPalette(c)
                  End Function)
-    DrawLine(a, 0, w, a, Presets.Gray)
-    DrawLine(w, a, w - a, w, Presets.Gray)
-    DrawLine(w - a, w, 0, w - a, Presets.Gray)
-    DrawLine(0, w - a, a, 0, Presets.Gray)
+    DrawLine(a, 0, w, a)
+    DrawLine(w, a, w - a, w)
+    DrawLine(w - a, w, 0, w - a)
+    DrawLine(0, w - a, a, 0)
     SetPixelMode(Pixel.Mode.Normal)
     a += s : If a > w Then a = 0
 
