@@ -2091,6 +2091,14 @@ Public MustInherit Class PixelGameEngine
     End Get
   End Property
 
+  Protected Function GetPixel(x As Double, y As Double) As Pixel
+    Return GetPixel(CInt(x), CInt(y))
+  End Function
+
+  Protected Function GetPixel(x As Integer, y As Integer) As Pixel
+    Return m_drawTarget.GetPixel(x, y)
+  End Function
+
   Protected Function Draw(pos As Vi2d) As Boolean
     Return Draw(pos.x, pos.y, Presets.White)
   End Function
