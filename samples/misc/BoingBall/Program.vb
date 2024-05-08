@@ -48,7 +48,9 @@ Friend Class BoingBall
 
   Protected Overrides Function OnUserUpdate(elapsedTime As Single) As Boolean
 
-    m_t += elapsedTime : If m_t < 1 / 60 Then Return True Else m_t -= 1 / 60
+    If GetKey(Key.ESCAPE).Pressed Then Return False
+
+    m_t += elapsedTime : If m_t < 1.0! / 60.0! Then Return True Else m_t -= 1.0! / 60.0!
 
     Clear(Presets.Gray)
 
@@ -104,10 +106,10 @@ Friend Class BoingBall
 
   End Function
 
-  Private Shared Sub TiltSphere(points As List(Of List(Of Pt)), ang As Double)
+  Private Shared Sub TiltSphere(points As List(Of List(Of Pt)), ang As Single)
 
-    Dim st = MathF.Sin(ang * Math.PI / 180.0)
-    Dim ct = MathF.Cos(ang * Math.PI / 180.0)
+    Dim st = MathF.Sin(ang * MathF.PI / 180.0!)
+    Dim ct = MathF.Cos(ang * MathF.PI / 180.0!)
 
     For i = 0 To 9
       For j = 0 To 8
