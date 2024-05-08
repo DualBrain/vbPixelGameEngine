@@ -40,6 +40,8 @@ Friend Class Circles
 
   Protected Overrides Function OnUserUpdate(elapsedTime As Single) As Boolean
 
+    If GetKey(Key.ESCAPE).Pressed Then Return False
+
     Dim mt = CSng(1 / 60)
 
     m_mt += elapsedTime

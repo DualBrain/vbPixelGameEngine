@@ -33,6 +33,8 @@ Friend Class AniMathPat
 
   Protected Overrides Function OnUserUpdate(elapsedTime As Single) As Boolean
 
+    If GetKey(Key.ESCAPE).Pressed Then Return False
+
     If m_phase = 0 Then
       For f = 1 To m_d
         m_dd(f, 1) = (m_p2(f, 1) - m_p1(f, 1)) / m_fc

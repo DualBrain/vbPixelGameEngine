@@ -36,6 +36,8 @@ Friend Class AlphaSparkles
 
   Protected Overrides Function OnUserUpdate(elapsedTime As Single) As Boolean
 
+    If GetKey(Key.ESCAPE).Pressed Then Return False
+
     If GetMouse(0).Held Then
       Dim dx = GetMouseX, dy = GetMouseY
       SetPixelMode(Pixel.Mode.Alpha)

@@ -53,6 +53,8 @@ Friend Class Polys
 
   Protected Overrides Function OnUserUpdate(elapsedTime As Single) As Boolean
 
+    If GetKey(Key.ESCAPE).Pressed Then Return False
+
     Return True
 
   End Function
