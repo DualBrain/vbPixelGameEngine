@@ -137,6 +137,8 @@ Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "AmigaBall", "graphics\Amiga
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "AniMathPat", "graphics\AniMathPat\AniMathPat.vbproj", "{4EEF3A1D-91E7-4D73-8DD9-867E814E12FB}"
 EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "AnimWave", "graphics\AnimWave\AnimWave.vbproj", "{321A1EBE-36E9-4521-A704-06A3C3FBAEB6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -363,6 +365,10 @@ Global
 		{4EEF3A1D-91E7-4D73-8DD9-867E814E12FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4EEF3A1D-91E7-4D73-8DD9-867E814E12FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4EEF3A1D-91E7-4D73-8DD9-867E814E12FB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{321A1EBE-36E9-4521-A704-06A3C3FBAEB6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{321A1EBE-36E9-4521-A704-06A3C3FBAEB6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{321A1EBE-36E9-4521-A704-06A3C3FBAEB6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{321A1EBE-36E9-4521-A704-06A3C3FBAEB6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -422,6 +428,7 @@ Global
 		{4C35012F-1E0B-472B-8084-47A3E38AD937} = {27BD2545-D0BB-4AC5-A6D4-74B3D700D0DF}
 		{8F98CD82-E746-4D4B-880A-9F20F07FCEEA} = {F82D3462-767B-44FC-9960-35DFB2257CD4}
 		{4EEF3A1D-91E7-4D73-8DD9-867E814E12FB} = {F82D3462-767B-44FC-9960-35DFB2257CD4}
+		{321A1EBE-36E9-4521-A704-06A3C3FBAEB6} = {F82D3462-767B-44FC-9960-35DFB2257CD4}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {0A734DAD-9F0E-4DF0-A944-FEDFAD6EE10C}
