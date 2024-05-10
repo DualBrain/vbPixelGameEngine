@@ -23,7 +23,7 @@ Public Enum Presets As UInteger
   Olive = &H808000
   Apricot = &HFFD8B1
   Navy = &H75
-  Black = &H0
+  Black = &HFF000000UI
   DarkGrey = &H8B8B8B
   DarkRed = &H8B0000
   DarkYellow = &H8B8B00
@@ -75,7 +75,7 @@ Public Structure Pixel
 
 #Region "Presets"
 
-  Public Shared ReadOnly Empty As New Pixel(0, 0, 0, 0)
+  Public Shared ReadOnly Empty As New Pixel(0, 0, 0, &HFF)
 
   Private Shared ReadOnly m_presetPixels As Dictionary(Of Presets, Pixel)
 

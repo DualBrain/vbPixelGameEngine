@@ -1,4 +1,5 @@
 Imports VbPixelGameEngine
+Imports VbPixelGameEngine.SpecBAS
 
 Friend Module Program
 
@@ -27,7 +28,7 @@ Friend Class AreaFill
     Clear()
 
     For f = 1 To 255
-      SpecPalette(f) = New Pixel(128 + f / 2.0!, 64 + f / 1.5!, f)
+      Palette(f) = New Pixel(128 + f / 2.0!, 64 + f / 1.5!, f)
     Next
 
     Return True
@@ -61,7 +62,7 @@ Friend Class AreaFill
       For y = -r To r
         Dim x1 = Int(MathF.Sqrt(r * r - y * y))
         For x = -x1 To x1
-          Draw(x + xc, y + yc, SpecPalette(c))
+          Draw(x + xc, y + yc, Palette(c))
         Next
       Next
     ElseIf m_pass = 1 Then
@@ -76,7 +77,7 @@ Friend Class AreaFill
       r -= 1
       For y = yc - r To yc + r
         For x = xc - r To xc + r
-          Draw(x, y, SpecPalette(c))
+          Draw(x, y, Palette(c))
         Next
       Next
     Else

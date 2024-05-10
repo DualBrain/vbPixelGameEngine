@@ -1,4 +1,5 @@
 Imports VbPixelGameEngine
+Imports VbPixelGameEngine.SpecBAS
 
 Friend Module Program
 

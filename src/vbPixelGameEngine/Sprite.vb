@@ -36,7 +36,7 @@ Public Class Sprite
     Height = h
     m_pixelColData = New Pixel(Width * Height - 1) {}
     For i = 0 To Width * Height - 1
-      m_pixelColData(i) = New Pixel()
+      m_pixelColData(i) = New Pixel(&H0, &H0, &H0, &HFF)
     Next
   End Sub
 
@@ -159,7 +159,7 @@ Public Class Sprite
       If x >= 0 AndAlso x < Width AndAlso y >= 0 AndAlso y < Height Then
         Return m_pixelColData(y * Width + x)
       Else
-        Return New Pixel(0, 0, 0, 0)
+        Return New Pixel(0, 0, 0, &HFF)
       End If
     Else
       Return m_pixelColData(Math.Abs(y Mod Height) * Width + Math.Abs(x Mod Width))

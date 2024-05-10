@@ -1,4 +1,5 @@
 Imports VbPixelGameEngine
+Imports VbPixelGameEngine.SpecBAS
 
 Friend Module Program
 
@@ -57,21 +58,6 @@ Friend Class AniMathPat
     Return True
 
   End Function
-
-  Private Sub PLOT(a(,) As Double)
-    For i = 0 To UBound(a, 1)
-      Dim x = a(i, 1), y = a(i, 2), c = CInt(a(i, 3)) Mod 256
-      Draw(x, y, SpecPalette(c))
-    Next
-  End Sub
-
-  Private Shared Sub MAT(target(,) As Double, source(,) As Double)
-    For a = 0 To UBound(target, 1)
-      For b = 0 To UBound(target, 2)
-        target(a, b) = source(a, b)
-      Next
-    Next
-  End Sub
 
   Private Sub Calculate()
     MAT(m_p2, m_p1)

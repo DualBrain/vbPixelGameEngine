@@ -1,3 +1,4 @@
+Imports System.MathF
 Imports VbPixelGameEngine
 
 Friend Module Program
@@ -33,17 +34,16 @@ Friend Class BubbleUniverse
 
     Clear()
 
-    Dim TAU = MathF.PI * 2
     Dim n = 200.0!
-    Dim r = TAU / 235.0!
+    Dim r = Tau / 235.0!
 
     Dim hw = ScreenWidth \ 2
     Dim hh = ScreenHeight \ 2
 
     For i = 0 To n
       For j = 0 To n
-        Dim u = MathF.Sin(i + v) + MathF.Sin(r * i + x)
-        v = MathF.Cos(i + v) + MathF.Cos(r * i + x)
+        Dim u = Sin(i + v) + Sin(r * i + x)
+        v = Cos(i + v) + Cos(r * i + x)
         x = u + tm
         Dim p = New Pixel(i, j, 99)
         Draw(CInt(Fix(hw + u * hw * 0.4)), CInt(Fix(hh + v * hh * 0.4)), p)

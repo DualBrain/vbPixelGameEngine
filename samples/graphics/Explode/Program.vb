@@ -4,7 +4,7 @@ Imports VbPixelGameEngine.SpecBAS
 Friend Module Program
 
   Sub Main()
-    Dim game As New ArchSpiral
+    Dim game As New Explode
     If game.Construct(800, 480, False, True) Then
       game.Start()
     End If
@@ -12,25 +12,42 @@ Friend Module Program
 
 End Module
 
-Friend Class ArchSpiral
+Friend Class Explode
   Inherits PixelGameEngine
 
   Friend Sub New()
-    AppName = "Archimedes Spiral"
+    AppName = "Explode"
   End Sub
 
+  Private Const np As Integer = 1001
+  Private ReadOnly p(np, 4) As Single
+
   Protected Overrides Function OnUserCreate() As Boolean
-    Clear()
-    For t = 0 To 1325.21! Step 0.001!
-      Dim r = 1.5 + 0.35 * t
-      Draw(400 + r * Cos(t), 240 + r * Sin(t))
+    For f = 1 To np
+      p(f, 1) = SCRW() / 2.0!
+      p(f, 2) = SCRH() / 2.0!
+      p(f, 3) = CSng(Rnd * 4) - 2
+      p(f, 4) = CSng(Rnd * 4) - 2
     Next
+    PAPER(0) : INK(15)
     Return True
   End Function
 
   Protected Overrides Function OnUserUpdate(elapsedTime As Single) As Boolean
+
     If GetKey(Key.ESCAPE).Pressed Then Return False
+
+    CLS()
+
+    For f = 1 To np
+      PLOT(p(f, 1), p(f, 2))
+      INC(p(f, 1), p(f, 3))
+      INC(p(f, 2), p(f, 4))
+      INC(p(f, 4), 0.01)
+    Next f
+
     Return True
+
   End Function
 
 End Class

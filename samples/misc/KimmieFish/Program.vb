@@ -125,27 +125,4 @@ Friend Class KimmieFish
     FillRect(x, y1, w, h, QBColor(c))
   End Sub
 
-  Private Shared Function QBColor(c As Integer) As Pixel
-    Select Case c
-      Case 0 : Return Presets.Black
-      Case 1 : Return Presets.DarkBlue
-      Case 2 : Return Presets.DarkGreen
-      Case 3 : Return Presets.DarkCyan
-      Case 4 : Return Presets.DarkRed
-      Case 5 : Return Presets.DarkMagenta
-      Case 6 : Return Presets.Brown
-      Case 7 : Return Presets.DarkGrey
-      Case 8 : Return Presets.Gray
-      Case 9 : Return Presets.Blue
-      Case 10 : Return Presets.Green
-      Case 11 : Return Presets.Cyan
-      Case 12 : Return Presets.Red
-      Case 13 : Return Presets.Magenta
-      Case 14 : Return Presets.Yellow
-      Case 15 : Return Presets.White
-      Case Else
-        Stop
-    End Select
-  End Function
-
 End Class

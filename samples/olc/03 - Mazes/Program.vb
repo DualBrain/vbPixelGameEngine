@@ -156,7 +156,7 @@ Friend Class Mazes
     ' Draw Unit - the top of the stack
     For py = 0 To m_pathWidth - 1
       For px = 0 To m_pathWidth - 1
-        Draw(m_stack.Peek.X * (m_pathWidth + 1) + px, m_stack.Peek.Y * (m_pathWidth + 1) + py, FgGreen) ' Draw Cell
+        Draw(m_stack.Peek.X * (m_pathWidth + 1) + px, m_stack.Peek.Y * (m_pathWidth + 1) + py, Presets.Green) ' Draw Cell
       Next
     Next
 
