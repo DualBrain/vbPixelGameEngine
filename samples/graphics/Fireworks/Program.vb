@@ -22,7 +22,7 @@ Friend Class Fireworks
 
   Private ReadOnly m_fireworks As New List(Of Firework)
 
-  Private m_holiday As Holiday = Holiday.July4
+  Private m_holiday As Holiday = Holiday.None
 
   Friend Sub New()
     AppName = "Fireworks"
