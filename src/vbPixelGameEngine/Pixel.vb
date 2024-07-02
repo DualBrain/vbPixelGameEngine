@@ -1,4 +1,5 @@
-﻿Imports System.Runtime.InteropServices
+﻿Imports System.MathF
+Imports System.Runtime.InteropServices
 
 Public Enum Presets As UInteger
   White = &HFFFFFF
@@ -145,6 +146,27 @@ Public Structure Pixel
     Return (a1.R = b1.R) AndAlso (a1.G = b1.G) AndAlso (a1.B = b1.B) AndAlso (a1.A = b1.A)
   End Operator
 
+  Public Shared Operator *(p1 As Pixel, p2 As Pixel) As Pixel
+    Dim r = CByte(Min(255, Max(0, p1.R) * p2.R))
+    Dim g = CByte(Min(255, Max(0, p1.G) * p2.G))
+    Dim b = CByte(Min(255, Max(0, p1.B) * p2.B))
+    Return New Pixel(r, g, b, p1.A)
+  End Operator
+
+  Public Shared Operator *(p1 As Pixel, t As Single) As Pixel
+    Dim r = CByte(Min(255, Max(0, p1.R) * t))
+    Dim g = CByte(Min(255, Max(0, p1.G) * t))
+    Dim b = CByte(Min(255, Max(0, p1.B) * t))
+    Return New Pixel(r, g, b, p1.A)
+  End Operator
+
+  Public Shared Operator +(p1 As Pixel, p2 As Pixel) As Pixel
+    Dim r = CByte(Min(255, Max(0, p1.R) + p2.R))
+    Dim g = CByte(Min(255, Max(0, p1.G) + p2.G))
+    Dim b = CByte(Min(255, Max(0, p1.B) + p2.B))
+    Return New Pixel(r, g, b, p1.A)
+  End Operator
+
   Public Shared Operator <>(a1 As Pixel, b1 As Pixel) As Boolean
     Return Not (a1 = b1)
   End Operator
@@ -162,6 +184,10 @@ Public Structure Pixel
       Return Me = CType(obj, Pixel)
     End If
     Return False
+  End Function
+
+  Public Shared Function Lerp(p1 As Pixel, p2 As Pixel, t As Single) As Pixel
+    Return (p2 * t) + p1 * (1.0! - t)
   End Function
 
 #Disable Warning IDE0070 ' Use 'System.HashCode'

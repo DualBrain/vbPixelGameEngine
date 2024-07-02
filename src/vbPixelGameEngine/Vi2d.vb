@@ -86,6 +86,10 @@
     Return New Vi2d(left.x - right.x, left.y - right.y)
   End Operator
 
+  Public Shared Operator -(left As Vi2d, right As Vf2d) As Vi2d
+    Return New Vi2d(left.x - CInt(right.x), left.y - CInt(right.y))
+  End Operator
+
   Public Shared Operator *(left As Vi2d, right As Integer) As Vi2d
     Return New Vi2d(left.x * right, left.y * right)
   End Operator

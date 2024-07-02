@@ -22,7 +22,8 @@
   End Function
 
   Public Function Norm() As Vf2d
-    Dim r = CSng(1 / Mag())
+    Dim m = Mag()
+    Dim r = If(m <> 0, CSng(1 / m), 0)
     Return New Vf2d(x * r, y * r)
   End Function
 
@@ -82,7 +83,15 @@
     Return New Vf2d(right.x + left, right.y + left)
   End Operator
 
+  Public Shared Operator +(left As Vf2d, right As Vi2d) As Vf2d
+    Return New Vf2d(left.x + right.x, left.y + right.y)
+  End Operator
+
   Public Shared Operator -(left As Vf2d, right As Vf2d) As Vf2d
+    Return New Vf2d(left.x - right.x, left.y - right.y)
+  End Operator
+
+  Public Shared Operator -(left As Vf2d, right As Vi2d) As Vf2d
     Return New Vf2d(left.x - right.x, left.y - right.y)
   End Operator
 
@@ -105,42 +114,6 @@
   Public Shared Operator /(left As Vf2d, right As Vf2d) As Vf2d
     Return New Vf2d(left.x / right.x, left.y / right.y)
   End Operator
-
-  'Public Shared Operator +=(left As Vf2d, right As Vf2d) As Vf2d
-  '  left.x += right.x
-  '  left.y += right.y
-  '  Return left
-  'End Operator
-
-  'Public Shared Operator -=(left As Vf2d, right As Vf2d) As Vf2d
-  '  left.x -= right.x
-  '  left.y -= right.y
-  '  Return left
-  'End Operator
-
-  'Public Shared Operator *=(left As Vf2d, right As single) As Vf2d
-  '  left.x *= right
-  '  left.y *= right
-  '  Return left
-  'End Operator
-
-  'Public Shared Operator /=(left As Vf2d, right As single) As Vf2d
-  '  left.x /= right
-  '  left.y /= right
-  '  Return left
-  'End Operator
-
-  'Public Shared Operator *=(left As Vf2d, right As Vf2d) As Vf2d
-  '  left.x *= right.x
-  '  left.y *= right.y
-  '  Return left
-  'End Operator
-
-  'Public Shared Operator /=(left As Vf2d, right As Vf2d) As Vf2d
-  '  left.x /= right.x
-  '  left.y /= right.y
-  '  Return left
-  'End Operator
 
   Public Shared Operator +(lhs As Vf2d) As Vf2d
     Return New Vf2d(+lhs.x, +lhs.y)
@@ -169,13 +142,5 @@
   Public Shared Widening Operator CType(v As Vf2d) As Vi2d
     Return New Vi2d(CInt(Fix(v.x)), CInt(Fix(v.y)))
   End Operator
-
-  'Public Shared Widening Operator CType(v As Vf2d) As Vf2d
-  '  Return New Vf2d(v.x, v.y)
-  'End Operator
-
-  'Public Shared Widening Operator CType(v As Vf2d) As v2d_generic(Of Double)
-  '  Return New v2d_generic(Of Double)(v.x, v.y)
-  'End Operator
 
 End Structure

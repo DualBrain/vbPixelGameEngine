@@ -1605,6 +1605,7 @@ Public MustInherit Class PixelGameEngine
   Private m_pixelMode As Pixel.Mode
   Private m_blendFactor As Single = 1.0F
 
+  Private m_lastElapsed As Single
   Private m_screenWidth As Integer
   Private m_screenHeight As Integer
   Private m_pixelWidth As Integer
@@ -1635,8 +1636,9 @@ Public MustInherit Class PixelGameEngine
   Private ReadOnly m_mouseState(4) As HwButton
   Private m_mousePosXcache As Integer
   Private m_mousePosYcache As Integer
-  Private m_mousePosX As Integer
-  Private m_mousePosY As Integer
+  'Private m_mousePosX As Integer
+  'Private m_mousePosY As Integer
+  Private m_mousePos As Vi2d
   Private m_mouseWheelDelta As Integer
   Private m_mouseWheelDeltaCache As Integer
   Private m_viewX As Integer
@@ -1650,7 +1652,13 @@ Public MustInherit Class PixelGameEngine
   Private m_subPixelOffsetX As Single
   Private m_subPixelOffsetY As Single
 
-  Protected Structure HwButton
+  Friend Enum Mouse
+    Left
+    Right
+    Middle
+  End Enum
+
+  Public Structure HwButton
     Public Pressed As Boolean ' Set once during the frame the event occurs
     Public Released As Boolean ' Set once during the frame the event occurs
     Public Held As Boolean ' Set true for all frames between pressed and released events
@@ -1765,7 +1773,16 @@ Public MustInherit Class PixelGameEngine
     ALT
   End Enum
 
+  Private m_mouseButtons As Byte = 5
+  Private m_defaultAlpha As Byte = &HFF
+  Private m_defaultPixel As Integer = m_defaultAlpha << 24
+  Private m_tabSizeInSpaces As Byte = 4
+  Private Const OLC_MAX_VERTS = 128
+
   Private m_fontSprite As Sprite
+  Private m_spacing(95) As Byte
+  Private m_fontSpacing(95) As Vi2d
+  Private m_KeyboardMap As List(Of Tuple(Of Key, String, String))
 
   Protected Friend Sub New()
     AppName = "Undefined"
@@ -2049,13 +2066,13 @@ Public MustInherit Class PixelGameEngine
     End Get
   End Property
 
-  Protected ReadOnly Property GetKey(k As Key) As HwButton
+  Public ReadOnly Property GetKey(k As Key) As HwButton
     Get
       Return m_keyboardState(k)
     End Get
   End Property
 
-  Protected ReadOnly Property GetMouse(b As Integer) As HwButton
+  Friend ReadOnly Property GetMouse(b As Integer) As HwButton
     Get
       Return m_mouseState(b)
     End Get
@@ -2063,13 +2080,19 @@ Public MustInherit Class PixelGameEngine
 
   Protected ReadOnly Property GetMouseX() As Integer
     Get
-      Return m_mousePosX
+      Return m_mousePos.x
     End Get
   End Property
 
   Protected ReadOnly Property GetMouseY() As Integer
     Get
-      Return m_mousePosY
+      Return m_mousePos.y
+    End Get
+  End Property
+
+  Friend ReadOnly Property GetMousePos() As Vi2d
+    Get
+      Return m_mousePos
     End Get
   End Property
 
@@ -2090,6 +2113,10 @@ Public MustInherit Class PixelGameEngine
       Return m_screenHeight
     End Get
   End Property
+
+  Friend Function GetElapsedTime() As Single
+    Return m_lastElapsed
+  End Function
 
   Protected Function GetPixel(x As Double, y As Double) As Pixel
     Return GetPixel(CInt(x), CInt(y))
@@ -2163,6 +2190,10 @@ Public MustInherit Class PixelGameEngine
   End Sub
 
   Protected Sub DrawLine(pos1 As Vi2d, pos2 As Vi2d, p As Pixel, Optional pattern As UInteger = &HFFFFFFFFUI)
+    DrawLine(pos1.x, pos1.y, pos2.x, pos2.y, p, pattern)
+  End Sub
+
+  Friend Sub DrawLine(pos1 As Vf2d, pos2 As Vi2d, p As Pixel, Optional pattern As UInteger = &HFFFFFFFFUI)
     DrawLine(pos1.x, pos1.y, pos2.x, pos2.y, p, pattern)
   End Sub
 
@@ -2275,6 +2306,14 @@ Public MustInherit Class PixelGameEngine
     DrawCircle(pos.x, pos.y, radius, p, mask)
   End Sub
 
+  Public Sub DrawCircle(pos As Vf2d, radius As Integer, p As Pixel, Optional mask As Byte = &HFF)
+    DrawCircle(pos.x, pos.y, radius, p, mask)
+  End Sub
+
+  Public Sub DrawCircle(pos As Vf2d, radius As Single, p As Pixel, Optional mask As Byte = &HFF)
+    DrawCircle(pos.x, pos.y, radius, p, mask)
+  End Sub
+
   Protected Sub DrawCircle(x As Double, y As Double, radius As Double)
     DrawCircle(x, y, radius, Presets.White, &HFF)
   End Sub
@@ -2312,11 +2351,39 @@ Public MustInherit Class PixelGameEngine
 
   End Sub
 
+  Public Sub FloodFill(x As Integer, y As Integer, c As Pixel)
+
+    If x < 0 Then x = 0
+    If x > ScreenWidth - 1 Then x = ScreenWidth - 1
+    If y < 0 Then y = 0
+    If y > ScreenHeight - 1 Then y = ScreenHeight - 1
+
+    Dim p = New Vi2d(x, y)
+    Dim stk As New Stack()
+    stk.Push(p)
+    Dim replacementColor = GetPixel(p.x, p.y)
+    Do While stk.Count <> 0
+      p = CType(stk.Pop(), Vi2d)
+      Dim testColor = GetPixel(p.x, p.y)
+      If testColor = replacementColor Then
+        Draw(p.x, p.y, c)
+        If p.x - 1 > -1 Then stk.Push(New Vi2d(p.x - 1, p.y))
+        If p.x + 1 < ScreenWidth Then stk.Push(New Vi2d(p.x + 1, p.y))
+        If p.y - 1 > -1 Then stk.Push(New Vi2d(p.x, p.y - 1))
+        If p.y + 1 < ScreenHeight Then stk.Push(New Vi2d(p.x, p.y + 1))
+      End If
+    Loop
+  End Sub
+
   Protected Sub FillCircle(pos As Vi2d, radius As Integer)
     FillCircle(pos.x, pos.y, radius, Presets.White)
   End Sub
 
   Protected Sub FillCircle(pos As Vi2d, radius As Integer, p As Pixel)
+    FillCircle(pos.x, pos.y, radius, p)
+  End Sub
+
+  Friend Sub FillCircle(pos As Vf2d, radius As Integer, p As Pixel)
     FillCircle(pos.x, pos.y, radius, p)
   End Sub
 
@@ -2377,6 +2444,10 @@ Public MustInherit Class PixelGameEngine
 
   Public Sub DrawRect(x As Double, y As Double, w As Double, h As Double, p As Pixel)
     DrawRect(CInt(x), CInt(y), CInt(w), CInt(h), p)
+  End Sub
+
+  Public Sub DrawRect(pos As Vf2d, size As Vf2d, p As Pixel)
+    DrawRect(CInt(pos.x), CInt(pos.y), CInt(size.x), CInt(size.y), p)
   End Sub
 
   Public Sub DrawRect(x As Integer, y As Integer, w As Integer, h As Integer, p As Pixel)
@@ -2442,6 +2513,10 @@ Public MustInherit Class PixelGameEngine
 
   Protected Sub FillRect(x As Integer, y As Integer, w As Integer, h As Integer)
     FillRect(x, y, w, h, Presets.White)
+  End Sub
+
+  Public Sub FillRect(pos As Vf2d, size As Vf2d, p As Pixel)
+    FillRect(CInt(pos.x), CInt(pos.y), CInt(size.x), CInt(size.y), p)
   End Sub
 
   Public Sub FillRect(x As Double, y As Double, w As Double, h As Double, p As Pixel)
@@ -2694,6 +2769,10 @@ next4:
     DrawSprite(pos.x, pos.y, sprite, scale)
   End Sub
 
+  Friend Sub DrawSprite(pos As Vf2d, sprite As Sprite, Optional scale As Integer = 1)
+    DrawSprite(pos.x, pos.y, sprite, scale)
+  End Sub
+
   Public Sub DrawSprite(x As Double, y As Double, sprite As Sprite, Optional scale As Integer = 1)
     DrawSprite(CInt(x), CInt(y), sprite, scale)
   End Sub
@@ -2761,39 +2840,59 @@ next4:
 
   End Sub
 
-  Protected Sub DrawString(pos As Vi2d, sText As String)
-    DrawString(pos.x, pos.y, sText, Presets.White, 1)
+  Protected Function GetTextSize(text As String) As Vi2d
+    Dim size = New Vi2d(0, 1)
+    Dim pos = New Vi2d(0, 1)
+    For Each c In text
+      If c = vbLf Then
+        pos.y += 1
+        pos.x = 0
+      ElseIf c = vbTab Then
+        pos.x += m_tabSizeInSpaces
+      Else
+        pos.x += 1
+      End If
+      size.x = Math.Max(size.x, pos.x)
+      size.y = Math.Max(size.y, pos.y)
+    Next
+    Return size * 8
+  End Function
+
+  Protected Sub DrawString(pos As Vi2d, text As String)
+    DrawString(pos.x, pos.y, text, Presets.White, 1)
   End Sub
 
-  Protected Sub DrawString(pos As Vi2d, sText As String, col As Pixel, Optional scale As Integer = 1)
-    DrawString(pos.x, pos.y, sText, col, scale)
+  Protected Sub DrawString(pos As Vi2d, text As String, col As Pixel, Optional scale As Integer = 1)
+    DrawString(pos.x, pos.y, text, col, scale)
   End Sub
 
-  Protected Sub DrawString(x As Double, y As Double, sText As String)
-    DrawString(x, y, sText, Presets.White, 1)
+  Protected Sub DrawString(x As Double, y As Double, text As String)
+    DrawString(x, y, text, Presets.White, 1)
   End Sub
 
-  Protected Sub DrawString(x As Integer, y As Integer, sText As String)
-    DrawString(x, y, sText, Presets.White, 1)
+  Protected Sub DrawString(x As Integer, y As Integer, text As String)
+    DrawString(x, y, text, Presets.White, 1)
   End Sub
 
-  Protected Sub DrawString(x As Double, y As Double, sText As String, col As Pixel, Optional scale As Integer = 1)
-    DrawString(CInt(x), CInt(y), sText, col, scale)
+  Protected Sub DrawString(x As Double, y As Double, text As String, col As Pixel, Optional scale As Integer = 1)
+    DrawString(CInt(x), CInt(y), text, col, scale)
   End Sub
 
-  Protected Sub DrawString(x As Integer, y As Integer, sText As String, col As Pixel, Optional scale As Integer = 1)
+  Protected Sub DrawString(x As Integer, y As Integer, text As String, col As Pixel, Optional scale As Integer = 1)
 
     Dim sx = 0
     Dim sy = 0
     Dim m = m_pixelMode
 
+    'If m <> Pixel.Custom Then
     If col.A <> 255 Then
       SetPixelMode(Pixel.Mode.Alpha)
     Else
       SetPixelMode(Pixel.Mode.Mask)
     End If
+    'End If
 
-    For Each c In sText
+    For Each c In text
       If c = vbLf Then
         sx = 0
         sy += 8 * scale
@@ -2830,6 +2929,87 @@ next4:
 
   End Sub
 
+  Friend Function GetTextSizeProp(text As String) As Vi2d
+    Dim size = New Vi2d(0, 1)
+    Dim pos = New Vi2d(0, 1)
+    For Each c In text
+      If c = vbLf Then
+        pos.y += 1
+        pos.x = 0
+      ElseIf c = vbTab Then
+        pos.x += m_tabSizeInSpaces * 8
+      Else
+        pos.x += m_fontSpacing(AscW(c) - 32).y
+      End If
+      size.x = Math.Max(size.x, pos.x)
+      size.y = Math.Max(size.y, pos.y)
+    Next
+    size.y *= 8
+    Return size
+  End Function
+
+  Friend Sub DrawStringProp(pos As Vi2d, text As String)
+    DrawStringProp(pos, text, Presets.White, 1)
+  End Sub
+
+  Friend Sub DrawStringProp(pos As Vi2d, text As String, col As Pixel, Optional scale As Integer = 1)
+    DrawStringProp(pos.x, pos.y, text, col, scale)
+  End Sub
+
+  Friend Sub DrawStringProp(x As Integer, y As Integer, text As String, col As Pixel, Optional scale As Integer = 1)
+
+    Dim sx = 0
+    Dim sy = 0
+    Dim m = m_pixelMode
+
+    'If m <> Pixel.Custom Then
+    If col.A <> 255 Then
+      SetPixelMode(Pixel.Mode.Alpha)
+    Else
+      SetPixelMode(Pixel.Mode.Mask)
+    End If
+    'End If
+
+    For Each c In text
+      If c = vbLf Then
+        sx = 0
+        sy += 8 * scale
+      ElseIf c = vbTab Then
+        sx += 8 * m_tabSizeInSpaces * scale
+      Else
+        Dim ch = (Asc(c) - 32)
+        Dim ox = ch Mod 16
+        Dim oy = ch \ 16
+        If scale > 1 Then
+          For i = 0 To m_fontSpacing(ch).y - 1 '7
+            For j = 0 To 7
+              If m_fontSprite.GetPixel(i + ox * 8 + m_fontSpacing(ch).x, j + oy * 8).R > 0 Then
+                For iIs = 0 To scale - 1
+                  For js = 0 To scale - 1
+                    Draw(x + sx + (i * scale) + iIs, y + sy + (j * scale) + js, col)
+                  Next
+                Next
+              End If
+            Next
+          Next
+        Else
+          For i = 0 To m_fontSpacing(ch).y - 1 '7
+            For j = 0 To 7
+              If m_fontSprite.GetPixel(i + ox * 8 + m_fontSpacing(ch).x, j + oy * 8).R > 0 Then
+                Draw(x + sx + i, y + sy + j, col)
+              End If
+            Next
+          Next
+        End If
+        sx += m_fontSpacing(ch).y * scale
+      End If
+
+    Next
+
+    SetPixelMode(m)
+
+  End Sub
+
   Public Sub SetPixelMode(m As Pixel.Mode)
     m_pixelMode = m
   End Sub
@@ -2849,6 +3029,106 @@ next4:
     m_blendFactor = blend
     If m_blendFactor < 0.0F Then m_blendFactor = 0.0F
     If m_blendFactor > 1.0F Then m_blendFactor = 1.0F
+  End Sub
+
+  Public Sub TextEntryEnable(enable As Boolean, Optional text As String = "")
+    If enable Then
+      m_textEntryCursor = text.Length
+      m_textEntryString = text
+      m_textEntryEnable = True
+    Else
+      m_textEntryEnable = False
+    End If
+  End Sub
+
+  Public Function TextEntryGetString() As String
+    Return m_textEntryString
+  End Function
+
+  Public Function TextEntryGetCursor() As Integer
+    Return m_textEntryCursor
+  End Function
+
+  Public Function IsTextEntryEnabled() As Boolean
+    Return m_textEntryEnable
+  End Function
+
+  Private m_textEntryCursor As Integer
+  Private m_textEntryEnable As Boolean
+  Private m_textEntryString As String
+
+  Sub UpdateTextEntry()
+
+    ' Check for typed characters
+    For Each key In m_KeyboardMap
+      If GetKey(key.Item1).Pressed Then
+        m_textEntryString = m_TextEntryString.Insert(m_TextEntryCursor, If(GetKey(PixelGameEngine.Key.SHIFT).Held, key.Item3, key.Item2))
+        m_textEntryCursor += 1
+      End If
+    Next
+
+    ' Check for command characters
+    If GetKey(PixelGameEngine.Key.LEFT).Pressed Then
+      m_textEntryCursor = Math.Max(0, m_textEntryCursor - 1)
+    End If
+    If GetKey(PixelGameEngine.Key.RIGHT).Pressed Then
+      m_textEntryCursor = Math.Min(m_textEntryString.Length, m_textEntryCursor + 1)
+    End If
+    If GetKey(PixelGameEngine.Key.BACK).Pressed AndAlso m_textEntryCursor > 0 Then
+      m_textEntryString = m_textEntryString.Remove(m_textEntryCursor - 1, 1)
+      m_textEntryCursor = Math.Max(0, m_textEntryCursor - 1)
+    End If
+    If GetKey(PixelGameEngine.Key.DEL).Pressed AndAlso m_textEntryCursor < m_textEntryString.Length Then
+      m_textEntryString = m_textEntryString.Remove(m_textEntryCursor, 1)
+    End If
+
+    'If GetKey(PixelGameEngine.Key.UP).Pressed Then
+    '  If m_commandHistory.Any() Then
+    '    If m_commandHistoryIt <> m_commandHistory.GetEnumerator().Current Then
+    '      m_commandHistoryIt = m_ommandHistoryIt.Previous()
+    '    End If
+    '    m_textEntryCursor = m_commandHistoryIt.Value.Length
+    '    m_textEntryString = m_commandHistoryIt.Value
+    '  End If
+    'End If
+
+    'If GetKey(PixelGameEngine.Key.DOWN).Pressed Then
+    '  If m_commandHistory.Any() Then
+    '    If m_commandHistoryIt <> m_commandHistory.GetEnumerator().End Then
+    '      m_commandHistoryIt = m_commandHistoryIt.Next()
+    '      If m_commandHistoryIt <> m_commandHistory.GetEnumerator().End Then
+    '        m_textEntryCursor = m_commandHistoryIt.Value.Length
+    '        m_textEntryString = m_commandHistoryIt.Value
+    '      Else
+    '        m_textEntryCursor = 0
+    '        m_textEntryString = ""
+    '      End If
+    '    End If
+    '  End If
+    'End If
+
+    If GetKey(PixelGameEngine.Key.ENTER).Pressed Then
+      'If m_consoleShow Then
+      '  Console.WriteLine(">" & m_textEntryString)
+      '  If OnConsoleCommand(m_textEntryString) Then
+      '    m_commandHistory.Add(m_textEntryString)
+      '    m_commandHistoryIt = m_commandHistory.GetEnumerator().End
+      '  End If
+      '  m_textEntryString = ""
+      '  m_textEntryCursor = 0
+      'Else
+      OnTextEntryComplete(m_textEntryString)
+      TextEntryEnable(False)
+      'End If
+    End If
+
+  End Sub
+
+  ''' <summary>
+  ''' Called when a text entry is confirmed with "enter" key
+  ''' </summary>
+  ''' <param name="text"></param>
+  Public Overridable Sub OnTextEntryComplete(text As String)
   End Sub
 
   Protected Overridable Function OnUserCreate() As Boolean
@@ -3119,8 +3399,9 @@ next4:
 
           ' Cache mouse coordinates so they remain
           ' consistent during frame
-          m_mousePosX = m_mousePosXcache
-          m_mousePosY = m_mousePosYcache
+          'm_mousePosX = m_mousePosXcache
+          'm_mousePosY = m_mousePosYcache
+          m_mousePos = New Vi2d(m_mousePosXcache, m_mousePosYcache)
 
           m_mouseWheelDelta = m_mouseWheelDeltaCache
           m_mouseWheelDeltaCache = 0
@@ -3131,6 +3412,7 @@ next4:
           End If
 
           ' Handle Frame Update
+          m_lastElapsed = elapsedTime
           If Not OnUserUpdate(elapsedTime) Then
             Singleton.AtomActive = False
           End If
@@ -3320,12 +3602,42 @@ next4:
       For i = 0 To 23
         Dim k = If((r And (1 << i)) <> 0, 255, 0)
         m_fontSprite.SetPixel(px, py, New Pixel(k, k, k, k))
-        If System.Threading.Interlocked.Increment(py) = 48 Then
+        If Interlocked.Increment(py) = 48 Then
           px += 1 : py = 0
         End If
       Next
 
     Next
+
+    m_spacing = {
+      &H3, &H25, &H16, &H8, &H7, &H8, &H8, &H4, &H15, &H15, &H8, &H7, &H15, &H7, &H24, &H8,
+      &H8, &H17, &H8, &H8, &H8, &H8, &H8, &H8, &H8, &H8, &H24, &H15, &H6, &H7, &H16, &H17,
+      &H8, &H8, &H8, &H8, &H8, &H8, &H8, &H8, &H8, &H17, &H8, &H8, &H17, &H8, &H8, &H8,
+      &H8, &H8, &H8, &H8, &H17, &H8, &H8, &H8, &H8, &H17, &H8, &H15, &H8, &H15, &H8, &H8,
+      &H24, &H18, &H17, &H17, &H17, &H17, &H17, &H17, &H17, &H33, &H17, &H17, &H33, &H18, &H17, &H17,
+      &H17, &H17, &H17, &H17, &H7, &H17, &H17, &H18, &H18, &H17, &H17, &H7, &H33, &H7, &H8, &H0}
+
+    Dim offset = 0
+    For Each c In m_spacing
+      m_fontSpacing(offset) = New Vi2d(c >> 4, c And 15)
+      offset += 1
+    Next
+
+    m_KeyboardMap = New List(Of Tuple(Of Key, String, String)) From {
+      Tuple.Create(Key.A, "a", "A"), Tuple.Create(Key.B, "b", "B"), Tuple.Create(Key.C, "c", "C"), Tuple.Create(Key.D, "d", "D"), Tuple.Create(Key.E, "e", "E"),
+      Tuple.Create(Key.F, "f", "F"), Tuple.Create(Key.G, "g", "G"), Tuple.Create(Key.H, "h", "H"), Tuple.Create(Key.I, "i", "I"), Tuple.Create(Key.J, "j", "J"),
+      Tuple.Create(Key.K, "k", "K"), Tuple.Create(Key.L, "l", "L"), Tuple.Create(Key.M, "m", "M"), Tuple.Create(Key.N, "n", "N"), Tuple.Create(Key.O, "o", "O"),
+      Tuple.Create(Key.P, "p", "P"), Tuple.Create(Key.Q, "q", "Q"), Tuple.Create(Key.R, "r", "R"), Tuple.Create(Key.S, "s", "S"), Tuple.Create(Key.T, "t", "T"),
+      Tuple.Create(Key.U, "u", "U"), Tuple.Create(Key.V, "v", "V"), Tuple.Create(Key.W, "w", "W"), Tuple.Create(Key.X, "x", "X"), Tuple.Create(Key.Y, "y", "Y"),
+      Tuple.Create(Key.Z, "z", "Z"),
+      Tuple.Create(Key.K0, "0", ")"), Tuple.Create(Key.K1, "1", "!"), Tuple.Create(Key.K2, "2", """"), Tuple.Create(Key.K3, "3", "#"), Tuple.Create(Key.K4, "4", "$"),
+      Tuple.Create(Key.K5, "5", "%"), Tuple.Create(Key.K6, "6", "^"), Tuple.Create(Key.K7, "7", "&"), Tuple.Create(Key.K8, "8", "*"), Tuple.Create(Key.K9, "9", "("),
+      Tuple.Create(Key.NP0, "0", "0"), Tuple.Create(Key.NP1, "1", "1"), Tuple.Create(Key.NP2, "2", "2"), Tuple.Create(Key.NP3, "3", "3"), Tuple.Create(Key.NP4, "4", "4"),
+      Tuple.Create(Key.NP5, "5", "5"), Tuple.Create(Key.NP6, "6", "6"), Tuple.Create(Key.NP7, "7", "7"), Tuple.Create(Key.NP8, "8", "8"), Tuple.Create(Key.NP9, "9", "9"),
+      Tuple.Create(Key.NP_MUL, "*", "*"), Tuple.Create(Key.NP_DIV, "/", "/"), Tuple.Create(Key.NP_ADD, "+", "+"), Tuple.Create(Key.NP_SUB, "-", "-"), Tuple.Create(Key.NP_DECIMAL, ".", "."),
+      Tuple.Create(Key.PERIOD, ".", ">"), Tuple.Create(Key.EQUALS, "=", "+"), Tuple.Create(Key.COMMA, ",", "<"), Tuple.Create(Key.MINUS, "-", "_"), Tuple.Create(Key.SPACE, " ", " "),
+      Tuple.Create(Key.OEM_1, ";", ":"), Tuple.Create(Key.OEM_2, "/", "?"), Tuple.Create(Key.OEM_3, "'", "@"), Tuple.Create(Key.OEM_4, "[", "{"),
+      Tuple.Create(Key.OEM_5, "\", "|"), Tuple.Create(Key.OEM_6, "]", "}"), Tuple.Create(Key.OEM_7, "#", "~")}
 
   End Sub
 
@@ -3485,7 +3797,7 @@ next4:
     Win32.glViewport(m_viewX, m_viewY, m_viewW, m_viewH)
 
     ' Remove Frame cap
-    wglSwapInterval = CType(Marshal.GetDelegateForFunctionPointer(Win32.WglGetProcAddress("wglSwapIntervalEXT"), GetType(wglSwapInterval_t)), wglSwapInterval_t)
+    wglSwapInterval = CType(Marshal.GetDelegateForFunctionPointer(Win32.wglGetProcAddress("wglSwapIntervalEXT"), GetType(wglSwapInterval_t)), wglSwapInterval_t)
     If wglSwapInterval IsNot Nothing AndAlso Not m_enableVSYNC Then wglSwapInterval(0)
 
     Return True
