@@ -2072,7 +2072,7 @@ Public MustInherit Class PixelGameEngine
     End Get
   End Property
 
-  Friend ReadOnly Property GetMouse(b As Integer) As HwButton
+  Public ReadOnly Property GetMouse(b As Integer) As HwButton
     Get
       Return m_mouseState(b)
     End Get
