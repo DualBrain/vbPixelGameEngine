@@ -1,4 +1,4 @@
-This project has adopted a code of conduct is derived from [The Ruby Community Conduct Guideline](https://www.ruby-lang.org/en/conduct/).
+This project has adopted a code of conduct derived from [The Ruby Community Conduct Guideline](https://www.ruby-lang.org/en/conduct/).
 
 ---
 
