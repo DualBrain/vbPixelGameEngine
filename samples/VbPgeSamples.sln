@@ -179,6 +179,8 @@ Project("{778DAE3C-4631-46EA-AA77-85C1314464D9}") = "SVirjeeFractal", "graphics\
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "FlippyHexMaze", "graphics\FlippyHexMaze\FlippyHexMaze.vbproj", "{33127528-9DEF-4076-8A2B-9F2B04729898}"
 EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "FlippyHexMaze2", "graphics\FlippyHexMaze2\FlippyHexMaze2.vbproj", "{B78A983C-4D5D-4FCB-A6C1-4A9A2579AC86}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -489,6 +491,10 @@ Global
 		{33127528-9DEF-4076-8A2B-9F2B04729898}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{33127528-9DEF-4076-8A2B-9F2B04729898}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{33127528-9DEF-4076-8A2B-9F2B04729898}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B78A983C-4D5D-4FCB-A6C1-4A9A2579AC86}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B78A983C-4D5D-4FCB-A6C1-4A9A2579AC86}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B78A983C-4D5D-4FCB-A6C1-4A9A2579AC86}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B78A983C-4D5D-4FCB-A6C1-4A9A2579AC86}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -569,6 +575,7 @@ Global
 		{ED151673-E19F-4322-AADA-C0285CD8FD69} = {F82D3462-767B-44FC-9960-35DFB2257CD4}
 		{93ADC8EB-5A08-4A1B-A638-5FF5D7A34FEC} = {F82D3462-767B-44FC-9960-35DFB2257CD4}
 		{33127528-9DEF-4076-8A2B-9F2B04729898} = {F82D3462-767B-44FC-9960-35DFB2257CD4}
+		{B78A983C-4D5D-4FCB-A6C1-4A9A2579AC86} = {F82D3462-767B-44FC-9960-35DFB2257CD4}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {0A734DAD-9F0E-4DF0-A944-FEDFAD6EE10C}

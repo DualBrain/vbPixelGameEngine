@@ -3528,8 +3528,8 @@ next4:
             Dim title As String = Nothing
             'If Not ShowEngineName Then title = If(ShowIPS, $"{AppName} - IPS: {m_frameCount} ({avg})", AppName)
             'If ShowEngineName Then title = If(ShowIPS, $"vbPixelGameEngine v0.0.1 - {AppName} - IPS: {m_frameCount} ({avg})", $"vbPixelGameEngine v0.0.1 - {AppName}")
-            If Not ShowEngineName Then title = If(ShowIPS, $"{AppName} - IPS: {m_frameCount}", AppName)
-            If ShowEngineName Then title = If(ShowIPS, $"vbPixelGameEngine v0.0.1 - {AppName} - IPS: {m_frameCount}", $"vbPixelGameEngine v0.0.1 - {AppName}")
+            If Not ShowEngineName Then title = If(ShowIPS AndAlso Not m_enableVSYNC, $"{AppName} - IPS: {m_frameCount}", AppName)
+            If ShowEngineName Then title = If(ShowIPS AndAlso Not m_enableVSYNC, $"vbPixelGameEngine v0.0.1 - {AppName} - IPS: {m_frameCount}", $"vbPixelGameEngine v0.0.1 - {AppName}")
             m_frameCount = 0
 
             If IsOSPlatform(Windows) Then
