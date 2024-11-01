@@ -173,7 +173,11 @@ Project("{778DAE3C-4631-46EA-AA77-85C1314464D9}") = "79 - Spirographs", "olc\79 
 EndProject
 Project("{778DAE3C-4631-46EA-AA77-85C1314464D9}") = "Gears", "graphics\Gears\Gears.vbproj", "{A9DFD983-7F8C-4E34-B3FE-7EC20A9DF707}"
 EndProject
-Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "_playground", "graphics\_playground\_playground.vbproj", "{ED151673-E19F-4322-AADA-C0285CD8FD69}"
+Project("{778DAE3C-4631-46EA-AA77-85C1314464D9}") = "_playground", "graphics\_playground\_playground.vbproj", "{ED151673-E19F-4322-AADA-C0285CD8FD69}"
+EndProject
+Project("{778DAE3C-4631-46EA-AA77-85C1314464D9}") = "SVirjeeFractal", "graphics\SVirjeeFractal\SVirjeeFractal.vbproj", "{93ADC8EB-5A08-4A1B-A638-5FF5D7A34FEC}"
+EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "FlippyHexMaze", "graphics\FlippyHexMaze\FlippyHexMaze.vbproj", "{33127528-9DEF-4076-8A2B-9F2B04729898}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -477,6 +481,14 @@ Global
 		{ED151673-E19F-4322-AADA-C0285CD8FD69}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{ED151673-E19F-4322-AADA-C0285CD8FD69}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{ED151673-E19F-4322-AADA-C0285CD8FD69}.Release|Any CPU.Build.0 = Release|Any CPU
+		{93ADC8EB-5A08-4A1B-A638-5FF5D7A34FEC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{93ADC8EB-5A08-4A1B-A638-5FF5D7A34FEC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{93ADC8EB-5A08-4A1B-A638-5FF5D7A34FEC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{93ADC8EB-5A08-4A1B-A638-5FF5D7A34FEC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{33127528-9DEF-4076-8A2B-9F2B04729898}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{33127528-9DEF-4076-8A2B-9F2B04729898}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{33127528-9DEF-4076-8A2B-9F2B04729898}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{33127528-9DEF-4076-8A2B-9F2B04729898}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -555,6 +567,8 @@ Global
 		{B2016B01-5536-49F1-8CC4-56DD776EE2F5} = {01AD755D-1C8A-4B83-A857-A5F3945D234F}
 		{A9DFD983-7F8C-4E34-B3FE-7EC20A9DF707} = {F82D3462-767B-44FC-9960-35DFB2257CD4}
 		{ED151673-E19F-4322-AADA-C0285CD8FD69} = {F82D3462-767B-44FC-9960-35DFB2257CD4}
+		{93ADC8EB-5A08-4A1B-A638-5FF5D7A34FEC} = {F82D3462-767B-44FC-9960-35DFB2257CD4}
+		{33127528-9DEF-4076-8A2B-9F2B04729898} = {F82D3462-767B-44FC-9960-35DFB2257CD4}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {0A734DAD-9F0E-4DF0-A944-FEDFAD6EE10C}

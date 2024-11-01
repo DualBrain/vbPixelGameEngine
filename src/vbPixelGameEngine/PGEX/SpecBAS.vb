@@ -1,6 +1,4 @@
-﻿Imports System.Reflection.Metadata.Ecma335
-
-Public Class SpecBAS
+﻿Public Class SpecBAS
   Inherits PgeX
 
   Public Const PI As Single = 3.14159274
@@ -8,7 +6,16 @@ Public Class SpecBAS
 
   Private Shared m_ink As Integer = 0
   Private Shared m_paper As Integer = 8
-  Private Shared m_radians As Boolean = True
+  Private Shared m_stroke As Integer = 1
+
+  Private Shared m_mathMode As MathMode = MathMode.Radians
+
+  Private Enum MathMode
+    Radians
+    Degrees
+    Turns
+    Gradians
+  End Enum
 
   Public Shared Sub CLS()
     Pge.Clear(Palette(m_paper))
@@ -34,6 +41,10 @@ Public Class SpecBAS
     Return Pge.ScreenWidth
   End Function
 
+  Public Shared Sub STROKE(size As Double)
+    m_stroke = CInt(Fix(size))
+  End Sub
+
   Public Shared Function RGBTOINT(r As Double, g As Double, b As Double) As Integer
     Dim rr = CInt(r) : If rr < 0 Then rr = 0 Else If rr > 255 Then rr = 255
     Dim gg = CInt(g) : If gg < 0 Then gg = 0 Else If gg > 255 Then gg = 255
@@ -41,12 +52,20 @@ Public Class SpecBAS
     Return rr << 16 + gg << 8 + bb
   End Function
 
-  Public Shared Sub DEGREES()
-    m_radians = False
+  Public Shared Sub RADIANS()
+    m_mathMode = MathMode.Radians
   End Sub
 
-  Public Shared Sub RADIANS()
-    m_radians = True
+  Public Shared Sub DEGREES()
+    m_mathMode = MathMode.Degrees
+  End Sub
+
+  Public Shared Sub TURNS()
+    m_mathMode = MathMode.Turns
+  End Sub
+
+  Public Shared Sub GRADIANS()
+    m_mathMode = MathMode.Gradians
   End Sub
 
   Public Shared Function DEGTORAD(n As Double) As Double
@@ -65,28 +84,102 @@ Public Class SpecBAS
     Return n * 180 / MathF.PI
   End Function
 
+  Private Shared Function RadToAngle(angle As Single) As Single
+    Select Case m_mathMode
+      Case MathMode.Degrees : Return RADTODEG(angle) ' Degrees to radians
+      Case MathMode.Turns : Return angle / (PI * 2) ' Turns to radians
+      Case MathMode.Gradians : Return angle / (PI / 200) ' Gradians to radians
+      Case Else ' MathMode.Radians
+        Return angle
+    End Select
+  End Function
+
+  Private Shared Function RadToAngle(angle As Double) As Double
+    Select Case m_mathMode
+      Case MathMode.Degrees : Return RADTODEG(angle) ' Radians to degrees
+      Case MathMode.Turns : Return angle / (PI * 2) ' Radians to turns
+      Case MathMode.Gradians : Return angle / (PI / 200) ' Radians to Gradians
+      Case Else ' MathMode.Radians
+        Return angle
+    End Select
+  End Function
+
+  Private Shared Function AngleToRad(angle As Single) As Single
+    Select Case m_mathMode
+      Case MathMode.Degrees : Return DEGTORAD(angle) ' Degrees to radians
+      Case MathMode.Turns : Return angle * (PI * 2) ' Turns to radians
+      Case MathMode.Gradians : Return angle * (PI / 200) ' Gradians to radians
+      Case Else ' MathMode.Radians
+        Return angle
+    End Select
+  End Function
+
+  Private Shared Function AngleToRad(angle As Double) As Double
+    Select Case m_mathMode
+      Case MathMode.Degrees : Return DEGTORAD(angle) ' Degrees to radians
+      Case MathMode.Turns : Return angle * (PI * 2) ' Turns to radians
+      Case MathMode.Gradians : Return angle * (PI / 200) ' Gradians to radians
+      Case Else ' MathMode.Radians
+        Return angle
+    End Select
+  End Function
+
   Public Shared Function SIN(n As Single) As Single
-    Return MathF.Sin(If(m_radians, n, DEGTORAD(n)))
+    Dim v = AngleToRad(n)
+    Return MathF.Sin(v)
   End Function
 
   Public Shared Function SIN(n As Double) As Double
-    Return Math.Sin(If(m_radians, n, DEGTORAD(n)))
+    Dim v = AngleToRad(n)
+    Return Math.Sin(v)
   End Function
 
   Public Shared Function COS(n As Single) As Single
-    Return MathF.Cos(If(m_radians, n, DEGTORAD(n)))
+    Dim v = AngleToRad(n)
+    Return MathF.Cos(v)
   End Function
 
   Public Shared Function COS(n As Double) As Double
-    Return Math.Cos(If(m_radians, n, DEGTORAD(n)))
+    Dim v = AngleToRad(n)
+    Return Math.Cos(v)
+  End Function
+
+  Public Shared Function CEIL(n As Single) As Integer
+    Return CInt(Fix(MathF.Ceiling(n)))
+  End Function
+
+  Public Shared Function CEIL(n As Double) As Integer
+    Return CInt(Fix(Math.Ceiling(n)))
   End Function
 
   Public Shared Function ATN(n As Single) As Single
-    Return MathF.Atan(If(m_radians, n, DEGTORAD(n)))
+    Dim v = AngleToRad(n)
+    Return MathF.Atan(v)
   End Function
 
   Public Shared Function ATN(n As Double) As Double
-    Return Math.Atan(If(m_radians, n, DEGTORAD(n)))
+    Dim v = AngleToRad(n)
+    Return Math.Atan(v)
+  End Function
+
+  Public Shared Function ASN(n As Single) As Single
+    Dim v = AngleToRad(n)
+    Return MathF.Asin(v)
+  End Function
+
+  Public Shared Function ASN(n As Double) As Double
+    Dim v = AngleToRad(n)
+    Return Math.Asin(v)
+  End Function
+
+  Public Shared Function TAN(n As Single) As Single
+    Dim v = AngleToRad(n)
+    Return MathF.Tan(v)
+  End Function
+
+  Public Shared Function TAN(n As Double) As Double
+    Dim v = AngleToRad(n)
+    Return Math.Tan(v)
   End Function
 
   Public Shared Function SQR(n As Single) As Single
@@ -690,5 +783,17 @@ Public Class SpecBAS
       Next
     Next
   End Sub
+
+  Public Shared Function MID(a As Single, b As Single, c As Single) As Single
+    Return MathF.Max(MathF.Min(a, b), MathF.Min(MathF.Max(a, b), c))
+  End Function
+
+  Public Shared Function MID(a As Double, b As Double, c As Double) As Double
+    Return Math.Max(Math.Min(a, b), Math.Min(Math.Max(a, b), c))
+  End Function
+
+  Public Shared Function MSECS() As Integer
+    Return CInt(Fix((Microsoft.VisualBasic.DateAndTime.Timer * 1000)))
+  End Function
 
 End Class
