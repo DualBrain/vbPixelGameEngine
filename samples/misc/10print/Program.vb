@@ -31,7 +31,7 @@ Friend Class TenPrint
 
   Protected Overrides Function OnUserUpdate(elapsedTime As Single) As Boolean
 
-    Static tt As Single : Const DELAY As Single = 5 / 60.0!
+    Static tt As Single : Const DELAY As Single = 6 / 60.0!
     tt += elapsedTime : If tt < DELAY Then Return True Else tt -= DELAY
 
     Static y As Integer
@@ -40,27 +40,45 @@ Friend Class TenPrint
 
     Const PROBABILITY As Double = 0.43
 
-    ' Draw to buffer...
+    ' Set all drawing to memory buffer...
     SetDrawTarget(m_display)
-    Dim ys = y + SEGMENT_LENGTH - 2
-    For x = 0 To ScreenWidth - 1 Step SEGMENT_LENGTH
-      Dim t = Rnd <= PROBABILITY
-      Dim x1 = x + If(Not t, SEGMENT_LENGTH - 2, 0)
-      Dim x2 = x + If(t, SEGMENT_LENGTH - 2, 0)
-      Dim y1 = y
-      Dim y2 = ys
-      DrawLine(x1, y1, x2, y2, fColor) ' \
-    Next
+
     If y + SEGMENT_LENGTH > ScreenHeight Then
+      ' Scroll...
       y -= SEGMENT_LENGTH
       DrawPartialSprite(New Vi2d(0, 0),
                         m_display,
                         New Vi2d(0, SEGMENT_LENGTH),
                         New Vi2d(ScreenWidth, ScreenHeight - SEGMENT_LENGTH))
       FillRect(0, y, ScreenWidth, SEGMENT_LENGTH, bColor)
-    Else
-      y += SEGMENT_LENGTH
     End If
+
+    Dim ys = y + SEGMENT_LENGTH - 2
+    For x = 0 To ScreenWidth - 1 Step SEGMENT_LENGTH
+
+      ' \/
+      Dim t = Rnd <= PROBABILITY
+      Dim x1 = x + If(Not t, SEGMENT_LENGTH - 2, 0)
+      Dim x2 = x + If(t, SEGMENT_LENGTH - 2, 0)
+      Dim y1 = y
+      Dim y2 = ys
+
+      ' -| (basket)
+      'x1 = x + If(Not t, SEGMENT_LENGTH \ 2, 0)
+      'x2 = x + If(Not t, SEGMENT_LENGTH \ 2, SEGMENT_LENGTH)
+      'y1 = y + If(t, SEGMENT_LENGTH \ 2, 0)
+      'y2 = y + If(t, SEGMENT_LENGTH \ 2, SEGMENT_LENGTH)
+
+      ' -| (comb)
+      'x1 = x
+      'x2 = x + If(Not t, 0, SEGMENT_LENGTH)
+      'y1 = y + If(t, SEGMENT_LENGTH - 1, 0)
+      'y2 = y + SEGMENT_LENGTH - 1
+
+      DrawLine(x1, y1, x2, y2, fColor)
+
+    Next
+    y += SEGMENT_LENGTH
 
     ' Write buffer to screen.
     SetDrawTarget(Nothing)
