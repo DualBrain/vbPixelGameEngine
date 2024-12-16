@@ -185,6 +185,8 @@ Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "10print", "misc\10print\10p
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "Loxodrome", "graphics\Loxodrome\Loxodrome.vbproj", "{49FD21DC-1BA0-47E1-8DFE-9CC8C8E6A475}"
 EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "Shapes", "graphics\Shapes\Shapes.vbproj", "{4DFC7240-B2F7-41C4-9652-40BC93BCD88E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -507,6 +509,10 @@ Global
 		{49FD21DC-1BA0-47E1-8DFE-9CC8C8E6A475}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{49FD21DC-1BA0-47E1-8DFE-9CC8C8E6A475}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{49FD21DC-1BA0-47E1-8DFE-9CC8C8E6A475}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4DFC7240-B2F7-41C4-9652-40BC93BCD88E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4DFC7240-B2F7-41C4-9652-40BC93BCD88E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4DFC7240-B2F7-41C4-9652-40BC93BCD88E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4DFC7240-B2F7-41C4-9652-40BC93BCD88E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -590,6 +596,7 @@ Global
 		{B78A983C-4D5D-4FCB-A6C1-4A9A2579AC86} = {F82D3462-767B-44FC-9960-35DFB2257CD4}
 		{A2A30009-34B2-4912-8D1D-2D714919068D} = {7A5E4F08-59CB-4F16-AB84-81677057EBE9}
 		{49FD21DC-1BA0-47E1-8DFE-9CC8C8E6A475} = {F82D3462-767B-44FC-9960-35DFB2257CD4}
+		{4DFC7240-B2F7-41C4-9652-40BC93BCD88E} = {F82D3462-767B-44FC-9960-35DFB2257CD4}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {0A734DAD-9F0E-4DF0-A944-FEDFAD6EE10C}
