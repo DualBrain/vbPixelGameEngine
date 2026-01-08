@@ -1793,7 +1793,7 @@ Public MustInherit Class PixelGameEngine
 
   Public Function GetScreenSize() As (w As Integer, h As Integer)
 
-    If IsOSPlatform(Windows) Then
+    If IsOSPlatform(OSPlatform.Windows) Then
       Dim mi = New Win32.MONITORINFO With {.cbSize = Marshal.SizeOf(GetType(Win32.MONITORINFO))}
       If Win32.GetMonitorInfo(Win32.MonitorFromWindow(m_hWnd, 0), mi) Then
         Return (mi.rcMonitor.Right - mi.rcMonitor.Left, mi.rcMonitor.Bottom - mi.rcMonitor.Top)
@@ -1807,7 +1807,7 @@ Public MustInherit Class PixelGameEngine
 
   Public ReadOnly Property IsFullScreen As Boolean
     Get
-      If IsOSPlatform(Windows) Then
+      If IsOSPlatform(OSPlatform.Windows) Then
         Dim currentStyle = Win32.GetWindowLong(m_hWnd, GWL_STYLE)
         Return Not ((currentStyle And WS_OVERLAPPEDWINDOW) = WS_OVERLAPPEDWINDOW)
       Else
@@ -1819,7 +1819,7 @@ Public MustInherit Class PixelGameEngine
 
   Public Sub ToggleFullScreen()
 
-    If IsOSPlatform(Windows) Then
+    If IsOSPlatform(OSPlatform.Windows) Then
 
       ' Get the current window style
       Dim currentStyle = Win32.GetWindowLong(m_hWnd, GWL_STYLE)
@@ -1870,7 +1870,7 @@ Public MustInherit Class PixelGameEngine
 
   Public Sub DecreasePixelSize()
     If m_pixelWidth > 1 AndAlso m_pixelHeight > 1 Then
-      If IsOSPlatform(Windows) Then
+      If IsOSPlatform(OSPlatform.Windows) Then
         m_pixelWidth -= 1
         m_pixelHeight -= 1
         m_windowWidth = m_screenWidth * m_pixelWidth
@@ -1890,7 +1890,7 @@ Public MustInherit Class PixelGameEngine
 
   Public Sub IncreasePixelSize()
     'TODO: Possibly limit to a maximum?
-    If IsOSPlatform(Windows) Then
+    If IsOSPlatform(OSPlatform.Windows) Then
       m_pixelWidth += 1
       m_pixelHeight += 1
       m_windowWidth = m_screenWidth * m_pixelWidth
@@ -1908,7 +1908,7 @@ Public MustInherit Class PixelGameEngine
   End Sub
 
   Public Function CapsLock() As Boolean
-    If IsOSPlatform(Windows) Then
+    If IsOSPlatform(OSPlatform.Windows) Then
       Return (Win32.GetKeyState(VK_CAPITAL) And 1) <> 0
     Else
       If pge_Display <> IntPtr.Zero Then
@@ -1920,7 +1920,7 @@ Public MustInherit Class PixelGameEngine
   End Function
 
   Public Function NumLock() As Boolean
-    If IsOSPlatform(Windows) Then
+    If IsOSPlatform(OSPlatform.Windows) Then
       Return (Win32.GetKeyState(VK_NUMLOCK) And 1) <> 0
     Else
       If pge_Display <> IntPtr.Zero Then
@@ -1969,7 +1969,7 @@ Public MustInherit Class PixelGameEngine
     m_defaultDrawTarget = New Sprite(m_screenWidth, m_screenHeight)
     SetDrawTarget(Nothing)
 
-    If IsOSPlatform(Windows) Then
+    If IsOSPlatform(OSPlatform.Windows) Then
       Win32.glClear(GL_COLOR_BUFFER_BIT)
       Win32.SwapBuffers(m_glDeviceContext)
       Win32.glClear(GL_COLOR_BUFFER_BIT)
@@ -1987,7 +1987,7 @@ Public MustInherit Class PixelGameEngine
   Public Function Start() As RCode
 
     ' Construct the window
-    If IsOSPlatform(Windows) Then
+    If IsOSPlatform(OSPlatform.Windows) Then
       If WindowCreateWindows() = IntPtr.Zero Then Return RCode.Fail
     ElseIf IsOSPlatform(Linux) Then
       If WindowCreateLinux() = IntPtr.Zero Then Return RCode.Fail
@@ -1995,7 +1995,7 @@ Public MustInherit Class PixelGameEngine
       Return RCode.Fail
     End If
 
-    If IsOSPlatform(Windows) Then
+    If IsOSPlatform(OSPlatform.Windows) Then
       'FreeConsole() ' doesn't always work??????
       Dim ptr = Win32.GetConsoleWindow
       Win32.ShowWindow(ptr, 0)
@@ -2006,7 +2006,7 @@ Public MustInherit Class PixelGameEngine
     Dim t As New Thread(AddressOf EngineThread)
     t.Start()
 
-    If IsOSPlatform(Windows) Then
+    If IsOSPlatform(OSPlatform.Windows) Then
       ' Handle Windows Message Loop
       Dim m = New Win32.MSG With {.message = 0, ' Set the message parameter to zero to retrieve any message.
                                   .hWnd = IntPtr.Zero, ' Set the window handle parameter to zero to retrieve messages for any window.
@@ -3195,7 +3195,7 @@ next4:
 
   Private Sub EngineThread()
 
-    If IsOSPlatform(Windows) Then
+    If IsOSPlatform(OSPlatform.Windows) Then
       ' Start OpenGL, the context is owned by the game thread
       Pge_OpenGLCreate_Windows()
       ' Create Screen Texture - disable filtering
@@ -3419,7 +3419,7 @@ next4:
 
           'If True Then
 
-          If IsOSPlatform(Windows) Then
+          If IsOSPlatform(OSPlatform.Windows) Then
             Win32.glViewport(m_viewX, m_viewY, m_viewW, m_viewH)
             pixels = GCHandle.Alloc(m_defaultDrawTarget.GetData, GCHandleType.Pinned)
             Try
@@ -3532,7 +3532,7 @@ next4:
             If ShowEngineName Then title = If(ShowIPS AndAlso Not m_enableVSYNC, $"vbPixelGameEngine v0.0.1 - {AppName} - IPS: {m_frameCount}", $"vbPixelGameEngine v0.0.1 - {AppName}")
             m_frameCount = 0
 
-            If IsOSPlatform(Windows) Then
+            If IsOSPlatform(OSPlatform.Windows) Then
               Win32.SetWindowText(m_hWnd, title)
             ElseIf IsOSPlatform(Linux) Then
               X11.XStoreName(pge_Display, pge_Window, title)
@@ -3556,7 +3556,7 @@ next4:
       Marshal.FreeHGlobal(xe)
     End Try
 
-    If IsOSPlatform(Windows) Then
+    If IsOSPlatform(OSPlatform.Windows) Then
       Win32.wglDeleteContext(m_glRenderContext)
       Win32.PostMessage(m_hWnd, WM_DESTROY, IntPtr.Zero, IntPtr.Zero)
     ElseIf IsOSPlatform(Linux) Then
