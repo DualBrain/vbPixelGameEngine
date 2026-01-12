@@ -1,4 +1,4 @@
-﻿Imports System.Runtime.InteropServices
+Imports System.Runtime.InteropServices
 Imports System.Runtime.InteropServices.OSPlatform
 Imports System.Runtime.InteropServices.RuntimeInformation
 Imports System.Threading
@@ -1553,7 +1553,18 @@ Public MustInherit Class PixelGameEngine
                                                              ByRef attributes As XSetWindowAttributes ' XSetWindowAttributes*
                                                              ) As IntPtr ' Window
     Friend Declare Function XDefaultRootWindow Lib "libX11.so.6" (display As IntPtr) As IntPtr
+    Friend Declare Function XDefaultScreen Lib "libX11.so.6" (display As IntPtr) As Integer
+    Friend Declare Function XDefaultVisual Lib "libX11.so.6" (display As IntPtr, screen As Integer) As IntPtr
+    Friend Declare Function XDefaultDepth Lib "libX11.so.6" (display As IntPtr, screen As Integer) As Integer
+    Friend Declare Function XCreatePixmap Lib "libX11.so.6" (display As IntPtr, drawable As IntPtr, width As UInteger, height As UInteger, depth As UInteger) As IntPtr
     Friend Declare Function XDestroyWindow Lib "libX11.so.6" (display As IntPtr, window As IntPtr) As Integer
+    Friend Declare Sub XPutImage Lib "libX11.so.6" (display As IntPtr, drawable As IntPtr, gc As IntPtr, image As IntPtr, src_x As Integer, src_y As Integer, dest_x As Integer, dest_y As Integer, width As UInteger, height As UInteger)
+    Friend Declare Function XFreePixmap Lib "libX11.so.6" (display As IntPtr, pixmap As IntPtr) As Integer
+    Friend Declare Function XCreateImage Lib "libX11.so.6" (display As IntPtr, visual As IntPtr, depth As UInteger, format As Integer, offset As Integer, data As IntPtr, width As UInteger, height As UInteger, bitmap_pad As Integer, bytes_per_line As Integer) As IntPtr
+    Friend Declare Sub XDestroyImage Lib "libX11.so.6" (image As IntPtr)
+    Friend Declare Function XCreateGC Lib "libX11.so.6" (display As IntPtr, drawable As IntPtr, valuemask As ULong, values As IntPtr) As IntPtr
+    Friend Declare Function XFreeGC Lib "libX11.so.6" (display As IntPtr, gc As IntPtr) As Integer
+    Friend Declare Function XQueryExtension Lib "libX11.so.6" (display As IntPtr, <MarshalAs(UnmanagedType.LPStr)> name As String, ByRef major As Integer, ByRef minor As Integer, ByRef firstEvent As Integer, ByRef firstError As Integer) As Integer
     Friend Declare Function XFlush Lib "libX11.so.6" (display As IntPtr) As Integer
     Friend Declare Function XGetWindowAttributes Lib "libX11.so.6" (display As IntPtr, w As IntPtr, <Out> ByRef windowAttributesReturn As XWindowAttributes) As Integer
     Friend Declare Function XInitThreads Lib "libX11.so.6" () As Integer
@@ -1577,7 +1588,48 @@ Public MustInherit Class PixelGameEngine
                                                           protocols As Integer(), count As Integer)
 #Disable Warning CA2101 ' Specify marshaling for P/Invoke string arguments
     Friend Declare Sub XStoreName Lib "libX11.so.6" (display As IntPtr, window As IntPtr, <MarshalAs(UnmanagedType.LPStr)> title As String)
-#Enable Warning CA2101 ' Specify marshaling for P/Invoke string arguments
+
+#End Region
+
+#Region "Linux P/Invoke - XRender"
+
+  Public Const PictOpSrc As Integer = 1
+
+  <StructLayout(LayoutKind.Sequential)>
+  Public Structure XRenderPictFormat
+    Public id As UInteger
+    Public type As Integer
+    Public depth As Integer
+    ' Simplified; add more fields if needed
+  End Structure
+
+  <StructLayout(LayoutKind.Sequential)>
+  Public Structure XTransform
+    Public m11 As Integer
+    Public m12 As Integer
+    Public m13 As Integer
+    Public m21 As Integer
+    Public m22 As Integer
+    Public m23 As Integer
+    Public m31 As Integer
+    Public m32 As Integer
+    Public m33 As Integer
+  End Structure
+
+  Friend Declare Function XRenderFindVisualFormat Lib "libXrender.so.1" (display As IntPtr, visual As IntPtr) As IntPtr
+  Friend Declare Function XRenderCreatePicture Lib "libXrender.so.1" (display As IntPtr, drawable As IntPtr, format As IntPtr, valuemask As UInteger, attributes As IntPtr) As UInteger
+  Friend Declare Sub XRenderComposite Lib "libXrender.so.1" (display As IntPtr, op As Integer, src As UInteger, mask As UInteger, dst As UInteger, src_x As Integer, src_y As Integer, mask_x As Integer, mask_y As Integer, dst_x As Integer, dst_y As Integer, width As UInteger, height As UInteger)
+  Friend Declare Sub XRenderFreePicture Lib "libXrender.so.1" (display As IntPtr, picture As UInteger)
+  Friend Declare Sub XRenderSetPictureTransform Lib "libXrender.so.1" (display As IntPtr, picture As UInteger, transform As IntPtr)
+  Friend Declare Sub XRenderFillRectangle Lib "libXrender.so.1" (display As IntPtr, op As Integer, dst As UInteger, color As IntPtr, x As Integer, y As Integer, width As UInteger, height As UInteger)
+
+  <StructLayout(LayoutKind.Sequential)>
+  Public Structure XRenderColor
+    Public red As UShort
+    Public green As UShort
+    Public blue As UShort
+    Public alpha As UShort
+  End Structure
 
 #End Region
 
@@ -1591,6 +1643,10 @@ Public MustInherit Class PixelGameEngine
   Private pge_VisualInfo As IntPtr
   Private pge_ColorMap As IntPtr
   Private pge_SetWindowAttribs As X11.XSetWindowAttributes
+  Private pge_Visual As IntPtr
+  Private pge_RenderFormat As IntPtr
+  Private pge_WindowPicture As UInteger
+  Private pge_Depth As Integer
 
 #End Region
 
@@ -3207,7 +3263,7 @@ next4:
       Win32.glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL)
     ElseIf IsOSPlatform(Linux) Then
       ' Start OpenGL, the context is owned by the game thread
-      Pge_OpenGLCreate_Linux()
+      Pge_XRenderInit_Linux()
       ' Create Screen Texture - disable filtering
       X11.glEnable(GL_TEXTURE_2D)
       X11.glGenTextures(1, m_glBuffer)
@@ -3437,22 +3493,73 @@ next4:
             ' Preset Graphics to screen
             Win32.SwapBuffers(m_glDeviceContext)
           Else
-            X11.glViewport(m_viewX, m_viewY, m_viewW, m_viewH)
+            ' XRender rendering
             Dim pixel = GCHandle.Alloc(m_defaultDrawTarget.GetData, GCHandleType.Pinned)
             Try
-              X11.glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_screenWidth, m_screenHeight, GL_RGBA, GL_UNSIGNED_BYTE, pixel.AddrOfPinnedObject())
+            Try
+              Dim pixmap = X11.XCreatePixmap(pge_Display, pge_Window, CUInt(m_screenWidth), CUInt(m_screenHeight), CUInt(pge_Depth))
+              If pixmap <> IntPtr.Zero Then
+                Dim image = X11.XCreateImage(pge_Display, pge_Visual, CUInt(pge_Depth), 2, 0, pixel.AddrOfPinnedObject(), CUInt(m_screenWidth), CUInt(m_screenHeight), 32, 0)
+                If image <> IntPtr.Zero Then
+                  Dim gc = X11.XCreateGC(pge_Display, pixmap, 0, IntPtr.Zero)
+                  If gc <> IntPtr.Zero Then
+                    X11.XPutImage(pge_Display, pixmap, gc, image, 0, 0, 0, 0, CUInt(m_screenWidth), CUInt(m_screenHeight))
+
+                    Dim pixPicture = X11.XRenderCreatePicture(pge_Display, pixmap, pge_RenderFormat, 0, IntPtr.Zero)
+                    If pixPicture <> 0 Then
+                      ' Set transform for scaling to fill the window
+                      Dim transform As X11.XTransform
+                      Dim scaleX = m_screenWidth / m_viewW
+                      Dim scaleY = m_screenHeight / m_viewH
+                      transform.m11 = CInt(scaleX * (1 << 16))
+                      transform.m12 = 0
+                      transform.m13 = 0
+                      transform.m21 = 0
+                      transform.m22 = CInt(scaleY * (1 << 16))
+                      transform.m23 = 0
+                      transform.m31 = 0
+                      transform.m32 = 0
+                      transform.m33 = 1 << 16
+                      Dim transformPtr = Marshal.AllocHGlobal(Marshal.SizeOf(transform))
+                      Marshal.StructureToPtr(transform, transformPtr, False)
+                      X11.XRenderSetPictureTransform(pge_Display, pixPicture, transformPtr)
+                      Marshal.FreeHGlobal(transformPtr)
+
+                      ' Clear the entire window to black
+                      Dim blackColor As X11.XRenderColor
+                      blackColor.red = 0
+                      blackColor.green = 0
+                      blackColor.blue = 0
+                      blackColor.alpha = &HFFFF
+                      Dim colorPtr = Marshal.AllocHGlobal(Marshal.SizeOf(blackColor))
+                      Marshal.StructureToPtr(blackColor, colorPtr, False)
+                      X11.XRenderFillRectangle(pge_Display, X11.PictOpSrc, pge_WindowPicture, colorPtr, 0, 0, CUInt(m_windowWidth), CUInt(m_windowHeight))
+                      Marshal.FreeHGlobal(colorPtr)
+
+                      ' XRenderComposite with transform applied to src
+                      'Console.WriteLine("View: " & m_viewW & "x" & m_viewH & " Screen: " & m_screenWidth & "x" & m_screenHeight & " Scale: " & scaleX)
+                      X11.XRenderComposite(pge_Display, X11.PictOpSrc, pixPicture, 0, pge_WindowPicture, 0, 0, 0, 0, m_viewX, m_viewY, CUInt(m_viewW), CUInt(m_viewH))
+
+                      ' Cleanup
+                      X11.XRenderFreePicture(pge_Display, pixPicture)
+                    End If
+                    X11.XFreeGC(pge_Display, gc)
+                  End If
+                  ' XDestroyImage  ' Avoid freeing pinned data
+                End If
+                X11.XFreePixmap(pge_Display, pixmap)
+              End If
+              Catch ex As Exception
+                Console.WriteLine("Error in XRender rendering: " & ex.Message)
+              End Try
             Finally
               pixel.Free()
             End Try
-            ' Display texture on screen
-            X11.glBegin(GL_QUADS)
-            X11.glTexCoord2f(0.0, 1.0) : X11.glVertex3f(-1.0F + m_subPixelOffsetX, -1.0F + m_subPixelOffsetY, 0.0F)
-            X11.glTexCoord2f(0.0, 0.0) : X11.glVertex3f(-1.0F + m_subPixelOffsetX, 1.0F + m_subPixelOffsetY, 0.0F)
-            X11.glTexCoord2f(1.0, 0.0) : X11.glVertex3f(1.0F + m_subPixelOffsetX, 1.0F + m_subPixelOffsetY, 0.0F)
-            X11.glTexCoord2f(1.0, 1.0) : X11.glVertex3f(1.0F + m_subPixelOffsetX, -1.0F + m_subPixelOffsetY, 0.0F)
-            X11.glEnd()
-            ' Preset Graphics to screen
-            X11.glXSwapBuffers(pge_Display, pge_Window)
+            ' Flush to display
+            X11.XFlush(pge_Display)
+
+            ' Cap frame rate to reduce X server load
+            Thread.Sleep(16)  ' ~60 FPS
           End If
 
           'Else
@@ -3908,14 +4015,26 @@ next4:
 
     Dim rslt = X11.XInitThreads()
 
-    ' Grab the deafult display and window
+    ' Grab the default display and window
     pge_Display = X11.XOpenDisplay(Nothing)
+    ' Check for XRender extension
+    Dim major, minor, firstEvent, firstError As Integer
+    If X11.XQueryExtension(pge_Display, "RENDER", major, minor, firstEvent, firstError) = 0 Then
+      Console.WriteLine("ERROR: XRender extension not supported on this display.")
+      Return IntPtr.Zero
+    End If
     pge_WindowRoot = X11.XDefaultRootWindow(pge_Display)
 
-    ' Based on the display capabilities, configure the appearance of the window
-    Dim pge_GLAttribs() = {GLX_RGBA, GLX_DEPTH_SIZE, 24, GLX_DOUBLEBUFFER, None}
+    ' Choose a visual suitable for OpenGL/XRender (reuse GLX selection)
+    Dim pge_GLAttribs() = {GLX_RGBA, GLX_DEPTH_SIZE, 32, GLX_DOUBLEBUFFER, None}
     pge_VisualInfo = X11.glXChooseVisual(pge_Display, 0, pge_GLAttribs)
+    If pge_VisualInfo = IntPtr.Zero Then
+      Console.WriteLine("ERROR: No suitable visual found.")
+      Return IntPtr.Zero
+    End If
     Dim vi = Marshal.PtrToStructure(Of X11.XVisualInfo)(pge_VisualInfo)
+    pge_Visual = vi.Visual
+    pge_Depth = vi.Depth
     pge_ColorMap = X11.XCreateColormap(pge_Display, pge_WindowRoot, vi.Visual, AllocNone)
     pge_SetWindowAttribs.Colormap = pge_ColorMap
 
@@ -3937,6 +4056,13 @@ next4:
 
     X11.XMapWindow(pge_Display, pge_Window)
     X11.XStoreName(pge_Display, pge_Window, "vbPixelGameEngine")
+
+    ' Get XRender format for the visual
+    pge_RenderFormat = X11.XRenderFindVisualFormat(pge_Display, vi.Visual)
+    If pge_RenderFormat = IntPtr.Zero Then
+      Console.WriteLine("ERROR: XRenderFindVisualFormat failed.")
+      Return IntPtr.Zero
+    End If
 
     If m_fullScreen Then ' Thanks DragonEye, again :D
       Dim wm_state = X11.XInternAtom(pge_Display, "_NET_WM_STATE", False)
@@ -4009,26 +4135,19 @@ next4:
 
   End Function
 
-  Function Pge_OpenGLCreate_Linux() As Boolean
+  Function Pge_XRenderInit_Linux() As Boolean
 
-    Dim glDeviceContext = X11.glXCreateContext(pge_Display, pge_VisualInfo, IntPtr.Zero, GL_TRUE = 1)
-    Dim rslt = X11.glXMakeCurrent(pge_Display, pge_Window, glDeviceContext)
-
-    Dim gwa As X11.XWindowAttributes
-    Dim hrslt = X11.XGetWindowAttributes(pge_Display, pge_Window, gwa)
-    X11.glViewport(0, 0, gwa.Width, gwa.Height)
-
-    'Dim glSwapIntervalEXT As glSwapInterval_t = Nothing
-    glSwapIntervalEXT = CType(Marshal.GetDelegateForFunctionPointer(X11.glXGetProcAddress("glXSwapIntervalEXT"), GetType(glSwapInterval_t)), glSwapInterval_t)
-
-    If glSwapIntervalEXT Is Nothing AndAlso Not m_enableVSYNC Then
-      Console.WriteLine("NOTE: Could not disable VSYNC, glXSwapIntervalEXT() was not found!")
-      Console.WriteLine("      Don't worry though, things will still work, it's just the")
-      Console.WriteLine("      frame rate will be capped to your monitors refresh rate - javidx9")
+    ' Create XRender Picture for the window
+    pge_WindowPicture = X11.XRenderCreatePicture(pge_Display, pge_Window, pge_RenderFormat, 0, IntPtr.Zero)
+    If pge_WindowPicture = 0 Then
+      Console.WriteLine("ERROR: XRenderCreatePicture for window failed.")
+      Return False
     End If
 
-    If glSwapIntervalEXT IsNot Nothing AndAlso Not m_enableVSYNC Then
-      glSwapIntervalEXT(pge_Display, pge_Window, 0)
+    ' Note: VSYNC is not directly supported in XRender; frame timing handled in main loop
+    If Not m_enableVSYNC Then
+      Console.WriteLine("NOTE: VSYNC control is not available with XRender.")
+      Console.WriteLine("      Frame rate may be capped to display refresh rate.")
     End If
 
     Return True
@@ -4177,7 +4296,7 @@ next4:
 
 #End Region
 
-End Class
+  End Class
 
 Public MustInherit Class PgeX
 
