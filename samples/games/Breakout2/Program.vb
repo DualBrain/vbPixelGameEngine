@@ -45,8 +45,8 @@ Friend Class Breakout
   Private ReadOnly m_paddle As New Paddle(PaddleColor, 24, 4)
   Private ReadOnly m_ball As New Ball(BallColor, 4, 4, New Point(1, 1))
 
-  Private m_ballDx As Integer = 5
-  Private m_ballDy As Integer = -5
+  Private m_ballDx As Single = 5
+  Private m_ballDy As Single = -5
   Private m_ballSpeed As Single = 0.05
   Private m_ballSpeedMax As Single = 1.1
 
@@ -87,9 +87,9 @@ Friend Class Breakout
     Dim wallLeftBottom = New Block(WallLeftBottomColor, 0, m_paddleTop, 16, 7)
     Dim wallRightBottom = New Block(RED, w - ww, m_paddleTop, 16, 6)
 
-    m_fieldLeft = wallLeft.Rect.X + wallLeft.Rect.Width
-    m_fieldTop = wallHoriz.Rect.Y + wallHoriz.Rect.Height
-    m_fieldRight = wallRight.Rect.X
+    m_fieldLeft = CInt(Fix(wallLeft.Rect.X + wallLeft.Rect.Width))
+    m_fieldTop = CInt(Fix(wallHoriz.Rect.Y + wallHoriz.Rect.Height))
+    m_fieldRight = CInt(Fix(wallRight.Rect.X))
 
     m_walls.Add(wallLeft)
     m_walls.Add(wallRight)
@@ -112,7 +112,7 @@ Friend Class Breakout
         Case Else
       End Select
       For c = 0 To 17
-        m_blocksContainer.Add(New Block(p, (wallLeft.Rect.X + ww) + c * bw, 26 + (wallHoriz.Rect.Y + wh) + r * bh, bw, bh))
+        m_blocksContainer.Add(New Block(p, (CInt(Fix(wallLeft.Rect.X)) + ww) + c * bw, 26 + (CInt(Fix(wallHoriz.Rect.Y)) + wh) + r * bh, bw, bh))
       Next
     Next
 
@@ -324,8 +324,9 @@ Friend Class Breakout
       m_ball.Rect.X = m_fieldRight - 4
       m_ballDx = -m_ballDx
     End If
-    If m_ball.Rect.Y > m_paddleTop Then ' ScreenHeight Then
-      If m_ball.Rect.X + m_ball.Rect.Width - 1 >= m_paddle.Rect.X AndAlso m_ball.Rect.X <= m_paddle.Rect.X + m_paddle.Rect.Width - 1 Then
+    If m_ball.Rect.Y > m_paddleTop Then
+      If m_ball.Rect.X + m_ball.Rect.Width - 1 >= m_paddle.Rect.X AndAlso
+         m_ball.Rect.X <= m_paddle.Rect.X + m_paddle.Rect.Width - 1 Then
         ' hit the paddle
 
         'm_ballDy = -5
@@ -336,15 +337,30 @@ Friend Class Breakout
         'm_ballDx = -CInt(Fix((m_ballDy / 24) * (m_paddle.Rect.X - m_ball.Rect.X)))
         'm_ballDy = -m_ballDy
 
-        Dim center = m_paddle.Rect.X + (m_paddle.Rect.Width \ 2)
-        Dim d = center - m_ball.Rect.X
-        m_ballDx = CInt(Fix(d * -0.6))
-
-        'Dim angle = 1 - 2 * (m_ball.Rect.X - m_paddle.Rect.X) / m_paddle.Rect.Width
-        'Dim mult = If(m_ballDx < 0, -5, 5)
-        'm_ballDx = CInt(Fix(mult * angle))
-        m_ballDy = -m_ballDy
         m_ball.Rect.Y = m_paddleTop
+
+        Dim angleOfDeflection = MathF.Atan2(m_ball.Rect.Y - m_paddle.Rect.Y, m_ball.Rect.X - m_paddle.Rect.X)
+        If angleOfDeflection > 0 Then
+          angleOfDeflection += MathF.PI / 2
+        Else
+          angleOfDeflection -= MathF.PI / 2
+        End If
+
+        'm_ballDx *= MathF.Cos(angleOfDeflection)
+        'm_ballDy *= MathF.Sin(angleOfDeflection)
+        'm_ballDx = -m_ballDx '+ angleOfDeflection
+        m_ballDx += angleOfDeflection
+        m_ballDy = -m_ballDy
+
+        'Dim center = m_paddle.Rect.X + (m_paddle.Rect.Width \ 2)
+        'Dim d = center - m_ball.Rect.X
+        'm_ballDx = CInt(Fix(d * -0.6))
+
+        ''Dim angle = 1 - 2 * (m_ball.Rect.X - m_paddle.Rect.X) / m_paddle.Rect.Width
+        ''Dim mult = If(m_ballDx < 0, -5, 5)
+        ''m_ballDx = CInt(Fix(mult * angle))
+        'm_ballDy = -m_ballDy
+        'm_ball.Rect.Y = m_paddleTop
 
         m_score += 1
 

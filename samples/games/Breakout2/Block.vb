@@ -2,8 +2,8 @@
 
 Friend Class Rectangle
 
-  Public Property X As Integer
-  Public Property Y As Integer
+  Public Property X As Single 'Integer
+  Public Property Y As Single 'Integer
   Public Property Width As Integer
   Public Property Height As Integer
 
