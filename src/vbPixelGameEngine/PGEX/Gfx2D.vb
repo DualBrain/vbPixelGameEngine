@@ -1,8 +1,4 @@
-﻿Option Explicit On
-Option Strict On
-Option Infer On
-
-Imports VbPixelGameEngine.PixelGameEngine
+﻿Imports VbPixelGameEngine.PixelGameEngine
 
 ' Container class for Advanced 2D Drawing functions
 Public Class Gfx2D

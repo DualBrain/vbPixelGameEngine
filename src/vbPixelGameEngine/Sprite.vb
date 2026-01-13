@@ -147,6 +147,7 @@ Public Class Sprite
 
   Public Function SetPixel(x As Integer, y As Integer, p As Pixel) As Boolean
     If x >= 0 AndAlso x < Width AndAlso y >= 0 AndAlso y < Height Then
+      If OperatingSystem.IsLinux Then Dim t = p.R : p.R = p.B : p.B = t
       m_pixelColData(y * Width + x) = p
       Return True
     Else
@@ -157,12 +158,16 @@ Public Class Sprite
   Public Function GetPixel(x As Integer, y As Integer) As Pixel
     If m_modeSample = Mode.Normal Then
       If x >= 0 AndAlso x < Width AndAlso y >= 0 AndAlso y < Height Then
-        Return m_pixelColData(y * Width + x)
+        Dim p = m_pixelColData(y * Width + x)
+        If OperatingSystem.IsLinux Then Dim t = p.R : p.R = p.B : p.B = t
+        Return p
       Else
         Return New Pixel(0, 0, 0, &HFF)
       End If
     Else
-      Return m_pixelColData(Math.Abs(y Mod Height) * Width + Math.Abs(x Mod Width))
+      Dim p = m_pixelColData(Math.Abs(y Mod Height) * Width + Math.Abs(x Mod Width))
+      If OperatingSystem.IsLinux Then Dim t = p.R : p.R = p.B : p.B = t
+      Return p
     End If
   End Function
 

@@ -1,8 +1,4 @@
-﻿Option Explicit On
-Option Strict On
-Option Infer On
-
-Imports VbPixelGameEngine.PixelGameEngine
+﻿Imports VbPixelGameEngine.PixelGameEngine
 
 ' NOTE: Original version of this was based on v0.1
 '       Recently updated to bring in line with v0.3
