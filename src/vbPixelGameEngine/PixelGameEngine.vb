@@ -1588,12 +1588,12 @@ Public MustInherit Class PixelGameEngine
                                                               protocols As Integer(), count As Integer)
 #Disable Warning CA2101 ' Specify marshaling for P/Invoke string arguments
         Friend Declare Sub XStoreName Lib "libX11.so.6" (display As IntPtr, window As IntPtr, <MarshalAs(UnmanagedType.LPStr)> title As String)
-        
+
         ' Xkb declarations for CapsLock state
         Friend Declare Function XkbQueryExtension Lib "libX11.so.6" (display As IntPtr, ByRef majorOpcode As Short, ByRef minorOpcode As Short, ByRef majorVersion As Short, ByRef minorVersion As Short) As Integer
         Friend Declare Function XkbGetIndicatorState Lib "libX11.so.6" (display As IntPtr, deviceSpec As UInteger, statePtr As IntPtr) As Integer
         Public Const XkbUseCoreKbd As UInteger = &H100
-        
+
         ' Additional X11 functions for CapsLock detection
         Friend Declare Function XGetKeyboardMapping Lib "libX11.so.6" (display As IntPtr, firstKeyCode As Integer, count As Integer) As IntPtr
         Friend Declare Function XGetModifierMapping Lib "libX11.so.6" (display As IntPtr) As IntPtr
@@ -1976,27 +1976,27 @@ Public MustInherit Class PixelGameEngine
     Private Sub InitializeCapsLockState()
         ' Get CapsLock lock state from OS
         System.IO.File.AppendAllText("init_debug.log", $"=== InitializeCapsLockState ==={Environment.NewLine}")
-        
+
         If IsOSPlatform(OSPlatform.Windows) Then
             m_capsLockState = (Win32.GetKeyState(VK_CAPITAL) And 1) <> 0
             System.IO.File.AppendAllText("init_debug.log", $"Windows query result: {m_capsLockState}{Environment.NewLine}")
-ElseIf IsOSPlatform(Linux) AndAlso pge_Display <> IntPtr.Zero Then
+        ElseIf IsOSPlatform(Linux) AndAlso pge_Display <> IntPtr.Zero Then
             System.IO.File.AppendAllText("init_debug.log", $"Linux branch entered{Environment.NewLine}")
             System.IO.File.AppendAllText("init_debug.log", $"pge_Display: {pge_Display}{Environment.NewLine}")
-            
+
             ' PRACTICAL APPROACH: Try OS detection first, but default to False if it fails
             ' The important thing is that CapsLock key events work, so users can toggle properly
             Dim detectedState As Boolean = False
-            
+
             Try
                 System.IO.File.AppendAllText("init_debug.log", $"Attempting practical detection...{Environment.NewLine}")
-                
+
                 ' Try XkbGetIndicatorState one more time with proper error handling
                 Dim statePtr = Marshal.AllocHGlobal(4)
                 Try
                     Dim result = X11.XkbGetIndicatorState(pge_Display, X11.XkbUseCoreKbd, statePtr)
                     System.IO.File.AppendAllText("init_debug.log", $"XkbGetIndicatorState result: {result}{Environment.NewLine}")
-                    
+
                     If result = 1 Then
                         Dim state = Marshal.ReadInt32(statePtr)
                         detectedState = (state And 1) <> 0
@@ -2007,34 +2007,34 @@ ElseIf IsOSPlatform(Linux) AndAlso pge_Display <> IntPtr.Zero Then
                 Finally
                     Marshal.FreeHGlobal(statePtr)
                 End Try
-                
+
             Catch ex As Exception
                 System.IO.File.AppendAllText("init_debug.log", $"Detection exception: {ex.Message}{Environment.NewLine}")
             End Try
-            
+
             ' IMPORTANT: Even if detection fails, CapsLock key events work, so user can still toggle!
             ' Try sysfs approach as most reliable method for modern Linux
             If Not detectedState Then
                 detectedState = TryGetCapsLockViaSysfs()
             End If
-            
+
             m_capsLockState = detectedState
             System.IO.File.AppendAllText("init_debug.log", $"Final CapsLock state: {m_capsLockState}{Environment.NewLine}")
-            
+
             ' For debugging: Try to read sysfs regardless to see what's there
             TryGetCapsLockViaSysfs()
         Else
             System.IO.File.AppendAllText("init_debug.log", $"Skipping OS query (not Linux or pge_Display is zero){Environment.NewLine}")
         End If
-        
+
         System.IO.File.AppendAllText("init_debug.log", $"Final CapsLock state: {m_capsLockState}{Environment.NewLine}")
-        
+
         ' Initialize the keyboard state arrays with CapsLock lock state
         m_keyNewState(Key.CAPS_LOCK) = m_capsLockState
         m_keyOldState(Key.CAPS_LOCK) = m_capsLockState
         m_keyboardState(Key.CAPS_LOCK).Held = m_capsLockState
     End Sub
-    
+
     Private Sub TryGetCapsLockViaXkb()
         Try
             System.IO.File.AppendAllText("init_debug.log", $"Trying XkbGetIndicatorState...{Environment.NewLine}")
@@ -2042,7 +2042,7 @@ ElseIf IsOSPlatform(Linux) AndAlso pge_Display <> IntPtr.Zero Then
             Try
                 Dim result = X11.XkbGetIndicatorState(pge_Display, X11.XkbUseCoreKbd, statePtr)
                 System.IO.File.AppendAllText("init_debug.log", $"XkbGetIndicatorState result: {result}{Environment.NewLine}")
-                
+
                 If result = 1 Then
                     Dim state = Marshal.ReadInt32(statePtr)
                     System.IO.File.AppendAllText("init_debug.log", $"Xkb state value: {state} (binary: {Convert.ToString(state, 2).PadLeft(8, "0"c)}){Environment.NewLine}")
@@ -2058,16 +2058,16 @@ ElseIf IsOSPlatform(Linux) AndAlso pge_Display <> IntPtr.Zero Then
             System.IO.File.AppendAllText("init_debug.log", $"Xkb exception: {ex.Message}{Environment.NewLine}")
         End Try
     End Sub
-    
+
     Private Function TryGetCapsLockViaSysfs() As Boolean
         Try
             ' Try reading from /sys/class/leds/ which is the most reliable method
             System.IO.File.AppendAllText("init_debug.log", $"Trying sysfs approach...{Environment.NewLine}")
-            
+
             ' Common paths for CapsLock LED on Linux
             Dim ledPaths As String() = {
                 "/sys/class/leds/input0::capslock/brightness",
-                "/sys/class/leds/input1::capslock/brightness", 
+                "/sys/class/leds/input1::capslock/brightness",
                 "/sys/class/leds/input2::capslock/brightness",
                 "/sys/class/leds/input3::capslock/brightness",
                 "/sys/class/leds/input4::capslock/brightness",
@@ -2075,7 +2075,7 @@ ElseIf IsOSPlatform(Linux) AndAlso pge_Display <> IntPtr.Zero Then
                 "/sys/class/leds/platform::capslock/brightness",
                 "/sys/class/leds/tpacpi::capslock/brightness"
             }
-            
+
             For Each path In ledPaths
                 If System.IO.File.Exists(path) Then
                     Dim brightness = System.IO.File.ReadAllText(path).Trim()
@@ -2084,7 +2084,7 @@ ElseIf IsOSPlatform(Linux) AndAlso pge_Display <> IntPtr.Zero Then
                     Return isOn
                 End If
             Next
-            
+
             ' Try searching for any capslock LED
             If System.IO.Directory.Exists("/sys/class/leds/") Then
                 Dim ledDirs = System.IO.Directory.GetDirectories("/sys/class/leds/")
@@ -2100,22 +2100,22 @@ ElseIf IsOSPlatform(Linux) AndAlso pge_Display <> IntPtr.Zero Then
                     End If
                 Next
             End If
-            
+
             System.IO.File.AppendAllText("init_debug.log", $"No CapsLock LED found in sysfs{Environment.NewLine}")
             Return False
-            
+
         Catch ex As Exception
             System.IO.File.AppendAllText("init_debug.log", $"Sysfs exception: {ex.Message}{Environment.NewLine}")
             Return False
         End Try
     End Function
-    
+
     Private Sub TryGetCapsLockViaLED()
         Try
             ' Alternative: Use X11 keyboard LED state through XInput if available
             ' This is a fallback method for systems where Xkb doesn't work
             System.IO.File.AppendAllText("init_debug.log", $"Trying LED-based detection...{Environment.NewLine}")
-            
+
             ' For now, default to False - LED detection is complex and system-dependent
             ' In a real implementation, you might use XInput or read /sys/class/leds/
             System.IO.File.AppendAllText("init_debug.log", $"LED detection not implemented, keeping current state{Environment.NewLine}")
@@ -2123,7 +2123,7 @@ ElseIf IsOSPlatform(Linux) AndAlso pge_Display <> IntPtr.Zero Then
             System.IO.File.AppendAllText("init_debug.log", $"LED exception: {ex.Message}{Environment.NewLine}")
         End Try
     End Sub
-    
+
     Private Sub TryGetCapsLockViaXQueryKeymap()
         Try
             System.IO.File.AppendAllText("init_debug.log", $"Trying XQueryKeymap...{Environment.NewLine}")
@@ -2141,7 +2141,7 @@ ElseIf IsOSPlatform(Linux) AndAlso pge_Display <> IntPtr.Zero Then
             System.IO.File.AppendAllText("init_debug.log", $"XQueryKeymap exception: {ex.Message}{Environment.NewLine}")
         End Try
     End Sub
-    
+
     Private Sub TryGetCapsLockViaModifierMapping()
         Try
             System.IO.File.AppendAllText("init_debug.log", $"Trying XGetModifierMapping...{Environment.NewLine}")
@@ -2160,7 +2160,7 @@ ElseIf IsOSPlatform(Linux) AndAlso pge_Display <> IntPtr.Zero Then
 
     Private Sub SyncCapsLockState()
         Dim newCapsLockState As Boolean = False
-        
+
         If IsOSPlatform(OSPlatform.Windows) Then
             newCapsLockState = (Win32.GetKeyState(VK_CAPITAL) And 1) <> 0
         ElseIf IsOSPlatform(Linux) AndAlso pge_Display <> IntPtr.Zero Then
@@ -2175,7 +2175,7 @@ ElseIf IsOSPlatform(Linux) AndAlso pge_Display <> IntPtr.Zero Then
                 Marshal.FreeHGlobal(statePtr)
             End Try
         End If
-        
+
         ' Update the CapsLock lock state if it changed
         If m_capsLockState <> newCapsLockState Then
             m_capsLockState = newCapsLockState
@@ -3589,7 +3589,7 @@ next4:
                 'Dim e As X11.XKeyEvent = CType(xev, X11.XKeyEvent) ' Because DragonEye loves numpads
                 'X11.XLookupString(e, Nothing, 0, sym, Nothing)
                 'pKeyNewState(MapKeys(sym)) = True
-Case X11.XEventType.KeyRelease
+                                Case X11.XEventType.KeyRelease
                                     Dim key = CType(Marshal.PtrToStructure(xe, GetType(X11.XKeyEvent)), X11.XKeyEvent)
                                     Dim sym = X11.XLookupKeysym(key, 0)
                                     If MapKeys.ContainsKey(sym) Then
@@ -4069,7 +4069,7 @@ Case X11.XEventType.KeyRelease
         Singleton.MapKeys(VK_SPACE) = Key.SPACE
         Singleton.MapKeys(VK_MENU) = Key.ALT
         Singleton.MapKeys(VK_CAPITAL) = Key.CAPS_LOCK
-        
+
         ' Add X11 keysym mappings for Linux
         Singleton.MapKeys(&HFFE5) = Key.CAPS_LOCK ' XK_Caps_Lock
 
